@@ -1,0 +1,78 @@
+.loginContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100%;
+  align-items: center;
+}
+
+/* Left pannel */
+.loginBox {
+  display: grid;
+  padding: 0 5rem;
+  max-width: 24rem;
+  justify-self: center;
+}
+
+.loginTitle {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.loginSubtitle {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 40px;
+}
+
+.buttonWrapper {
+  margin: 24px 0;
+}
+
+.separator {
+  text-align: center;
+  margin: 16px 0;
+  font-size: 16px;
+  color: #888;
+}
+
+.googleButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.googleButton img {
+  margin-right: 10px;
+}
+
+.signupLink {
+  text-align: center;
+  margin-top: 30px;
+  font-size: 16px;
+  color: #666;
+}
+
+.signupLink a {
+  color: #4a90e2;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.signupLink a:hover {
+  color: #357abd;
+}
+
+/* Right pannel */
+.imageWrapper {
+  height: 100%;
+}
+
+.frontImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-top-left-radius: 1.5rem;
+  border-bottom-left-radius: 1.5rem;
+}
