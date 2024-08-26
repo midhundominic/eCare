@@ -10,6 +10,7 @@
   display: grid;
   padding: 0 5rem;
   max-width: 24rem;
+  width: 60%;
   justify-self: center;
 }
 

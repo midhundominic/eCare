@@ -17,7 +17,10 @@ const TextInput = (props) => {
 
   return (
     <div className={styles.inputGroup}>
-      <label htmlFor={name}>{title}</label>
+      <div className={styles.labelWrapper}>
+        <label htmlFor={name}>{title}</label>
+        {isRequired && <span className={styles.errorText}>*</span>}
+      </div>
       <input
         type={type}
         id={name}

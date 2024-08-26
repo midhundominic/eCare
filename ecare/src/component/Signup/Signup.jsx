@@ -17,72 +17,41 @@ const Signup = () => {
     password: "",
     confirmPassword: "",
   });
-  const [formError, setFormError] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const [formError, setFormError] = useState({});
 
   const handleChange = (event) => {
     const { name, value } = event.target;
 
     // Update the state
-    setformData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-
-    // Log to ensure the correct field is being updated
-    console.log(`Field updated: ${name}, Value: ${value}`);
-    console.log("Current formData state:", {
-      ...formData,
-      [name]: value,
-    });
+    setformData((prevState) => ({ ...prevState, [name]: value }));
+    setErrors({ ...errors, [name]: "" });
   };
 
   const validateForm = () => {
     const { name, email, password, confirmPassword } = formData;
     let errors = {};
-    let haveError = false;
     if (!name) {
       errors = { ...errors, name: "Please enter your name" };
-      haveError = true;
     }
     if (!email) {
       errors = { ...errors, email: "Please enter your email" };
-      haveError = true;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      errors.email = "Enter a valid email";
     }
     if (!password) {
       errors = { ...errors, password: "Please enter a password" };
-      haveError = true;
     }
     if (password !== confirmPassword) {
       errors = { ...errors, password: "Passwords do not match" };
-      haveError = true;
     }
-    setFormError(errors);
 
-    return haveError;
-    // if (!name || !email || !password || !confirmPassword) {
-    //   // alert("All fields are required!");
-    //   return false;
-    // }
-
-    // if (password !== confirmPassword) {
-    //   // alert("Passwords do not match!");
-    //   return false;
-    // }
-
-    // return true;
+    return errors;
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    validateForm();
-    console.log("formData before submission:", formData);
-
-    if (!validateForm()) {
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length === 0) {
       try {
         const { name, email, password } = formData;
         console.log("Submitting data:", { name, email, password });
@@ -94,7 +63,7 @@ const Signup = () => {
             password,
           }
         );
-
+        setFormError({});
         if (response.status === 201) {
           alert("SignUp Success");
           setformData({
@@ -111,6 +80,8 @@ const Signup = () => {
         console.error("Error response:", error.response);
         alert(error.response?.data.message || "Error Occurred");
       }
+    } else {
+      setFormError(validationErrors);
     }
   };
 
@@ -134,7 +105,7 @@ const Signup = () => {
           />
 
           <TextInput
-            type="email"
+            type="text"
             title="Email"
             name="email"
             value={formData.email}

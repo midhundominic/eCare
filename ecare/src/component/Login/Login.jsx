@@ -38,7 +38,7 @@ const Login = () => {
           </div>
 
           <div className={styles.separator}>or</div>
-          <Button varient="secondary">
+          <Button variant="secondary">
             <div className={styles.googleButton}>
               <img
                 src="https://img.icons8.com/color/16/000000/google-logo.png"
