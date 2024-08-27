@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
 import styles from "./signup.module.css";
 import FrontImage from "../../assets/images/img_front.png";
 import TextInput from "../Common/TextInput";
-import Checkbox from "../Common/Checkbox";
 import Button from "../Common/Button";
 import { LOGIN } from "../../router/routes";
+import { postSignup } from "../../services/patientServices";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -55,14 +54,11 @@ const Signup = () => {
       try {
         const { name, email, password } = formData;
         console.log("Submitting data:", { name, email, password });
-        const response = await axios.post(
-          "http://localhost:5000/api/Patient_Login",
-          {
-            name,
-            email,
-            password,
-          }
-        );
+        const response = await postSignup({
+          name,
+          email,
+          password,
+        });
         setFormError({});
         if (response.status === 201) {
           alert("SignUp Success");
