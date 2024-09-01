@@ -19,23 +19,21 @@ const TextInput = (props) => {
     <div className={styles.inputGroup}>
       <div className={styles.labelWrapper}>
         <label htmlFor={name}>{title}</label>
-        {isRequired && <span className={styles.errorText}>*</span>}
+        {isRequired && <span className={styles.required}>*</span>}
       </div>
       <input
         type={type}
         id={name}
         name={name}
         placeholder={placeholder}
-        // required={isRequired}
         onChange={onChange}
         onFocus={onFocus}
+        className={`${styles.input} ${error ? styles.inputError : ""}`}
       />
       {error && <span className={styles.errorText}>{error}</span>}
     </div>
   );
 };
-
-export default TextInput;
 
 TextInput.propTypes = {
   type: PropTypes.oneOf(["email", "password", "text"]).isRequired,
@@ -47,3 +45,5 @@ TextInput.propTypes = {
   onChange: PropTypes.func,
   onFocus: PropTypes.func,
 };
+
+export default TextInput;

@@ -1,14 +1,72 @@
-import React from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import styles from "./login.module.css";
 import FrontImage from "../../assets/images/img_front.png";
 import TextInput from "../Common/TextInput";
 import Checkbox from "../Common/Checkbox";
 import Button from "../Common/Button";
+import { HOME } from "../../router/routes";
+import { postSignin } from "../../services/patientServices";
 
 const Login = () => {
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [error, setError] = useState({});
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prevState) => ({ ...prevState, [name]: value }));
+    setError((prevState) => ({ ...prevState, [name]: "" }));
+  };
+
+  const validateForm = () => {
+    const { email, password } = formData;
+    let errors = {};
+    if (!email) {
+      errors.email = "Pleace enter your email";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      errors.email = "Enter a valid email";
+    }
+    if (!password) {
+      errors.password = "Pleace enter your password";
+    }
+
+    return errors;
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const validationErrors = validateForm();
+    console.log("11", validationErrors);
+    if (Object.keys(validationErrors).length === 0) {
+      try {
+        const { email, password } = formData;
+        const response = await postSignin({
+          email,
+          password,
+        });
+        setError({});
+        console.log("res", response);
+
+        alert("SignIn Success");
+        setFormData({
+          email: "",
+          password: "",
+        });
+        navigate(HOME);
+      } catch (err) {
+        console.error("Error response:", error.response);
+        alert(error.response?.data.message || "Error Occured");
+      }
+    } else {
+      setError(validationErrors);
+    }
+  };
 
   return (
     <div className={styles.loginContainer}>
@@ -17,20 +75,26 @@ const Login = () => {
         <span className={styles.loginSubtitle}>
           Enter your Credentials to access your account
         </span>
-        <form>
+        <form onSubmit={handleSubmit}>
           <TextInput
-            type="email"
+            type="text"
             title="Email"
             name="email"
+            onChange={handleChange}
+            onFocus={validateForm}
+            value={formData.email}
             placeholder="Enter your email"
-            isRequired={true}
+            error={error["email"]}
           />
           <TextInput
             type="password"
             title="Password"
             name="password"
+            onChange={handleChange}
+            onFocus={validateForm}
+            value={formData.password}
             placeholder="Enter your password"
-            isRequired={true}
+            error={error["password"]}
           />
           <Checkbox name="remember-me" title="Remember me" />
           <div className={styles.buttonWrapper}>

@@ -18,32 +18,63 @@ const Signup = () => {
   });
   const [formError, setFormError] = useState({});
 
+  const validateField = (name, value) => {
+    let error = "";
+    switch (name) {
+      case "name":
+        if (!value) {
+          error = "Please enter your name";
+        } else if (value.length < 3) {
+          error = "Name must be at least 3 characters long";
+        }
+        break;
+      case "email":
+        if (!value) {
+          error = "Please enter your email";
+        } else if (!/\S+@\S+\.\S+/.test(value)) {
+          error = "Enter a valid email";
+        }
+        break;
+      case "password":
+        if (!value) {
+          error = "Please enter a password";
+        } else if (!/[!@#$%^&*(),.?":{}|<>]/g.test(value)) {
+          error = "Password must contain at least one special character";
+        
+        } else if (value.length < 8) {
+          error = "Password must be at least 8 characters long";
+        }
+        break;
+      case "confirmPassword":
+        if (value !== formData.password) {
+          error = "Passwords do not match";
+        }
+        break;
+      default:
+        break;
+    }
+    return error;
+  };
+
   const handleChange = (event) => {
     const { name, value } = event.target;
 
     // Update the state
     setformData((prevState) => ({ ...prevState, [name]: value }));
-    setErrors({ ...errors, [name]: "" });
+
+    // Validate the field as the user types
+    const error = validateField(name, value);
+    setFormError((prevState) => ({ ...prevState, [name]: error }));
   };
 
   const validateForm = () => {
-    const { name, email, password, confirmPassword } = formData;
-    let errors = {};
-    if (!name) {
-      errors = { ...errors, name: "Please enter your name" };
-    }
-    if (!email) {
-      errors = { ...errors, email: "Please enter your email" };
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      errors.email = "Enter a valid email";
-    }
-    if (!password) {
-      errors = { ...errors, password: "Please enter a password" };
-    }
-    if (password !== confirmPassword) {
-      errors = { ...errors, password: "Passwords do not match" };
-    }
-
+    const errors = {};
+    Object.keys(formData).forEach((key) => {
+      const error = validateField(key, formData[key]);
+      if (error) {
+        errors[key] = error;
+      }
+    });
     return errors;
   };
 
@@ -54,11 +85,7 @@ const Signup = () => {
       try {
         const { name, email, password } = formData;
         console.log("Submitting data:", { name, email, password });
-        const response = await postSignup({
-          name,
-          email,
-          password,
-        });
+        const response = await postSignup({ name, email, password });
         setFormError({});
         if (response.status === 201) {
           alert("SignUp Success");
@@ -94,7 +121,6 @@ const Signup = () => {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            onFocus={validateForm}
             placeholder="Enter your Name"
             isRequired={true}
             error={formError["name"]}
@@ -106,7 +132,6 @@ const Signup = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            onFocus={validateForm}
             placeholder="Enter your email"
             isRequired={true}
             error={formError["email"]}
@@ -118,9 +143,9 @@ const Signup = () => {
             name="password"
             value={formData.password}
             onChange={handleChange}
-            onFocus={validateForm}
             placeholder="Enter your password"
             isRequired={true}
+            error={formError["password"]}
           />
 
           <TextInput
@@ -129,9 +154,9 @@ const Signup = () => {
             name="confirmPassword"
             value={formData.confirmPassword}
             onChange={handleChange}
-            onFocus={validateForm}
             placeholder="Confirm Password"
             isRequired={true}
+            error={formError["confirmPassword"]}
           />
           <div className={styles.buttonWrapper}>
             <Button type="submit">Signup</Button>

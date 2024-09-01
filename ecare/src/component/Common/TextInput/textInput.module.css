@@ -42,3 +42,18 @@ input:focus {
   color: red;
   font-size: 12px;
 }
+.required {
+  color: red;
+}
+
+.inputError {
+  border-color: red;
+}
+.input {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: border-color 0.3s ease;
+}
