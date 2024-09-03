@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import styles from "./signup.module.css";
 import FrontImage from "../../assets/images/img_front.png";
 import TextInput from "../Common/TextInput";
 import Button from "../Common/Button";
 import { LOGIN } from "../../router/routes";
 import { postSignup } from "../../services/patientServices";
+import LoginButton from "../LoginButton";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -40,7 +40,6 @@ const Signup = () => {
           error = "Please enter a password";
         } else if (!/[!@#$%^&*(),.?":{}|<>]/g.test(value)) {
           error = "Password must contain at least one special character";
-        
         } else if (value.length < 8) {
           error = "Password must be at least 8 characters long";
         }
@@ -59,7 +58,7 @@ const Signup = () => {
   const handleChange = (event) => {
     const { name, value } = event.target;
 
-    // Update the state
+    // Update the state with the new input value
     setformData((prevState) => ({ ...prevState, [name]: value }));
 
     // Validate the field as the user types
@@ -84,9 +83,10 @@ const Signup = () => {
     if (Object.keys(validationErrors).length === 0) {
       try {
         const { name, email, password } = formData;
-        console.log("Submitting data:", { name, email, password });
+        console.log("Submitting data:", formData);
         const response = await postSignup({ name, email, password });
         setFormError({});
+        console.log("response",response);
         if (response.status === 201) {
           alert("SignUp Success");
           setformData({
@@ -159,22 +159,14 @@ const Signup = () => {
             error={formError["confirmPassword"]}
           />
           <div className={styles.buttonWrapper}>
-            <Button type="submit">Signup</Button>
+            <LoginButton
+              primaryText="Signup"
+              secondaryText="Signup with Google"
+            />
           </div>
         </form>
-
-        <div className={styles.seperator}>or</div>
-        <Button variant="secondary">
-          <div className={styles.googleButton}>
-            <img
-              src="https://img.icons8.com/color/16/000000/google-logo.png"
-              alt="Google logo"
-            />
-            Sign in with Google
-          </div>
-        </Button>
         <div className={styles.signinLink}>
-          Have an account?{" "}
+          Have an account?
           <a
             href="#"
             onClick={(e) => {

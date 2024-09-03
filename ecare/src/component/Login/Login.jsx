@@ -5,9 +5,9 @@ import styles from "./login.module.css";
 import FrontImage from "../../assets/images/img_front.png";
 import TextInput from "../Common/TextInput";
 import Checkbox from "../Common/Checkbox";
-import Button from "../Common/Button";
 import { HOME } from "../../router/routes";
 import { postSignin } from "../../services/patientServices";
+import LoginButton from "../LoginButton";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -58,7 +58,12 @@ const Login = () => {
           email: "",
           password: "",
         });
-        navigate(HOME);
+        if(response.patient.role == 1){
+          console.log("role",response);
+          navigate(HOME);
+        }
+        
+        
       } catch (err) {
         console.error("Error response:", error.response);
         alert(error.response?.data.message || "Error Occured");
@@ -97,20 +102,13 @@ const Login = () => {
             error={error["password"]}
           />
           <Checkbox name="remember-me" title="Remember me" />
-          <div className={styles.buttonWrapper}>
-            <Button>Login</Button>
-          </div>
 
-          <div className={styles.separator}>or</div>
-          <Button variant="secondary">
-            <div className={styles.googleButton}>
-              <img
-                src="https://img.icons8.com/color/16/000000/google-logo.png"
-                alt="Google logo"
-              />
-              Sign in with Google
-            </div>
-          </Button>
+          <div className={styles.buttonWrapper}>
+            <LoginButton
+              primaryText="Login"
+              secondaryText="Sign in with Google"
+            />
+          </div>
           <div className={styles.signupLink}>
             Don’t have an account?{" "}
             <a
