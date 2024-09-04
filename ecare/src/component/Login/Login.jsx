@@ -8,6 +8,7 @@ import Checkbox from "../Common/Checkbox";
 import { HOME } from "../../router/routes";
 import { postSignin } from "../../services/patientServices";
 import LoginButton from "../LoginButton";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -53,17 +54,15 @@ const Login = () => {
         setError({});
         console.log("res", response);
 
-        alert("SignIn Success");
+        toast.success("Login Succesful");
         setFormData({
           email: "",
           password: "",
         });
-        if(response.patient.role == 1){
-          console.log("role",response);
+        if (response.patient.role == 1) {
+          console.log("role", response);
           navigate(HOME);
         }
-        
-        
       } catch (err) {
         console.error("Error response:", error.response);
         alert(error.response?.data.message || "Error Occured");

@@ -7,6 +7,7 @@ import Button from "../Common/Button";
 import { LOGIN } from "../../router/routes";
 import { postSignup } from "../../services/patientServices";
 import LoginButton from "../LoginButton";
+import { toast } from "react-toastify";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -86,19 +87,14 @@ const Signup = () => {
         console.log("Submitting data:", formData);
         const response = await postSignup({ name, email, password });
         setFormError({});
-        console.log("response",response);
-        if (response.status === 201) {
-          alert("SignUp Success");
-          setformData({
-            name: "",
-            email: "",
-            password: "",
-            confirmPassword: "",
-          });
-          navigate(LOGIN);
-        } else {
-          alert("SignUp Failed");
-        }
+        toast.success("Account created succesfully.");
+        setformData({
+          name: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+        navigate(LOGIN);
       } catch (error) {
         console.error("Error response:", error.response);
         alert(error.response?.data.message || "Error Occurred");

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast, Slide } from "react-toastify";
 
 const apiClient = axios.create({
   baseURL: "http://localhost:5000/api",
@@ -19,9 +20,37 @@ apiClient.interceptors.request.use(
 );
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (response.status === 201) {
+      return response;
+    }
+    // Handle non-200 responses
+    toast.error("Unexpected response status: " + response.status);
+    return Promise.reject(new Error("Unexpected response status"));
+  },
   (error) => {
-    // Handle errors globally
+    let errorMessage = "An error occurred. Please try again later.";
+
+    // Check if the error is due to a network issue (backend is down)
+    if (!error.response) {
+      errorMessage =
+        "Network error: Unable to reach the server. Please check your connection or try again later.";
+    }
+    // Check for specific HTTP status errors (e.g., 400 Bad Request)
+    else if (error.response.status === 400) {
+      errorMessage =
+        error.response.data.message ||
+        "Bad request: Please check your input and try again.";
+    }
+    // Handle other HTTP status errors if needed
+    else if (error.response.status >= 500) {
+      errorMessage =
+        "Server error: Something went wrong on our end. Please try again later.";
+    }
+    // Show the error message in a toast notification
+    toast.dismiss();
+    toast.error(errorMessage);
+
     return Promise.reject(error);
   }
 );
