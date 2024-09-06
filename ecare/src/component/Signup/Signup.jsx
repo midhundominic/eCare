@@ -84,10 +84,9 @@ const Signup = () => {
     if (Object.keys(validationErrors).length === 0) {
       try {
         const { name, email, password } = formData;
-        console.log("Submitting data:", formData);
         const response = await postSignup({ name, email, password });
         setFormError({});
-        toast.success("Account created succesfully.");
+        toast.success("Account created successfully.");
         setformData({
           name: "",
           email: "",

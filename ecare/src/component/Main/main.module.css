@@ -1,0 +1,40 @@
+.mainContent {
+  position: fixed;
+  top: 55px;
+  left: 240px; /* Start off-screen */
+  width: calc(100% - 280px);
+  height: 100%;
+  background-color: #fff;
+  padding: 20px;
+}
+
+.sidePanelDesktop {
+  display: block;
+  position: fixed;
+  top: 53px;
+  left: 0px; /* Start off-screen */
+  width: 200px;
+  height: 100%;
+  background-color: #444;
+  transition: left 0.3s ease;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.panelNav {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .mainContent {
+    left: 0;
+    top: 53px;
+    width: calc(100% - 40px);
+  }
+  .sidePanelDesktop {
+    display: none;
+  }
+}

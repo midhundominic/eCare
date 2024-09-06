@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { toast } from "react-toastify";
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { firebaseApp } from "../../firebase";
+import { postSignin, authWithGoogleService } from "../../services/patientServices";
 import styles from "./login.module.css";
 import FrontImage from "../../assets/images/img_front.png";
 import TextInput from "../Common/TextInput";
 import Checkbox from "../Common/Checkbox";
-import { HOME } from "../../router/routes";
-import { postSignin } from "../../services/patientServices";
 import LoginButton from "../LoginButton";
-import { toast } from "react-toastify";
+//import axios from "axios";
+import { HOME } from "../../router/routes";
+
+const auth = getAuth(firebaseApp);
+const googleProvider = new GoogleAuthProvider();
 
 const Login = () => {
   const navigate = useNavigate();
@@ -16,8 +21,8 @@ const Login = () => {
     email: "",
     password: "",
   });
-
   const [error, setError] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -29,49 +34,91 @@ const Login = () => {
     const { email, password } = formData;
     let errors = {};
     if (!email) {
-      errors.email = "Pleace enter your email";
+      errors.email = "Please enter your email";
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       errors.email = "Enter a valid email";
     }
     if (!password) {
-      errors.password = "Pleace enter your password";
+      errors.password = "Please enter your password";
     }
-
     return errors;
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const validationErrors = validateForm();
-    console.log("11", validationErrors);
     if (Object.keys(validationErrors).length === 0) {
       try {
+        setIsLoading(true);
         const { email, password } = formData;
-        const response = await postSignin({
-          email,
-          password,
-        });
+        const response = await postSignin({ email, password });
+        setIsLoading(false);
         setError({});
-        console.log("res", response);
 
-        toast.success("Login Succesful");
+        toast.success("Login Successful.");
         setFormData({
           email: "",
           password: "",
         });
-        if (response.patient.role == 1) {
-          console.log("role", response);
+
+        if (response.patient.role === 1) {
           navigate(HOME);
         }
       } catch (err) {
-        console.error("Error response:", error.response);
-        alert(error.response?.data.message || "Error Occured");
+        setIsLoading(false);
+        toast.error(err.response?.data.message || "Error Occurred");
       }
     } else {
       setError(validationErrors);
     }
   };
 
+  const signInWithGoogle = () => {
+    signInWithPopup(auth, googleProvider)
+      .then((result) => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        const user = result.user;
+
+        const fields = {
+          name: user.providerData[0].displayName,
+          email: user.providerData[0].email,
+          password: null,
+          images: user.providerData[0].photoURL,
+          phone: user.providerData[0].phoneNumber,
+        };
+
+        authWithGoogleService(fields)
+          .then((res) => {
+            if (res.error !== true) {
+              localStorage.setItem("token", res.token);
+              const user = {
+                name: res.user?.name,
+                email: res.user?.email,
+                userId: res.user?.id,
+              };
+
+              localStorage.setItem("user", JSON.stringify(user));
+              toast.success("Sign in successful");
+
+              setTimeout(() => {
+                navigate(HOME);
+                setIsLoading(false);
+              }, 2000);
+            } else {
+              toast.error(res.msg);
+              setIsLoading(false);
+            }
+          })
+          .catch((error) => {
+            toast.error(error.response?.data.message || error.message);
+            setIsLoading(false);
+          });
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
+  };
   return (
     <div className={styles.loginContainer}>
       <div className={styles.loginBox}>
@@ -106,6 +153,7 @@ const Login = () => {
             <LoginButton
               primaryText="Login"
               secondaryText="Sign in with Google"
+              onGoogleSignIn={signInWithGoogle} // Add onClick handler for Google Sign-In
             />
           </div>
           <div className={styles.signupLink}>

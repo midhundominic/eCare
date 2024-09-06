@@ -1,8 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
-const authRoutes = require("./Routes/authRoutes");
 const cors = require("cors");
+const authRoutes = require("./Routes/authRoutes");
+require("dotenv").config();
 
 const app = express();
 
@@ -18,9 +18,9 @@ app.use("/api", authRoutes); // Use the routes
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-// Connect to MongoDB (adjust the URI as necessary)
+// Connect to MongoDB
 mongoose
-  .connect("mongodb://localhost:27017/E-care", {
+  .connect(process.env.MONGO_URI, {
     // useNewUrlParser: true,
     // useUnifiedTopology: true,
   })

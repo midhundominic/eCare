@@ -17,3 +17,14 @@ export const patientSignin = async (payload) => {
     throw error;
   }
 };
+
+export const authWithGoogle = async (payload) => {
+  try {
+    const response = await apiClient.post("/patientauthWithGoogle", payload);
+    return response;
+  } catch (error) {
+    console.error("Error on signin patient", error.response?.data || error.message);
+    throw error;
+  }
+};
+

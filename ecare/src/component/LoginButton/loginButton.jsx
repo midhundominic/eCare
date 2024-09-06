@@ -4,7 +4,7 @@ import googleIcon from "../../assets/icons/ic_google.png";
 import rightArrow from "../../assets/icons/ic_arrow_right.png";
 
 const LoginButton = (props) => {
-  const { primaryText, secondaryText } = props;
+  const { primaryText, secondaryText, onGoogleSignIn } = props;
   const [isGoogleHovered, setIsGoogleHovered] = useState(false);
   return (
     <div className="buttons-container">
@@ -13,7 +13,9 @@ const LoginButton = (props) => {
         <img src={rightArrow} alt="Continue" className="arrow-icon" />
       </button>
       <button
+        type="button"
         className="google-login-btn"
+        onClick={onGoogleSignIn}
         onMouseEnter={() => setIsGoogleHovered(true)}
         onMouseLeave={() => setIsGoogleHovered(false)}
       >

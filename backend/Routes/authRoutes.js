@@ -1,9 +1,10 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const authControllers = require('../controllers/authControllers'); // Adjust the path if necessary
+const authControllers = require("../controllers/authControllers"); // Adjust the path if necessary
 
 // Define the POST route for sign-up
-router.post('/patient_signup', authControllers.signup); // Ensure signUp is correctly defined in authControllers
-router.post('/patient_signin', authControllers.signin);
+router.post("/patient_signup", authControllers.signup); // Ensure signUp is correctly defined in authControllers
+router.post("/patient_signin", authControllers.signin);
+router.post("/patientauthWithGoogle", authControllers.authWithGoogle); // Add this route
 
 module.exports = router;
