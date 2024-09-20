@@ -1,0 +1,17 @@
+.loginContainer{
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    height: 100%; 
+}
+
+.loginBox{
+    max-width: 350px;
+}
+
+.submitButton{
+    display: block;
+    margin: 20px auto;
+    cursor: pointer;
+    margin-left: center;
+}
