@@ -1,4 +1,5 @@
 import React from "react";
+import { BrowserRouter } from "react-router-dom";
 import { ToastContainer, Slide } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -19,7 +20,9 @@ const App = () => {
         transition={Slide}
         theme="colored"
       />
-      <Router />
+      <BrowserRouter>
+        <Router />
+      </BrowserRouter>
     </div>
   );
 };

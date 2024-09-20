@@ -1,7 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import styles from "./textInput.module.css";
+import { combineStyles } from "../../../utils/combineStyleUtil";
+import internalStyles from "./textInput.module.css";
 
 const TextInput = (props) => {
   const {
@@ -13,7 +14,9 @@ const TextInput = (props) => {
     onChange = () => {},
     onFocus = () => {},
     error = "",
+    styles: customStyles = {},
   } = props;
+  const styles = combineStyles(internalStyles, customStyles);
 
   return (
     <div className={styles.inputGroup}>

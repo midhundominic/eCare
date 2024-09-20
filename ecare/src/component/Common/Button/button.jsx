@@ -16,7 +16,7 @@ const Button = (props) => {
   });
 
   return (
-    <button type="submit" name={name} className={buttonStyle} onClick={onClick}>
+    <button name={name} className={buttonStyle} onClick={onClick}>
       {children}
     </button>
   );

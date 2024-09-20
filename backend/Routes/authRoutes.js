@@ -1,9 +1,15 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const authControllers = require('../controllers/authControllers'); // Adjust the path if necessary
+const patientControllers = require("../controllers/patientControllers");
+const adminControllers = require("../controllers/adminController");
+const doctorControllers = require("../controllers/doctorController");
 
 // Define the POST route for sign-up
-router.post('/patient_signup', authControllers.signup); // Ensure signUp is correctly defined in authControllers
-router.post('/patient_signin', authControllers.signin);
+router.post("/patient-signup", patientControllers.signup);
+router.post("/patient-signin", patientControllers.signin);
+router.post("/patientauthWithGoogle", patientControllers.authWithGoogle); // Add this route
+router.post("/admin-signin", adminControllers.adminSignin);
+router.post("/doctor-registration", doctorControllers.registerDoctor);
+router.post("/doctor-signin", doctorControllers.signin);
 
 module.exports = router;

@@ -41,6 +41,12 @@
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
+.google-login-btn:disabled {
+  background-color: #e6a1a1; /* Duller, muted version of #357abd */
+  color: #cccccc; /* Muted text color */
+  cursor: not-allowed; /* Shows that the button is not clickable */
+}
+
 .google-login-btn:hover {
   flex: 1;
   min-width: 0;
@@ -75,6 +81,12 @@
   align-items: center;
   justify-content: center;
   position: relative;
+}
+
+.login-btn:disabled {
+  background-color: #a3b9d4; /* Duller, muted version of #357abd */
+  color: #cccccc; /* Muted text color */
+  cursor: not-allowed; /* Shows that the button is not clickable */
 }
 
 .login-btn .arrow-icon {

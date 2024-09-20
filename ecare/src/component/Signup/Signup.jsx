@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "./signup.module.css";
 import FrontImage from "../../assets/images/img_front.png";
 import TextInput from "../Common/TextInput";
-import Button from "../Common/Button";
-import { LOGIN } from "../../router/routes";
+import { ROUTES } from "../../router/routes";
 import { postSignup } from "../../services/patientServices";
 import LoginButton from "../LoginButton";
 import { toast } from "react-toastify";
@@ -58,8 +57,6 @@ const Signup = () => {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-
-    // Update the state with the new input value
     setformData((prevState) => ({ ...prevState, [name]: value }));
 
     // Validate the field as the user types
@@ -84,17 +81,16 @@ const Signup = () => {
     if (Object.keys(validationErrors).length === 0) {
       try {
         const { name, email, password } = formData;
-        console.log("Submitting data:", formData);
         const response = await postSignup({ name, email, password });
         setFormError({});
-        toast.success("Account created succesfully.");
+        toast.success("Account created successfully.");
         setformData({
           name: "",
           email: "",
           password: "",
           confirmPassword: "",
         });
-        navigate(LOGIN);
+        navigate(ROUTES.LOGIN);
       } catch (error) {
         console.error("Error response:", error.response);
         alert(error.response?.data.message || "Error Occurred");
@@ -167,7 +163,7 @@ const Signup = () => {
             href="#"
             onClick={(e) => {
               e.preventDefault();
-              navigate(LOGIN);
+              navigate(ROUTES.LOGIN);
             }}
           >
             Sign In

@@ -60,4 +60,48 @@ export const NAV_CONTENT_ADMIN = [
     link: ROUTES.DOCTOR_REGISTER,
     icon: PeopleRoundedIcon,
   },
+  {
+    id:4,
+    title:"Care Coordinator",
+    link: ROUTES.COORDINATOR_REGISTER,
+    icon: PeopleRoundedIcon,
+  },
 ];
+
+export const NAV_CONTENT_DOCTOR = [
+  {
+    id: 1,
+    title: "Dashboard",
+    link: ROUTES.DEFAULT_HOME,
+    icon: DashboardCustomizeRoundedIcon,
+  },
+  {
+    id: 2,
+    title: "Appointments",
+    link: ROUTES.ADMIN_DOC_LIST,
+    icon: BadgeRoundedIcon,
+  },
+  {
+    id: 3,
+    title: "Patients",
+    link: ROUTES.DOCTOR_REGISTER,
+    icon: PeopleRoundedIcon,
+  },
+];
+
+export const NAV_CONTENT_COORDINATOR = [
+  {
+    id: 1,
+    title: "Dashboard",
+    link: ROUTES.DEFAULT_HOME,
+    icon: DashboardCustomizeRoundedIcon,
+  },
+ 
+  {
+    id: 2,
+    title: "Patients",
+    link: ROUTES.DOCTOR_REGISTER,
+    icon: PeopleRoundedIcon,
+  },
+];
+
