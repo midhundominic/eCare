@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import EastRoundedIcon from "@mui/icons-material/EastRounded";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
-import { NAV_CONTENT_ADMIN, NAV_CONTENT_PATIENT } from "./navContent";
+import { NAV_CONTENT_ADMIN, NAV_CONTENT_COORDINATOR, NAV_CONTENT_DOCTOR, NAV_CONTENT_PATIENT } from "./navContent";
 import styles from "./sideNav.module.css";
 import { ROUTES } from "../../router/routes";
 
@@ -38,6 +38,10 @@ const SideNav = () => {
         return NAV_CONTENT_ADMIN;
       case 1:
         return NAV_CONTENT_PATIENT;
+      case 2:
+        return NAV_CONTENT_DOCTOR;
+      case 3:
+        return NAV_CONTENT_COORDINATOR;
       default:
         return NAV_CONTENT_PATIENT;
     }

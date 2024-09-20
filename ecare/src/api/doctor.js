@@ -1,8 +1,17 @@
 import apiClient from "./index";
 
-export const doctorReg = async (payload) => {
+export const doctorSignup = async (payload) => {
     try {
-      const response = await apiClient.post("/doctor_register", payload);
+      const response = await apiClient.post("/doctor-registration", payload);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  export const doctorSignin = async (payload) => {
+    try {
+      const response = await apiClient.post("/doctor-signin", payload);
       return response.data;
     } catch (error) {
       throw error;

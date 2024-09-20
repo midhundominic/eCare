@@ -10,7 +10,7 @@
 .signupBox {
   display: grid;
   padding: 0 5rem;
-  max-height: 85vh;
+  max-height: 90vh;
   max-width: 24rem;
   width: 60%;
   justify-self: center;

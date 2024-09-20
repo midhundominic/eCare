@@ -10,8 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^6.0.2",
+    "@mui/material": "^6.0.2",
+    "@mui/x-date-pickers": "^7.16.0",
     "axios": "^1.7.4",
+    "bcrypt": "^5.1.1",
+    "clsx": "^2.1.1",
     "cors": "^2.8.5",
+    "dayjs": "^1.11.13",
     "express": "^4.19.2",
     "firebase": "^10.13.0",
     "frame": "^1.0.0-alpha.2",
