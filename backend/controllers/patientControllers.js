@@ -1,4 +1,4 @@
-const PatientModel = require("../models/patientModel"); // Update to your model's path
+const PatientModel = require("../models/patientModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -10,7 +10,6 @@ const signup = async (req, res) => {
   }
 
   try {
-    // Check if user already exists
     const existingUser = await PatientModel.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
@@ -33,32 +32,6 @@ const signup = async (req, res) => {
   }
 };
 
-const signin = async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
-
-  try {
-    //check the user exist
-    const patient = await PatientModel.findOne({ email });
-
-    if (!patient) {
-      return res.status(401).json({ message: "User not found" });
-    }
-
-    if (patient.password !== password) {
-      return res.status(401).json({ message: "Invalid password" });
-    }
-    res.status(201).json({
-      message: "Login Successsful",
-      data: { email: patient.email, role: patient.role, name: patient.name },
-    });
-  } catch (error) {
-    res.status(500).json({ message: "server error" });
-  }
-};
-
 const authWithGoogle = async (req, res) => {
   const { name, email } = req.body;
 
@@ -69,7 +42,7 @@ const authWithGoogle = async (req, res) => {
       user = new PatientModel({
         name,
         email,
-        password: "", // No password needed for Google sign-in
+        password: "",
         role: 1,
       });
 
@@ -94,8 +67,17 @@ const authWithGoogle = async (req, res) => {
   }
 };
 
+const getAllPatient = async (req, res) => {
+  try {
+    const patient = await PatientModel.find({});
+    res.status(201).json({ data: patient });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
 module.exports = {
   signup,
-  signin,
   authWithGoogle,
+  getAllPatient,
 };

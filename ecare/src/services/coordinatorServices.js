@@ -1,4 +1,4 @@
-import { coordinatorSignin, coordinatorSignup } from "../api/coordinator";
+import { coordinatorSignin, coordinatorSignup, coordinatorView } from "../api/coordinator";
 
 export const regCoordinator = async (payload) => {
   try {
@@ -16,6 +16,16 @@ export const postSigninCoordinator = async (payload) => {
       return response;
     } catch (error) {
       console.error("Error on signin Coordinator", error);
+      throw error;
+    }
+  };
+
+  export const getCoordinator = async () => {
+    try {
+      const response = await coordinatorView();
+      return response;
+    } catch (error) {
+      console.error("Error fetching doctors list", error);
       throw error;
     }
   };

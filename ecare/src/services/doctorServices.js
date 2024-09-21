@@ -1,4 +1,4 @@
-import { doctorSignup, doctorSignin } from "../api/doctor";
+import { doctorSignup, doctorSignin, doctorView } from "../api/doctor";
 
 export const regDoctor = async (payload) => {
   try {
@@ -16,6 +16,16 @@ export const postSigninDoctor = async (payload) => {
     return response;
   } catch (error) {
     console.error("Error on signin patient", error);
+    throw error;
+  }
+};
+
+export const getDoctors = async () => {
+  try {
+    const response = await doctorView();
+    return response;
+  } catch (error) {
+    console.error("Error fetching doctors list", error);
     throw error;
   }
 };

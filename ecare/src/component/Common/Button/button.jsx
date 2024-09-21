@@ -1,10 +1,19 @@
 import React, { useMemo } from "react";
 import PropTypes from "prop-types";
+import { combineStyles } from "../../../utils/combineStyleUtil";
 
-import styles from "./button.module.css";
+import internalStyles from "./button.module.css";
 
 const Button = (props) => {
-  const { variant = "primary", name, children, onClick } = props;
+  const {
+    variant = "primary",
+    name,
+    children,
+    onClick,
+    styles: customStyles = {},
+  } = props;
+
+  const styles = combineStyles(internalStyles, customStyles);
 
   const buttonStyle = useMemo(() => {
     switch (variant) {

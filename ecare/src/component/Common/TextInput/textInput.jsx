@@ -8,6 +8,7 @@ const TextInput = (props) => {
   const {
     type,
     name,
+    value,
     title = "",
     placeholder = "",
     isRequired = false,
@@ -28,6 +29,7 @@ const TextInput = (props) => {
         type={type}
         id={name}
         name={name}
+        value={value}
         placeholder={placeholder}
         onChange={onChange}
         onFocus={onFocus}
@@ -41,6 +43,7 @@ const TextInput = (props) => {
 TextInput.propTypes = {
   type: PropTypes.oneOf(["email", "password", "text"]).isRequired,
   name: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
   title: PropTypes.string,
   placeholder: PropTypes.string,
   error: PropTypes.string,

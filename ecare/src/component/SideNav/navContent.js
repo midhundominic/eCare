@@ -57,13 +57,13 @@ export const NAV_CONTENT_ADMIN = [
   {
     id: 3,
     title: "Patients",
-    link: ROUTES.DOCTOR_REGISTER,
+    link: ROUTES.ADMIN_PATIENT_LIST,
     icon: PeopleRoundedIcon,
   },
   {
     id:4,
     title:"Care Coordinator",
-    link: ROUTES.COORDINATOR_REGISTER,
+    link: ROUTES.ADMIN_COORDINATOR_LIST,
     icon: PeopleRoundedIcon,
   },
 ];

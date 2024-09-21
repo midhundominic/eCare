@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
 import styles from "./register.module.css";
 import TextInput from "../../Common/TextInput";
 import Button from "../../Common/Button";
 import { regDoctor } from "../../../services/doctorServices";
-import { toast } from "react-toastify";
 import { ROUTES } from "../../../router/routes";
+import PageTitle from "../../Common/PageTitle";
+import RadioButton from "../../Common/RadioButton";
+import SelectBox from "../../Common/SelectBox";
 
 const DoctorRegistration = () => {
   const navigate = useNavigate();
@@ -16,7 +20,7 @@ const DoctorRegistration = () => {
     phone: "",
     specialization: "",
     experience: "",
-    y_experience:"",
+    y_experience: "",
     gender: "",
     password: "",
     c_password: "",
@@ -31,8 +35,7 @@ const DoctorRegistration = () => {
   };
 
   const handleSubmit = async (event) => {
-    event.preventDefault(); 
-
+    event.preventDefault();
     const {
       firstName,
       lastName,
@@ -68,7 +71,7 @@ const DoctorRegistration = () => {
         specialization: "",
         experience: "",
         gender: "",
-        y_experience:"",
+        y_experience: "",
         password: "",
         c_password: "",
       });
@@ -82,122 +85,126 @@ const DoctorRegistration = () => {
   return (
     <div className={styles.registerContainer}>
       <div className={styles.registerBox}>
-        <span className={styles.signupSubtitle}>Register a New Doctor</span>
+        <PageTitle>Register a New Doctor</PageTitle>
         <form onSubmit={handleSubmit}>
-          <TextInput
-            type="text"
-            title="First Name"
-            name="firstName"
-            placeholder="Enter First Name"
-            value={formData.firstName}
-            onChange={handleChange}
-            isRequired={true}
-          />
-          <TextInput
-            type="text"
-            title="Last Name"
-            name="lastName"
-            placeholder="Enter Last Name"
-            value={formData.lastName}
-            onChange={handleChange}
-            isRequired={true}
-          />
+          <div className={styles.formContent}>
+            <TextInput
+              type="text"
+              title="First Name"
+              name="firstName"
+              placeholder="Enter First Name"
+              value={formData.firstName}
+              onChange={handleChange}
+              isRequired={true}
+              styles={{ inputGroup: styles.customizeInputGroup }}
+            />
+            <TextInput
+              type="text"
+              title="Last Name"
+              name="lastName"
+              placeholder="Enter Last Name"
+              value={formData.lastName}
+              onChange={handleChange}
+              isRequired={true}
+              styles={{ inputGroup: styles.customizeInputGroup }}
+            />
 
-          <label className={styles.inputLabel} htmlFor="text">
-            Experience
-          </label>
-          <select
-            name="experience"
-            onChange={handleChange}
-            className={styles.inputField}
-            required
-          >
-            <option value="">Select Experience</option>
-            <option value="Senior">Senior</option>
-            <option value="Junior">Junior</option>
-          </select>
+            <SelectBox
+              name="experience"
+              title="Experience Level"
+              value={formData.experience}
+              isRequired
+              onChange={handleChange}
+              options={[
+                { value: "senior", label: "Senior" },
+                { value: "junior", label: "junior" },
+                { value: "mid-level", label: "Mid-Level" },
+              ]}
+              styles={{ selectBoxRoot: styles.selectBoxRoot }}
+            />
 
-          <label className={styles.inputLabel} htmlFor="gender">
-            Gender
-          </label>
-          <select
-            name="gender"
-            value={formData.gender}
-            onChange={handleChange}
-            className={styles.inputField}
-            required
-          >
-            <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
+            
+            <RadioButton
+              isRequired
+              name="gender"
+              title="Gender"
+              labels={[
+                { value: "male", label: "Male" },
+                { value: "female", label: "Female" },
+                { value: "others", label: "Others" },
+              ]}
+              onChange={handleChange}
+            />
+            <TextInput
+              type="text"
+              title="Email"
+              name="email"
+              placeholder="Enter email"
+              value={formData.email}
+              onChange={handleChange}
+              isRequired={true}
+              styles={{ inputGroup: styles.customizeInputGroup }}
+            />
+            <TextInput
+              type="text"
+              title="Phone No"
+              name="phone"
+              placeholder="Enter Phone number"
+              value={formData.phone}
+              onChange={handleChange}
+              isRequired={true}
+              styles={{ inputGroup: styles.customizeInputGroup }}
+            />
+            <TextInput
+              type="text"
+              title="specialization"
+              name="specialization"
+              placeholder="Enter specialization"
+              value={formData.specialization}
+              onChange={handleChange}
+              isRequired={true}
+              styles={{ inputGroup: styles.customizeInputGroup }}
+            />
+            <SelectBox
+              name="y_experience"
+              title="Year of Experience"
+              value={formData.y_experience}
+              isRequired
+              onChange={handleChange}
+              options={[
+                { value: "0-2", label: "0-2 Years" },
+                { value: "3-5", label: "3-5 Years" },
+                { value: ">6", label: "More than 6 Years" },
+              ]}
+              styles={{ selectBoxRoot: styles.selectBoxRoot }}
+            />
 
-          <TextInput
-            type="text"
-            title="Email"
-            name="email"
-            placeholder="Enter email"
-            value={formData.email}
-            onChange={handleChange}
-            isRequired={true}
-          />
-          <TextInput
-            type="text"
-            title="Phone No"
-            name="phone"
-            placeholder="Enter Phone number"
-            value={formData.phone}
-            onChange={handleChange}
-            isRequired={true}
-          />
-          <TextInput
-            type="text"
-            title="specialization"
-            name="specialization"
-            placeholder="Enter specialization"
-            value={formData.specialization}
-            onChange={handleChange}
-            isRequired={true}
-          />
-          <label className={styles.inputLabel} htmlFor="y_experience">
-            Year of Experience
-          </label>
-          <select
-            name="y_experience"
-            value={formData.y_experience}
-            onChange={handleChange}
-            className={styles.inputField}
-            required
-          >
-            <option value="">Select</option>
-            <option value="0-2 Years">0-2 Years</option>
-            <option value="3-5 Years">3-5 Years</option>
-            <option value="More than 6 Years">More than 6 Years</option>
-          </select>
-
-          <TextInput
-            type="text"
-            title="Password"
-            name="password"
-            placeholder="Enter Password"
-            value={formData.password}
-            onChange={handleChange}
-            isRequired={true}
-          />
-          <TextInput
-            type="text"
-            title="Confirm Password"
-            name="c_password"
-            placeholder="Confirm password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            isRequired={true}
-          />
-
-          <Button type="submit" className={styles.saveButton}>
-            Save
-          </Button>
+            <TextInput
+              type="text"
+              title="Password"
+              name="password"
+              placeholder="Enter Password"
+              value={formData.password}
+              onChange={handleChange}
+              isRequired={true}
+              styles={{ inputGroup: styles.customizeInputGroup }}
+            />
+            <TextInput
+              type="text"
+              title="Confirm Password"
+              name="c_password"
+              placeholder="Confirm password"
+              value={formData.c_password}
+              onChange={handleChange}
+              isRequired={true}
+              styles={{ inputGroup: styles.customizeInputGroup }}
+            />
+          </div>
+          <div className={styles.buttonContainer}>
+            <Button type="submit" styles={{ btnPrimary: styles.newButton }}>
+              Create Doctor
+            </Button>
+          </div>
         </form>
       </div>
     </div>

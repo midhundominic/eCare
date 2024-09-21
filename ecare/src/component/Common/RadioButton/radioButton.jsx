@@ -20,7 +20,7 @@ const RadioButton = (props) => {
         {isRequired && <span className={styles.required}>*</span>}
       </div>
 
-      <div class={styles.radioSelection}>
+      <div className={styles.radioSelection}>
         {labels.map((item) => {
           return (
             <label key={item.value}>

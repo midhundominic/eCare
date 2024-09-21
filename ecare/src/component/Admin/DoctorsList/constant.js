@@ -1,32 +1,33 @@
 export const HEAD_CELLS = [
-  {
-    id: "name",
-    numeric: false,
-    disablePadding: true,
-    label: "Dessert (100g serving)",
-  },
-  {
-    id: "calories",
-    numeric: true,
-    disablePadding: false,
-    label: "Calories",
-  },
-  {
-    id: "fat",
-    numeric: true,
-    disablePadding: false,
-    label: "Fat (g)",
-  },
-  {
-    id: "carbs",
-    numeric: true,
-    disablePadding: false,
-    label: "Carbs (g)",
-  },
-  {
-    id: "protein",
-    numeric: true,
-    disablePadding: false,
-    label: "Protein (g)",
-  },
-];
+    {
+      id: "name",
+      numeric: false,
+      disablePadding: true,
+      label: "Name",
+    },
+    {
+      id: "email",
+      numeric: false,
+      disablePadding: false,
+      label: "Email",
+    },
+    {
+      id: "specialization",
+      numeric: false,
+      disablePadding: false,
+      label: "Specialization",
+    },
+    {
+      id: "phone",
+      numeric: false,
+      disablePadding: false,
+      label: "Phone",
+    },
+    {
+      id: "experience",
+      numeric: false,
+      disablePadding: false,
+      label: "Experience (Years)",
+    },
+  ];
+  
