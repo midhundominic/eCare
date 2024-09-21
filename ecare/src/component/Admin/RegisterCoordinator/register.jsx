@@ -6,6 +6,8 @@ import Button from "../../Common/Button";
 import { toast } from "react-toastify";
 import { ROUTES } from "../../../router/routes";
 import { regCoordinator } from "../../../services/coordinatorServices";
+import PageTitle from "../../Common/PageTitle";
+import RadioButton from "../../Common/RadioButton";
 
 const CoordinatorRegistration = () => {
   const navigate = useNavigate();
@@ -28,16 +30,9 @@ const CoordinatorRegistration = () => {
   };
 
   const handleSubmit = async (event) => {
-    event.preventDefault(); 
+    event.preventDefault();
 
-    const {
-      firstName,
-      lastName,
-      email,
-      phone,
-      gender,
-      password,
-    } = formData;
+    const { firstName, lastName, email, phone, gender, password } = formData;
 
     try {
       const response = await regCoordinator({
@@ -70,87 +65,91 @@ const CoordinatorRegistration = () => {
   return (
     <div className={styles.registerContainer}>
       <div className={styles.registerBox}>
-        <span className={styles.signupSubtitle}>Register a New Care Coordinator</span>
+        <PageTitle>Register a New Care Coordinator</PageTitle>
         <form onSubmit={handleSubmit}>
-          <TextInput
-            type="text"
-            title="First Name"
-            name="firstName"
-            placeholder="Enter First Name"
-            value={formData.firstName}
-            onChange={handleChange}
-            isRequired={true}
-          />
-          <TextInput
-            type="text"
-            title="Last Name"
-            name="lastName"
-            placeholder="Enter Last Name"
-            value={formData.lastName}
-            onChange={handleChange}
-            isRequired={true}
-          />
+          <div className={styles.formContent}>
+            <TextInput
+              type="text"
+              title="First Name"
+              name="firstName"
+              placeholder="Enter First Name"
+              value={formData.firstName}
+              onChange={handleChange}
+              isRequired={true}
+              styles={{ inputGroup: styles.customizeInputGroup }}
+            />
+            <TextInput
+              type="text"
+              title="Last Name"
+              name="lastName"
+              placeholder="Enter Last Name"
+              value={formData.lastName}
+              onChange={handleChange}
+              isRequired={true}
+              styles={{ inputGroup: styles.customizeInputGroup }}
+            />
 
-        
+            <RadioButton
+              isRequired
+              name="gender"
+              title="Gender"
+              value={formData.gender}
+              onChange={handleChange}
+              labels={[
+                { value: "male", label: "Male" },
+                { value: "female", label: "Female" },
+                { value: "others", label: "Others" },
+              ]}
+              styles={{ selectBoxRoot: styles.selectBoxRoot }}
+            />
 
-          <label className={styles.inputLabel} htmlFor="gender">
-            Gender
-          </label>
-          <select
-            name="gender"
-            value={formData.gender}
-            onChange={handleChange}
-            className={styles.inputField}
-            required
-          >
-            <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
+            <TextInput
+              type="text"
+              title="Email"
+              name="email"
+              placeholder="Enter email"
+              value={formData.email}
+              onChange={handleChange}
+              isRequired={true}
+              styles={{ inputGroup: styles.customizeInputGroup }}
+            />
+            <TextInput
+              type="text"
+              title="Phone No"
+              name="phone"
+              placeholder="Enter Phone number"
+              value={formData.phone}
+              onChange={handleChange}
+              isRequired={true}
+              styles={{ inputGroup: styles.customizeInputGroup }}
+            />
 
-          <TextInput
-            type="text"
-            title="Email"
-            name="email"
-            placeholder="Enter email"
-            value={formData.email}
-            onChange={handleChange}
-            isRequired={true}
-          />
-          <TextInput
-            type="text"
-            title="Phone No"
-            name="phone"
-            placeholder="Enter Phone number"
-            value={formData.phone}
-            onChange={handleChange}
-            isRequired={true}
-          />
-          
-
-          <TextInput
-            type="text"
-            title="Password"
-            name="password"
-            placeholder="Enter Password"
-            value={formData.password}
-            onChange={handleChange}
-            isRequired={true}
-          />
-          <TextInput
-            type="text"
-            title="Confirm Password"
-            name="c_password"
-            placeholder="Confirm password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            isRequired={true}
-          />
-
-          <Button type="submit" className={styles.saveButton}>
-            Save
-          </Button>
+            <TextInput
+              type="text"
+              title="Password"
+              name="password"
+              placeholder="Enter Password"
+              value={formData.password}
+              onChange={handleChange}
+              isRequired={true}
+              styles={{ inputGroup: styles.customizeInputGroup }}
+            />
+            <TextInput
+              type="text"
+              title="Confirm Password"
+              name="c_password"
+              placeholder="Confirm password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              isRequired={true}
+              styles={{ inputGroup: styles.customizeInputGroup }}
+            />
+          </div>
+          <div className={styles.buttonContainer}>
+            <Button type="submit" styles={{ btnPrimary: styles.newButton }}>
+              Create Coordinator
+            </Button>
+          </div>
         </form>
       </div>
     </div>

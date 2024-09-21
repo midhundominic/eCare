@@ -30,3 +30,12 @@ export const authWithGoogle = async (payload) => {
     throw error;
   }
 };
+
+export const patientView= async(payload)=>{
+  try{
+    const response= await apiClient.get("/patients-view",payload);
+    return response.data;
+  }catch(error){
+    throw error;
+  }
+}

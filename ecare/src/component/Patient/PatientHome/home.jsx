@@ -1,13 +1,14 @@
 import React from "react";
 
-import NotificationsNoneRoundedIcon from '@mui/icons-material/NotificationsNoneRounded';
+import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
 import styles from "./patientHome.module.css";
+import PageTitle from "../../Common/PageTitle";
 
 const Home = () => {
   return (
     <div>
       <div className={styles.titleContainer}>
-        <h2 className={styles.title}>Dashboard</h2>
+        <PageTitle>Dashboard</PageTitle>
         <div className={styles.notificationWrapper}>
           <NotificationsNoneRoundedIcon
             style={{ color: "white", fontSize: "20px" }}

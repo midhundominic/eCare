@@ -80,6 +80,7 @@ const Login = () => {
             title="Email"
             name="email"
             placeholder="Enter your Email"
+            value={formData.email}
             onChange={handleChange}
             error={error.email}
           />
@@ -88,6 +89,7 @@ const Login = () => {
             title="Password"
             name="password"
             placeholder="Enter your Password"
+            value={formData.password}
             onChange={handleChange}
             error={error.password}
           />

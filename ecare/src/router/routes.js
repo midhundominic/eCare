@@ -12,6 +12,8 @@ export const ROUTES = {
   DOCTOR_REGISTER: "/doctor/reg",
   COORDINATOR_REGISTER: "/coordinator/reg",
   COORDINATOR_HOME:"/coordinator/home",
+  ADMIN_COORDINATOR_LIST:"/admin/coordinator",
+  ADMIN_PATIENT_LIST:"/admin/patient"
 };
 
 export const NON_AUTH_ROUTES = [
@@ -24,4 +26,6 @@ export const NON_AUTH_ROUTES = [
   ROUTES.DOCTOR_HOME,
   ROUTES.COORDINATOR_REGISTER,
   ROUTES.COORDINATOR_HOME,
+  ROUTES.ADMIN_COORDINATOR_LIST,
+  ROUTES.ADMIN_PATIENT_LIST,
 ];

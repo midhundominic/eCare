@@ -15,6 +15,8 @@ import DoctorsList from "../component/Admin/DoctorsList";
 import DoctorHome from "../component/Doctor/DoctorHome";
 import CoordinatorHome from "../component/Coordinator/CoordinatorHome";
 import CoordinatorRegister from "../component/Admin/RegisterCoordinator";
+import CoordinatorList from "../component/Admin/CoordinatorList";
+import PatientList from "../component/Admin/PatientiList";
 
 const Router = () => {
   const location = useLocation();
@@ -37,16 +39,27 @@ const Router = () => {
           <Routes>
             <Route path={ROUTES.PATIENT_HOME} element={<PatientHome />} />
             <Route path={ROUTES.ADMIN_HOME} element={<AdminHome />} />
-            <Route path={ROUTES.DOCTOR_HOME} element ={<DoctorHome/>} />
+            <Route path={ROUTES.DOCTOR_HOME} element={<DoctorHome />} />
             <Route path={ROUTES.DOCTOR_REGISTER} element={<DoctorRegister />} />
-            <Route path={ROUTES.COORDINATOR_REGISTER} element={<CoordinatorRegister/>} />
-            <Route path={ROUTES.COORDINATOR_HOME} element={<CoordinatorHome/>} />
+            <Route
+              path={ROUTES.COORDINATOR_REGISTER}
+              element={<CoordinatorRegister />}
+            />
+            <Route
+              path={ROUTES.COORDINATOR_HOME}
+              element={<CoordinatorHome />}
+            />
             <Route
               path={ROUTES.PATIENT_APPOINTMENT}
               element={<PatientAppointments />}
             />
             <Route path={ROUTES.PATIENT_PROFILE} element={<PatientProfile />} />
             <Route path={ROUTES.ADMIN_DOC_LIST} element={<DoctorsList />} />
+            <Route
+              path={ROUTES.ADMIN_COORDINATOR_LIST}
+              element={<CoordinatorList />}
+            />
+            <Route path={ROUTES.ADMIN_PATIENT_LIST} element={<PatientList/>} />
           </Routes>
         </Main>
       )}
