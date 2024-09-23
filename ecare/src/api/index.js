@@ -9,9 +9,13 @@ const apiClient = axios.create({
   },
 });
 
+// Request interceptor to add token to headers
 apiClient.interceptors.request.use(
   (config) => {
-    // You can add authorization tokens here
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers["Authorization"] = token;
+    }
     return config;
   },
   (error) => {
