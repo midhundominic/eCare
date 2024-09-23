@@ -15,7 +15,6 @@ import Checkbox from "../Common/Checkbox";
 import { ROUTES } from "../../router/routes";
 import LoginButton from "../LoginButton";
 
-
 const auth = getAuth(firebaseApp);
 const googleProvider = new GoogleAuthProvider();
 
@@ -54,34 +53,23 @@ const Login = () => {
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length === 0) {
       try {
-        setIsLoading(true);
         const { email, password } = formData;
-        const response = await postSignin({ email, password })
-        console.log(response, "frontend");
+        const response = await postSignin({ email, password });
+
         if (response.data) {
           setIsLoading(false);
           setError({});
-
-          toast.success("Login Successful.");
-          setFormData({
-            email: "",
-            password: "",
-          });
-          if (response.data.role === 1) {
-            localStorage.setItem("userData", JSON.stringify(response.data));
-            navigate(ROUTES.PATIENT_HOME);
-          }
-          else if(response.data.role === 2){
-            localStorage.setItem("userData", JSON.stringify(response.data));
-            navigate(ROUTES.DOCTOR_HOME);
-          }
-        
-        else if(response.data.role === 3){
           localStorage.setItem("userData", JSON.stringify(response.data));
-          navigate(ROUTES.COORDINATOR_HOME);
-        }
-      }
+          toast.success("Login Successful.");
 
+          if (response.data.role === 1) {
+            navigate(ROUTES.PATIENT_HOME);
+          } else if (response.data.role === 2) {
+            navigate(ROUTES.DOCTOR_HOME);
+          } else if (response.data.role === 3) {
+            navigate(ROUTES.COORDINATOR_HOME);
+          }
+        }
       } catch (err) {
         setIsLoading(false);
         toast.error(err.response?.data.message || "Error Occurred");
@@ -100,23 +88,17 @@ const Login = () => {
         const user = result.user;
 
         const fields = {
-          name: user.providerData[0].displayName,
-          email: user.providerData[0].email,
+          name: user.displayName,
+          email: user.email,
           password: null,
-          images: user.providerData[0].photoURL,
-          phone: user.providerData[0].phoneNumber,
+          images: user.photoURL,
+          phone: user.phoneNumber,
         };
 
         authWithGoogleService(fields)
           .then((res) => {
             if (res.error !== true) {
               localStorage.setItem("token", res.token);
-              const user = {
-                name: res.user?.name,
-                email: res.user?.email,
-                userId: res.user?.id,
-              };
-
               localStorage.setItem("userData", JSON.stringify(res.data));
               toast.success("Sign in successful");
               navigate(ROUTES.PATIENT_HOME);
@@ -135,6 +117,7 @@ const Login = () => {
         toast.error(error.message);
       });
   };
+
   return (
     <div className={styles.loginContainer}>
       <div className={styles.loginBox}>
@@ -174,7 +157,7 @@ const Login = () => {
             <LoginButton
               primaryText="Login"
               secondaryText="Sign in with Google"
-              onGoogleSignIn={signInWithGoogle} // Add onClick handler for Google Sign-In
+              onGoogleSignIn={signInWithGoogle} // Google Sign-In
               isDisabled={isLoading}
             />
           </div>
