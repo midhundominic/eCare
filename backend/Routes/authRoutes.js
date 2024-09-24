@@ -5,6 +5,8 @@ const adminControllers = require("../controllers/adminController");
 const doctorControllers = require("../controllers/doctorController");
 const authControllers = require("../controllers/authControllers");
 const coordinatoControllers = require("../controllers/coordinatorControllers");
+const forgotPassword = require("../controllers/authforgotPassword");
+const resetPassword = require("../controllers/resetPassword");
 
 
 router.post("/patient-signup", patientControllers.signup);
@@ -18,5 +20,8 @@ router.post("/coordinator-signin", authControllers.signin);
 router.get("/doctors-view",doctorControllers.getAllDoctors);
 router.get("/coordinator-view",coordinatoControllers.getAllCoordinator);
 router.get("/patients-view",patientControllers.getAllPatient);
+router.post("/forgot-password",forgotPassword.forgotPassword);
+router.post("/varifycode",resetPassword.verifyCode);
+router.post("/reset-password",resetPassword.resetPassword);
 
 module.exports = router;

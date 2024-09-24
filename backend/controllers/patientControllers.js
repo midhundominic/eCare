@@ -71,7 +71,7 @@ const signin = async (req, res) => {
         { expiresIn: "1h" }
       );
 
-      return res.status(200).json({
+      return res.status(201).json({
         message: "Login Successful",
         data: { email: patient.email, role: patient.role, name: patient.name },
         token,
@@ -124,7 +124,7 @@ const authWithGoogle = async (req, res) => {
 const getAllPatient = async (req, res) => {
   try {
     const patients = await PatientModel.find({});
-    res.status(200).json({ data: patients });
+    res.status(201).json({ data: patients });
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
   }

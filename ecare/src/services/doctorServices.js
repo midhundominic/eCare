@@ -20,7 +20,7 @@ export const postSigninDoctor = async (payload) => {
   }
 };
 
-export const getDoctors = async () => {
+export const getDoctors = async (payload) => {
   try {
     const response = await doctorView();
     return response;

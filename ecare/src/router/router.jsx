@@ -17,6 +17,9 @@ import CoordinatorHome from "../component/Coordinator/CoordinatorHome";
 import CoordinatorRegister from "../component/Admin/RegisterCoordinator";
 import CoordinatorList from "../component/Admin/CoordinatorList";
 import PatientList from "../component/Admin/PatientiList";
+import ForgotPassword from "../component/ForgotPassword";
+import VarifyCode from "../component/VarifyCode";
+import ResetPassword from "../component/ResetPassword";
 
 const Router = () => {
   const location = useLocation();
@@ -33,6 +36,9 @@ const Router = () => {
           <Route path={ROUTES.LOGIN} element={<Login />} />
           <Route path={ROUTES.SIGNUP} element={<Signup />} />
           <Route path={ROUTES.ADMIN} element={<Admin />} />
+          <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPassword />} />
+          <Route path={ROUTES.VARIFY_CODE} element={<VarifyCode />} />
+          <Route path={ROUTES.RESET_PASSWORD} element={<ResetPassword />} />
         </Routes>
       ) : (
         <Main>
@@ -59,7 +65,7 @@ const Router = () => {
               path={ROUTES.ADMIN_COORDINATOR_LIST}
               element={<CoordinatorList />}
             />
-            <Route path={ROUTES.ADMIN_PATIENT_LIST} element={<PatientList/>} />
+            <Route path={ROUTES.ADMIN_PATIENT_LIST} element={<PatientList />} />
           </Routes>
         </Main>
       )}

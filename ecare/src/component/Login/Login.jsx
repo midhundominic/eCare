@@ -10,7 +10,7 @@ import {
 } from "../../services/patientServices";
 import styles from "./login.module.css";
 import FrontImage from "../../assets/images/img_front.png";
-import TextInput from "../Common/TextInput";
+import TextInput from "../Common/TestInputPassword";
 import Checkbox from "../Common/Checkbox";
 import { ROUTES } from "../../router/routes";
 import LoginButton from "../LoginButton";
@@ -151,6 +151,16 @@ const Login = () => {
             placeholder="Enter your password"
             error={error["password"]}
           />
+          <div className={styles.signupLink}>
+            <a
+              href="#"
+              onClick={() => {
+                navigate(ROUTES.FORGOT_PASSWORD);
+              }}
+            >
+              Forgot Password?
+            </a>
+          </div>
           <Checkbox name="remember-me" title="Remember me" />
 
           <div className={styles.buttonWrapper}>
