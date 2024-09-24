@@ -1,4 +1,9 @@
-import { patientSignin, patientSignup, authWithGoogle, patientView } from "../api/patient";
+import {
+  patientSignin,
+  patientSignup,
+  authWithGoogle,
+  patientView,
+} from "../api/patient";
 
 export const postSignup = async (payload) => {
   try {
@@ -33,12 +38,12 @@ export const authWithGoogleService = async (payload) => {
   }
 };
 
-export const getPatients=async(payload)=>{
-  try{
-    const response= await patientView();
-    return response;    
-  }catch(error){
-    console.error("Error Fetching Patient",error)
+export const getPatients = async (payload) => {
+  try {
+    const response = await patientView();
+    return response;
+  } catch (error) {
+    console.error("Error Fetching Patient", error);
     throw error;
   }
 };

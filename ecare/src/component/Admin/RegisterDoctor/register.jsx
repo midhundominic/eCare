@@ -48,6 +48,25 @@ const DoctorRegistration = () => {
       password,
     } = formData;
 
+    console.log("Form Data: ", formData);
+
+  
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !phone ||
+      !specialization ||
+      !experience ||
+      !gender ||
+      !y_experience ||
+      !password ||
+      !c_password
+    ) {
+      toast.error("All fields are required");
+      return;
+    }
+
     try {
       const response = await regDoctor({
         firstName,
@@ -116,6 +135,7 @@ const DoctorRegistration = () => {
               isRequired
               onChange={handleChange}
               options={[
+                { value: "", label: "Select an option" },
                 { value: "senior", label: "Senior" },
                 { value: "junior", label: "junior" },
                 { value: "mid-level", label: "Mid-Level" },
@@ -123,7 +143,6 @@ const DoctorRegistration = () => {
               styles={{ selectBoxRoot: styles.selectBoxRoot }}
             />
 
-            
             <RadioButton
               isRequired
               name="gender"
@@ -172,6 +191,7 @@ const DoctorRegistration = () => {
               isRequired
               onChange={handleChange}
               options={[
+                { value: "", label: "Select an option" },
                 { value: "0-2", label: "0-2 Years" },
                 { value: "3-5", label: "3-5 Years" },
                 { value: ">6", label: "More than 6 Years" },

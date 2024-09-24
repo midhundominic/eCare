@@ -7,13 +7,16 @@ export const ROUTES = {
   PATIENT_PROFILE: "/patient/profile",
   ADMIN: "/admin",
   ADMIN_HOME: "/admin/home",
-  DOCTOR_HOME:"/doctor/home",
+  DOCTOR_HOME: "/doctor/home",
   ADMIN_DOC_LIST: "/admin/doctors",
   DOCTOR_REGISTER: "/doctor/reg",
   COORDINATOR_REGISTER: "/coordinator/reg",
-  COORDINATOR_HOME:"/coordinator/home",
-  ADMIN_COORDINATOR_LIST:"/admin/coordinator",
-  ADMIN_PATIENT_LIST:"/admin/patient"
+  COORDINATOR_HOME: "/coordinator/home",
+  ADMIN_COORDINATOR_LIST: "/admin/coordinator",
+  ADMIN_PATIENT_LIST: "/admin/patient",
+  FORGOT_PASSWORD: "/forgotpassword",
+  RESET_PASSWORD: "/resetpassword",
+  VARIFY_CODE: "/varify",
 };
 
 export const NON_AUTH_ROUTES = [
