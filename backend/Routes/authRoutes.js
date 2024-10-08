@@ -7,6 +7,11 @@ const authControllers = require("../controllers/authControllers");
 const coordinatoControllers = require("../controllers/coordinatorControllers");
 const forgotPassword = require("../controllers/authforgotPassword");
 const resetPassword = require("../controllers/resetPassword");
+const profileCoordinator = require("../controllers/profileControllers/coordinatorControllers");
+const authMiddleware = require("../middleware/auth");
+const uploadMiddleware = require("../middleware/upload");
+const profilePatient = require("../controllers/profileControllers/patientControllers");
+const profileDoctor = require ("../controllers/profileControllers/doctorControllers")
 
 
 router.post("/patient-signup", patientControllers.signup);
@@ -19,9 +24,22 @@ router.post("/coordinator-registration", coordinatoControllers.registerCoordinat
 router.post("/coordinator-signin", authControllers.signin);
 router.get("/doctors-view",doctorControllers.getAllDoctors);
 router.get("/coordinator-view",coordinatoControllers.getAllCoordinator);
-router.get("/patients-view",patientControllers.getAllPatient);
+// router.get("/patients-view",patientControllers.getAllPatient);
 router.post("/forgot-password",forgotPassword.forgotPassword);
 router.post("/varifycode",resetPassword.verifyCode);
 router.post("/reset-password",resetPassword.resetPassword);
+
+//profile Photo
+
+router.post("/doctor-profile-photo",profileDoctor.uploadDoctorProfilePhoto);
+// router.get("/doctor-profile-photo",profileDoctor.getDoctorProfile);
+
+//profile
+router.get("/coordinator-profile",authMiddleware,profileCoordinator.getCoordinatorProfile);
+router.get("/patient-profile", authMiddleware, profilePatient.getPatientProfile);
+router.put("/patient-profile", authMiddleware, profilePatient.updatePatientProfile);
+
+router.get("/doctor-profile",authMiddleware,profileDoctor.getDoctorProfile);
+router.put("/coordinator-update",profileCoordinator.updateCoordinatorProfile);
 
 module.exports = router;

@@ -12,6 +12,7 @@ const DoctorSchema = new mongoose.Schema({
   y_experience: { type: String, required: true },
   password: { type: String, required: true },
   role: { type: Number, required: true },
+  profilePhoto : {type: String, default: ""},
   date_created: { type: Date, required: true, default: () => dayjs().toDate() },
 });
 

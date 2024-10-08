@@ -51,25 +51,48 @@ const Login = () => {
     event.preventDefault();
     setIsLoading(true);
     const validationErrors = validateForm();
+
     if (Object.keys(validationErrors).length === 0) {
       try {
         const { email, password } = formData;
         const response = await postSignin({ email, password });
 
-        if (response.data) {
-          setIsLoading(false);
-          setError({});
-          localStorage.setItem("userData", JSON.stringify(response.data));
+        // Check if the token is in the response
+        if (response.token) {
+          const { role,firstName,lastName,name,email } = response.data;
+          let fullName = name;
+
+          if (role === 2 || role === 3) {
+            fullName = `${firstName} ${lastName}`;
+          }
+
+          localStorage.setItem("token", response.token); // Store token
+          localStorage.setItem("userData", JSON.stringify({
+          email,
+          name: fullName,
+          role
+        })); // Store user data
+
           toast.success("Login Successful.");
 
-          if (response.data.role === 1) {
-            navigate(ROUTES.PATIENT_HOME);
-          } else if (response.data.role === 2) {
-            navigate(ROUTES.DOCTOR_HOME);
-          } else if (response.data.role === 3) {
-            navigate(ROUTES.COORDINATOR_HOME);
+          // Navigate based on user role
+          switch (role) {
+            case 1:
+              navigate(ROUTES.PATIENT_HOME);
+              break;
+            case 2:
+              navigate(ROUTES.DOCTOR_HOME);
+              break;
+            case 3:
+              navigate(ROUTES.COORDINATOR_HOME);
+              break;
+            default:
+              navigate(ROUTES.PATIENT_HOME); // Default route
           }
+        } else {
+          toast.error("Token is missing in the response");
         }
+        setIsLoading(false);
       } catch (err) {
         setIsLoading(false);
         toast.error(err.response?.data.message || "Error Occurred");
@@ -81,42 +104,62 @@ const Login = () => {
   };
 
   const signInWithGoogle = () => {
+    setIsLoading(true); // Set loading state
     signInWithPopup(auth, googleProvider)
       .then((result) => {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential.accessToken;
         const user = result.user;
-
-        const fields = {
-          name: user.displayName,
-          email: user.email,
-          password: null,
-          images: user.photoURL,
-          phone: user.phoneNumber,
-        };
-
-        authWithGoogleService(fields)
-          .then((res) => {
-            if (res.error !== true) {
-              localStorage.setItem("token", res.token);
-              localStorage.setItem("userData", JSON.stringify(res.data));
-              toast.success("Sign in successful");
-              navigate(ROUTES.PATIENT_HOME);
-              setIsLoading(false);
-            } else {
-              toast.error(res.msg);
-              setIsLoading(false);
-            }
-          })
-          .catch((error) => {
-            toast.error(error.response?.data.message || error.message);
-            setIsLoading(false);
-          });
+        const profilePicture = user.photoURL;
+        
+        // Get the Firebase ID token
+        user.getIdToken().then((tokenId) => {
+          const fields = {
+            name: user.displayName,
+            email: user.email,
+            tokenId,  // Send the Firebase ID token to the backend
+          };
+  
+          // Call the backend service to verify the token and login
+          authWithGoogleService(fields)
+            .then((res) => {
+              setIsLoading(false); // Reset loading state
+              if (!res.error) {
+                const userData={
+                  ...res.data,  // Backend response
+                  name: res.data.name || user.displayName,
+                  email: res.data.email || user.email,
+                  role: res.data.role || user.role, // Use Firebase displayName as fallback
+                  profilePicture: res.data.profilePicture || profilePicture
+                };
+               
+                  localStorage.setItem("token", res.token);  // Store the JWT token received from your backend
+                  localStorage.setItem("userData", JSON.stringify({
+                    email: userData.email,
+                    name: userData.name,
+                    role: userData.role,
+                    profilePicture: userData.profilePicture,
+                  })); 
+                  toast.success("Sign in successful");
+                  navigate(ROUTES.PATIENT_HOME);
+                
+              } else {
+                toast.error(res.msg);
+              }
+            })
+            .catch((error) => {
+              setIsLoading(false); // Reset loading state
+              toast.error(error.response?.data.message || error.message);
+            });
+        }).catch((error) => {
+          setIsLoading(false); // Reset loading state
+          toast.error("Error getting Firebase ID token: " + error.message);
+        });
       })
       .catch((error) => {
+        setIsLoading(false); // Reset loading state
         toast.error(error.message);
       });
   };
+  
 
   return (
     <div className={styles.loginContainer}>

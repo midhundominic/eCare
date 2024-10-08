@@ -35,8 +35,8 @@ const signin = async (req, res) => {
           email: patient.email,
           role: patient.role,
           name: patient.name,
-          token,
         },
+        token:token,
       });
     }
 
@@ -47,7 +47,6 @@ const signin = async (req, res) => {
         return res.status(401).json({ message: "Invalid password" });
       }
 
-      // Generate JWT Token
       const token = jwt.sign(
         { userId: doctor._id, email: doctor.email, role: doctor.role },
         JWT_SECRET,
@@ -59,9 +58,10 @@ const signin = async (req, res) => {
         data: {
           email: doctor.email,
           role: doctor.role,
-          name: doctor.name,
-          token, // Include the token in the response
+          firstName: doctor.firstName,
+          lastName: doctor.lastName
         },
+        token:token,
       });
     }
 
@@ -72,7 +72,6 @@ const signin = async (req, res) => {
         return res.status(401).json({ message: "Invalid password" });
       }
 
-      // Generate JWT Token
       const token = jwt.sign(
         {
           userId: coordinator._id,
@@ -88,16 +87,17 @@ const signin = async (req, res) => {
         data: {
           email: coordinator.email,
           role: coordinator.role,
-          name: coordinator.name,
-          token, // Include the token in the response
+          firstName: coordinator.firstName,
+          lastName: coordinator.lastName,
         },
+        token:token,
       });
     }
 
     // If no user found
     return res.status(404).json({ message: "User not found" });
   } catch (error) {
-    console.error(error); // Log the error for debugging purposes
+    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };

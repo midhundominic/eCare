@@ -25,8 +25,18 @@ export const postSigninCoordinator = async (payload) => {
       const response = await coordinatorView();
       return response;
     } catch (error) {
-      console.error("Error fetching doctors list", error);
+      console.error("Error fetching coordinator list", error);
       throw error;
     }
   };
+
+  export const updateCoordinator= async () => {
+    try {
+      const response = await coordinatorUpdate();
+      return response;
+    }catch(error) {
+      console.error("Error Updating coordinator");
+      throw error;
+    }
+  }
   

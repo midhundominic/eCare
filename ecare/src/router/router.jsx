@@ -9,6 +9,9 @@ import PatientAppointments from "../component/Patient/PatientAppointments";
 import PatientProfile from "../component/Patient/PatientProfile";
 import Admin from "../component/Admin/Login";
 import AdminHome from "../component/Admin/Home";
+import AdminProile from "../component/Admin/AdminProile";
+import DoctorProfile from "../component/Doctor/DoctorProfile";
+import CoordinatorProfile from "../component/Coordinator/CoordinatorProfile";
 import DoctorRegister from "../component/Admin/RegisterDoctor";
 import { ROUTES, NON_AUTH_ROUTES } from "./routes";
 import DoctorsList from "../component/Admin/DoctorsList";
@@ -46,6 +49,7 @@ const Router = () => {
             <Route path={ROUTES.PATIENT_HOME} element={<PatientHome />} />
             <Route path={ROUTES.ADMIN_HOME} element={<AdminHome />} />
             <Route path={ROUTES.DOCTOR_HOME} element={<DoctorHome />} />
+            
             <Route path={ROUTES.DOCTOR_REGISTER} element={<DoctorRegister />} />
             <Route
               path={ROUTES.COORDINATOR_REGISTER}
@@ -60,6 +64,13 @@ const Router = () => {
               element={<PatientAppointments />}
             />
             <Route path={ROUTES.PATIENT_PROFILE} element={<PatientProfile />} />
+            <Route path={ROUTES.ADMIN_PROFILE} element={<AdminProile />} />
+            <Route path={ROUTES.DOCTOR_PROFILE} element={<DoctorProfile />} />
+            <Route
+              path={ROUTES.COORDINATOR_PROFILE}
+              element={<CoordinatorProfile />}
+            />
+
             <Route path={ROUTES.ADMIN_DOC_LIST} element={<DoctorsList />} />
             <Route
               path={ROUTES.ADMIN_COORDINATOR_LIST}

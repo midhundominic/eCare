@@ -11,6 +11,7 @@ export const coordinatorSignup = async (payload) => {
 
 export const coordinatorSignin = async (payload) => {
   try {
+    localStorage.setItem("token", response.token);
     const response = await apiClient.post("/coordinator-signin", payload);
     return response.data;
   } catch (error) {
@@ -26,3 +27,12 @@ export const coordinatorView = async (payload) => {
     throw error;
   }
 };
+
+export const coordinatorUpdate = async(payload) => {
+  try{
+    const response = await apiClient.put("/coordinator-update", payload);
+    return response.datal
+  }catch(error) {
+    throw error;
+  }
+}
