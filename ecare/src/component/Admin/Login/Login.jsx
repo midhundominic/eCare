@@ -56,6 +56,7 @@ const Login = () => {
           password: "",
         });
         if (response.data) {
+          localStorage.setItem('userData', JSON.stringify(response.data.data));
           localStorage.setItem("userData",JSON.stringify(response.data));
           navigate(ROUTES.ADMIN_HOME);
         }

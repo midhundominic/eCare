@@ -1,9 +1,19 @@
 const PatientModel = require("../models/patientModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const admin = require("firebase-admin");
+require("dotenv").config();
 
-// JWT Secret Key
+
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
+
+admin.initializeApp({
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"), // Properly format the private key
+  }),
+});
 
 const signup = async (req, res) => {
   const { name, email, password } = req.body;
@@ -48,62 +58,30 @@ const signup = async (req, res) => {
   }
 };
 
-const signin = async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
-
-  try {
-    // Check for the patient
-    const patient = await PatientModel.findOne({ email });
-    if (patient) {
-      const isMatch = await bcrypt.compare(password, patient.password);
-      if (!isMatch) {
-        return res.status(401).json({ message: "Invalid email or password" });
-      }
-
-      // Generate JWT Token
-      const token = jwt.sign(
-        { userId: patient._id, email: patient.email, role: patient.role },
-        JWT_SECRET,
-        { expiresIn: "1h" }
-      );
-
-      return res.status(201).json({
-        message: "Login Successful",
-        data: { email: patient.email, role: patient.role, name: patient.name },
-        token,
-      });
-    }
-
-    // If no user found
-    return res.status(404).json({ message: "User not found" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
 const authWithGoogle = async (req, res) => {
-  const { name, email } = req.body;
+  const { tokenId } = req.body; // Expect the Firebase ID token from the frontend
 
   try {
+    // Verify the Firebase ID token
+    const decodedToken = await admin.auth().verifyIdToken(tokenId);
+    const { name, email } = decodedToken; // Extract user info from the decoded token
+
+    // Check if the user exists in the database
     let user = await PatientModel.findOne({ email });
+
     if (!user) {
-      // Create a new user with empty password for Google users
+      // If the user doesn't exist, create a new one
       user = new PatientModel({
         name,
         email,
-        password: "",
-        role: 1,
+        password: "", // No password for Google users
+        role: 1, // Assuming Google users are patients (role = 1)
       });
 
       await user.save();
     }
 
-    // Generate JWT token
+    // Generate JWT token for your app
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
       JWT_SECRET,
@@ -111,13 +89,15 @@ const authWithGoogle = async (req, res) => {
     );
 
     res.status(201).json({
-      data: user,
-      token,
       message: "User login successful!",
+      data: { email: user.email, name: user.name, role: user.role },
+      token,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
+    console.error("Error during Google Sign-In:", error);
+    return res
+      .status(500)
+      .json({ message: "Invalid or expired Firebase token" });
   }
 };
 
@@ -132,7 +112,6 @@ const getAllPatient = async (req, res) => {
 
 module.exports = {
   signup,
-  signin,
   authWithGoogle,
   getAllPatient,
 };
