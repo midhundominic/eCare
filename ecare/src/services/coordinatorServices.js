@@ -1,4 +1,5 @@
 import { coordinatorSignin, coordinatorSignup, coordinatorView } from "../api/coordinator";
+import apiClient from "../api/index";
 
 export const regCoordinator = async (payload) => {
   try {
@@ -39,4 +40,13 @@ export const postSigninCoordinator = async (payload) => {
       throw error;
     }
   }
-  
+
+  export const deleteCoordinator = async (id) => {
+    try {
+      const response = await apiClient.delete(`/coordinator/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting coordinator", error);
+      throw error;
+    }
+  };

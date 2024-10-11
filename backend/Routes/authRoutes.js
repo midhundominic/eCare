@@ -14,32 +14,51 @@ const profilePatient = require("../controllers/profileControllers/patientControl
 const profileDoctor = require ("../controllers/profileControllers/doctorControllers")
 
 
+//patient
+
 router.post("/patient-signup", patientControllers.signup);
 router.post("/patient-signin", authControllers.signin);
 router.post("/patientauthWithGoogle", patientControllers.authWithGoogle); 
-router.post("/admin-signin", adminControllers.adminSignin);
-router.post("/doctor-registration", doctorControllers.registerDoctor);
-router.post("/doctor-signin", authControllers.signin);
-router.post("/coordinator-registration", coordinatoControllers.registerCoordinator);
-router.post("/coordinator-signin", authControllers.signin);
-router.get("/doctors-view",doctorControllers.getAllDoctors);
-router.get("/coordinator-view",coordinatoControllers.getAllCoordinator);
-// router.get("/patients-view",patientControllers.getAllPatient);
 router.post("/forgot-password",forgotPassword.forgotPassword);
 router.post("/varifycode",resetPassword.verifyCode);
 router.post("/reset-password",resetPassword.resetPassword);
+router.get("/patients-view",patientControllers.getAllPatient);
+
+//doctor
+
+router.post("/doctor-registration", doctorControllers.registerDoctor);
+router.post("/doctor-signin", authControllers.signin);
+router.get("/doctors-view",doctorControllers.getAllDoctors);
+
+//doctorid
+router.get("/doctor/:id", doctorControllers.getDoctorById);
+
+
+
+router.post("/admin-signin", adminControllers.adminSignin);
+
+//coordinator
+
+router.post("/coordinator-registration", coordinatoControllers.registerCoordinator);
+router.post("/coordinator-signin", authControllers.signin);
+router.get("/coordinator-view",coordinatoControllers.getAllCoordinator);
+
 
 //profile Photo
 
 router.post("/doctor-profile-photo",profileDoctor.uploadDoctorProfilePhoto);
-// router.get("/doctor-profile-photo",profileDoctor.getDoctorProfile);
+
 
 //profile
 router.get("/coordinator-profile",authMiddleware,profileCoordinator.getCoordinatorProfile);
 router.get("/patient-profile", authMiddleware, profilePatient.getPatientProfile);
 router.put("/patient-profile", authMiddleware, profilePatient.updatePatientProfile);
-
 router.get("/doctor-profile",authMiddleware,profileDoctor.getDoctorProfile);
 router.put("/coordinator-update",profileCoordinator.updateCoordinatorProfile);
+
+//delete
+router.delete("/doctor/:id",doctorControllers.deleteDoctor);
+router.delete("/patient/:id",patientControllers.deletePatientById);
+router.delete("/coordinator/:id",coordinatoControllers.deleteCoordinator);
 
 module.exports = router;

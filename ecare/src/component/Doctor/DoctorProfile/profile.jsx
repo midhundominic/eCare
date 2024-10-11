@@ -55,6 +55,12 @@ const Profile = () => {
                 setProfileImage(res.profilePhoto);
                 setPreviewImage("");
                 setIsEditing(false);
+
+                // Store the updated profile photo in localStorage
+                localStorage.setItem("updatedProfilePhoto", res.profilePhoto);
+
+                // Optionally, you can refresh the page to reload the SlideNav, but this is not ideal
+                // window.location.reload(); 
             } catch (error) {
                 console.error(
                     "Error uploading profile image",
@@ -68,7 +74,7 @@ const Profile = () => {
         setPreviewImage("");
         setIsEditing(false);
     };
-console.log()
+
     if (isLoading) {
         return <div>Loading...</div>;
     }

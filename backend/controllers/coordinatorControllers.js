@@ -40,7 +40,21 @@ const getAllCoordinator = async (req, res) => {
   }
 };
 
+
+const deleteCoordinator = async (req, res) => {
+  try {
+    const coordinator = await CoordinatorModel.findByIdAndDelete(req.params.id);
+    if (!coordinator) {
+      return res.status(404).json({ message: "Coordinator not found" });
+    }
+    res.status(201).json({ message: "Coordinator deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 module.exports = {
   registerCoordinator,
   getAllCoordinator,
+  deleteCoordinator,
 };

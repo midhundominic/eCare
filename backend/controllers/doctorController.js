@@ -65,7 +65,34 @@ const getAllDoctors = async (req, res) => {
   }
 };
 
+const getDoctorById = async (req, res) => {
+  try {
+    const doctor = await DoctorModel.findById(req.params.id); // Fetch doctor by ID
+    if (!doctor) {
+      return res.status(404).json({ message: "Doctor not found" });
+    }
+    res.status(201).json(doctor);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+const deleteDoctor = async (req, res) => {
+  
+  try {
+    const doctor = await DoctorModel.findByIdAndDelete(req.params.id);
+    if (!doctor) {
+      return res.status(404).json({ message: "Doctor not found" });
+    }
+    res.status(201).json({ message: "Doctor deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 module.exports = {
   registerDoctor,
   getAllDoctors,
+  getDoctorById,
+  deleteDoctor,
 };

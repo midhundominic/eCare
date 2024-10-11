@@ -10,6 +10,7 @@ const LogoutButton = () => {
     // Clear user data from local storage
     localStorage.removeItem("userData");
     localStorage.removeItem("token");
+    localStorage.removeItem("updatedProfilePhoto");
 
     // Navigate to the login page
     navigate(ROUTES.LOGIN, { replace: true });

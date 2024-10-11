@@ -35,6 +35,7 @@ const signin = async (req, res) => {
           email: patient.email,
           role: patient.role,
           name: patient.name,
+          userId: patient._id,
         },
         token:token,
       });
@@ -59,7 +60,8 @@ const signin = async (req, res) => {
           email: doctor.email,
           role: doctor.role,
           firstName: doctor.firstName,
-          lastName: doctor.lastName
+          lastName: doctor.lastName,
+          doctorId: doctor._id,
         },
         token:token,
       });

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import EastRoundedIcon from "@mui/icons-material/EastRounded";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { getProfileDoctor, getProfilePatient } from "../../services/profileServices"; // Ensure these functions are correctly implemented
 
 import {
   NAV_CONTENT_ADMIN,
@@ -15,14 +16,32 @@ import { ROUTES } from "../../router/routes";
 const SideNav = () => {
   const [activeNav, setActiveNav] = useState(1);
   const [userData, setUserData] = useState(null);
+  const [profileImage, setProfileImage] = useState("");
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Fetch user data from local storage
+  // Fetch user data and profile image based on role
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("userData"));
-    setUserData(user);
+    const fetchProfile = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem("userData")); // Get from local storage
+        setUserData(user);
+
+        // Fetch specific profile data based on role
+        if (user?.role === 2) { // Assuming role 2 is for doctors
+          const doctorProfile = await getProfileDoctor();
+          setProfileImage(doctorProfile.profilePhoto); // Set profile image path
+        } else if (user?.role === 1) { // Assuming role 1 is for patients
+          const patientProfile = await getProfilePatient();
+          setProfileImage(patientProfile.profilePhoto); // Set profile image path
+        } 
+        // You can also fetch for coordinators or admin if needed
+      } catch (error) {
+        console.error("Error fetching profile data", error);
+      }
+    };
+    fetchProfile();
   }, []);
 
   // Role-based navigation items
@@ -96,7 +115,17 @@ const SideNav = () => {
       {userData && (
         <div className={styles.navProfile}>
           <div className={styles.imageWrapper}>
-            <AccountCircleIcon style={{ color: "white", fontSize: "36px" }} />
+            {/* Conditional rendering for profile image */}
+            {profileImage ? (
+              <img
+                src={`http://localhost:5000/src/assets/doctorProfile/${profileImage}`} // Adjust the image path according to your setup
+                alt="Profile"
+                className={styles.profileImage}
+                style={{ width: "36px", height: "36px", borderRadius: "50%" }} // Styling for profile image
+              />
+            ) : (
+              <AccountCircleIcon style={{ color: "white", fontSize: "36px" }} />
+            )}
             <EastRoundedIcon
               style={{ color: "white", fontSize: "24px", cursor: "pointer" }}
               onClick={handleProfileClick}
@@ -104,7 +133,7 @@ const SideNav = () => {
           </div>
           <div className={styles.infoWrapper}>
             <div className={styles.navUserInfo}>
-              <span>{userData.name || "User"}</span>
+              <span>{userData.name || "User"}</span> {/* Accessing name directly */}
               <span className={styles.navEmail}>{userData.email}</span>
             </div>
           </div>

@@ -4,6 +4,7 @@ import {
   authWithGoogle,
   patientView,
 } from "../api/patient";
+import apiClient from "../api/index";
 
 export const postSignup = async (payload) => {
   try {
@@ -51,6 +52,16 @@ export const getPatients = async (payload) => {
     return response;
   } catch (error) {
     console.error("Error Fetching Patient", error);
+    throw error;
+  }
+};
+
+export const deletePatient = async (id) => {
+  try {
+    const response = await apiClient.delete(`/patient/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting patient", error);
     throw error;
   }
 };
