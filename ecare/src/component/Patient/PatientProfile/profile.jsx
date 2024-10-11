@@ -42,9 +42,9 @@ const Profile = () => {
   }
 
   // Ensure that profileData is defined
-  // if (!profileData || !profileData.personalInfo) {
-  //   return <div>Please complete your profile information.</div>;
-  // }
+  if (!profileData || !profileData.personalInfo) {
+    return <div>Please complete your profile information.</div>;
+  }
 
   return (
     <div className={styles.profileRoot}>

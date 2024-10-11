@@ -171,4 +171,192 @@
     background-color: #c82333;
   }
   
-  
+  /* Modal Overlay */
+.appointment-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75); /* Dark translucent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal Container */
+.appointment-modal {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 500px;
+  max-width: 90%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+  position: relative;
+}
+
+.appointment-modal h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group input, 
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.submit-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.submit-btn:hover {
+  background-color: #0056b3;
+}
+
+.cancel-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.cancel-btn:hover {
+  background-color: #c82333;
+}
+
+.date-picker {
+  margin-bottom: 15px;
+}
+
+.date-options {
+  display: flex;
+  gap: 10px;
+}
+
+.date-btn {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 60px;
+}
+
+.date-btn.selected {
+  background-color: #007bff;
+  color: white;
+}
+
+.date-btn div:first-child {
+  font-weight: bold;
+}
+
+.date-btn div:last-child {
+  font-size: 14px;
+}
+
+.time-slot-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.time-slot-btn {
+  padding: 10px 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #fff;
+  color: #333;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+  position: relative;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.time-slot-btn.selected {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.time-slot-btn.selected:hover {
+  background-color: #0056b3;
+}
+
+.time-slot-btn.unavailable {
+  background-color: #f8d7da;
+  color: #6c757d;
+  cursor: not-allowed;
+  border-color: #f5c6cb;
+}
+
+.time-slot-btn.unavailable:hover {
+  background-color: #f5c6cb;
+  color: #6c757d;
+}
+
+.time-slot-btn.unavailable::after {
+  content: "✘";
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  color: red;
+  font-size: 18px;
+}
+
+.time-slot-btn:hover {
+  background-color: #e9ecef;
+}
+
+
+/* Cross mark for unavailable slots */
+.cross-mark {
+  color: red;
+  font-weight: bold;
+  position: absolute;
+  right: 10px;
+  top: 5px;
+}
+
+.unavailable {
+  opacity: 0.5;
+  pointer-events: none; /* Prevent click */
+}

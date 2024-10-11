@@ -7,7 +7,7 @@ const PatientPersonalInfoSchema = new mongoose.Schema({
     unique: true,
   },
   dateOfBirth: {
-    type: String,
+    type: Date,
     required: false,
   },
   gender: {

@@ -147,19 +147,6 @@ const getAllPatient = async (req, res) => {
   }
 };
 
-
-// const deletePatient = async (req, res) => {
-//   try {
-//     const patient = await PatientModel.findByIdAndDelete(req.params.id);
-//     if (!patient) {
-//       return res.status(404).json({ message: "Patient not found" });
-//     }
-//     res.status(201).json({ message: "Patient deleted successfully" });
-//   } catch (error) {
-//     res.status(500).json({ message: "Server error", error: error.message });
-//   }
-// };
-
 const deletePatientById = async (req, res) => {
   try {
     const { id } = req.params;

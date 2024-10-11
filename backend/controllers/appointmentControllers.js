@@ -1,77 +1,80 @@
-const Appointment = require("../models/appointmentModel");
+const AppointmentModel = require("../models/appointmentModel");
 
-// Schedule an appointment
-const scheduleAppointment = async (req, res) => {
-  const { patientId, doctorId, appointmentDate } = req.body;
+// Create a new appointment
+const createAppointment = async (req, res) => {
+  const { patientId, doctorId, appointmentDate, timeSlot } = req.body;
+
+  if (!patientId || !doctorId || !appointmentDate || !timeSlot) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
 
   try {
-    const newAppointment = new Appointment({
+    // Check if the requested time slot for the doctor is already booked on the specified date
+    const existingAppointment = await AppointmentModel.findOne({
+      doctorId,
+      appointmentDate,
+      timeSlot,
+    });
+
+    if (existingAppointment) {
+      return res.status(400).json({ message: "Time slot already booked" });
+    }
+
+    // Check if the date is in the future and not in the past
+    const now = new Date();
+    const requestedDate = new Date(appointmentDate);
+    if (
+      requestedDate < now ||
+      (requestedDate.getDate() === now.getDate() &&
+        requestedDate.getTime() < now.getTime())
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Cannot schedule appointment for past time" });
+    }
+
+    // Create new appointment if the slot is free and the date is valid
+    const newAppointment = new AppointmentModel({
       patientId,
       doctorId,
       appointmentDate,
+      timeSlot,
     });
 
     await newAppointment.save();
-
-    res.status(201).json({
-      message: "Appointment scheduled successfully",
-      appointment: newAppointment,
-    });
+    res
+      .status(201)
+      .json({ message: "Appointment scheduled successfully", newAppointment });
   } catch (error) {
-    res.status(500).json({ message: "Error scheduling appointment", error });
+    console.error("Error creating appointment:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-// Reschedule an appointment
-const rescheduleAppointment = async (req, res) => {
-  const { appointmentId, newDate } = req.body;
+const getUnavailableTimeSlots = async (req, res) => {
+  const { doctorId, date } = req.query;
+
+  if (!doctorId || !date) {
+    return res.status(400).json({ message: "Doctor ID and date are required" });
+  }
 
   try {
-    const appointment = await Appointment.findByIdAndUpdate(
-      appointmentId,
-      { appointmentDate: newDate, status: 'rescheduled' },
-      { new: true }
+    // Find all appointments for the doctor on the given date
+    const appointments = await AppointmentModel.find({
+      doctorId,
+      appointmentDate: new Date(date),
+    });
+
+    // Extract the unavailable time slots
+    const unavailableSlots = appointments.map(
+      (appointment) => appointment.timeSlot
     );
 
-    if (!appointment) {
-      return res.status(404).json({ message: "Appointment not found" });
-    }
-
-    res.status(201).json({
-      message: "Appointment rescheduled successfully",
-      appointment,
-    });
+    res.status(201).json({ unavailableSlots });
   } catch (error) {
-    res.status(500).json({ message: "Error rescheduling appointment", error });
+    console.error("Error fetching unavailable time slots:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-// Cancel an appointment
-const cancelAppointment = async (req, res) => {
-  const { appointmentId } = req.body;
-
-  try {
-    const appointment = await Appointment.findByIdAndUpdate(
-      appointmentId,
-      { status: 'canceled' },
-      { new: true }
-    );
-
-    if (!appointment) {
-      return res.status(404).json({ message: "Appointment not found" });
-    }
-
-    res.status(201).json({
-      message: "Appointment canceled successfully",
-      appointment,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Error canceling appointment", error });
-  }
-};
-
-module.exports = {
-  scheduleAppointment,
-  rescheduleAppointment,
-  cancelAppointment,
-};
+module.exports = { createAppointment, getUnavailableTimeSlots };
