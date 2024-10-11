@@ -8,20 +8,24 @@ import UpdateButtons from "./UpdateButtons/updateButtons";
 import RadioButton from "../../Common/RadioButton";
 import DatePicker from "../../Common/DatePicker";
 import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../../router/routes";
 
 const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
-  // Set default values for the formData in case profileData is incomplete or undefined
   const [formData, setFormData] = useState({
-    dateOfBirth: profileData.dateOfBirth || "",
+    dateOfBirth: profileData.dateOfBirth ? dayjs(profileData.dateOfBirth) : null, // Ensure this is a Day.js object
     gender: profileData.gender || "",
     weight: profileData.weight || "",
     height: profileData.height || "",
-    ...profileData, // spread the rest of profileData properties
+    ...profileData,
   });
 
+  const navigate = useNavigate();
+
+  // Update formData when profileData changes
   useEffect(() => {
     setFormData({
-      dateOfBirth: profileData.dateOfBirth || "",
+      dateOfBirth: profileData.dateOfBirth ? dayjs(profileData.dateOfBirth) : null, // Ensure it's a Day.js object
       gender: profileData.gender || "",
       weight: profileData.weight || "",
       height: profileData.height || "",
@@ -32,6 +36,10 @@ const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prevState) => ({ ...prevState, [name]: value }));
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
   };
 
   const handleSaveClick = () => {
@@ -50,20 +58,17 @@ const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
             <DatePicker
               name="dateOfBirth"
               title="Date of birth"
-              value={
-                formData.dateOfBirth
-                  ? dayjs(formData.dateOfBirth) // Convert string to Dayjs object for DatePicker
-                  : null
-              }
+              value={formData.dateOfBirth} // Should be a Day.js object here
               onChange={(date) => {
                 setFormData((prevState) => ({
                   ...prevState,
-                  dateOfBirth: dayjs(date).format("YYYY-MM-DD"), // Store the date as 'YYYY-MM-DD'
+                  dateOfBirth: date ? dayjs(date) : null, // Ensure value is always a Day.js object
                 }));
               }}
               isRequired
             />
 
+            {/* Gender, Weight, Height Fields */}
             <RadioButton
               isRequired
               name="gender"
@@ -76,6 +81,7 @@ const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
               ]}
               onChange={handleChange}
             />
+
             <TextInput
               type="text"
               title="Weight"
@@ -96,19 +102,16 @@ const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
             />
           </div>
           <UpdateButtons
-            handleClickCancel={() => setIsEditing(false)}
+            handleClickCancel={handleCancel}
             handleClickSave={handleSaveClick}
           />
         </>
       ) : (
         <div className={styles.personalInfoRoot}>
+          {/* Display text info when not editing */}
           <TextInfo
             title="Date of Birth"
-            info={
-              formData.dateOfBirth
-                ? dayjs(formData.dateOfBirth).format("DD-MM-YYYY")
-                : "N/A"
-            }
+            info={formData.dateOfBirth ? dayjs(formData.dateOfBirth).format("DD-MM-YYYY") : "N/A"}
           />
           <TextInfo title="Gender" info={formData.gender || "N/A"} />
           <TextInfo title="Weight" info={`${formData.weight || "N/A"} kg`} />

@@ -13,6 +13,7 @@ const registerDoctor = async (req, res) => {
     specialization,
     y_experience,
     password,
+    aboutDoctor,
   } = req.body;
 
   if (
@@ -24,7 +25,8 @@ const registerDoctor = async (req, res) => {
     !phone ||
     !specialization ||
     !y_experience ||
-    !password
+    !password ||
+    !aboutDoctor
   ) {
     return res.status(400).json({ message: "All fields are required" });
   }
@@ -45,6 +47,7 @@ const registerDoctor = async (req, res) => {
       specialization,
       y_experience,
       password,
+      aboutDoctor,
       role: 2,
     });
 

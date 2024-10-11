@@ -15,7 +15,7 @@ app.use(express.json()); // Parse JSON bodies
 
 // Routes
 app.use("/api", authRoutes); // Use the routes
-app.use('/api/appointments', appointmentRoutes);
+// app.use('/api/appointments', appointmentRoutes);
 
 
 app.use('/src/assets/doctorProfile', express.static('src/assets/doctorProfile'));

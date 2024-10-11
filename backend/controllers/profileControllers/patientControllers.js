@@ -62,7 +62,7 @@ const updatePatientProfile = async (req, res) => {
     }
 
     // Update personal info fields
-    patientProfile.dateOfBirth = dayjs(dateOfBirth).format("YYYY-MM-DD");
+    patientProfile.dateOfBirth = dateOfBirth ? new Date(dateOfBirth) : null;  // Directly handle the Date object
     patientProfile.gender = gender;
     patientProfile.weight = weight;
     patientProfile.height = height;

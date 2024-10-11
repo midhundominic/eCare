@@ -16,7 +16,10 @@ const TextInput = (props) => {
     onFocus = () => {},
     error = "",
     styles: customStyles = {},
+    isTextArea = false, // Add a prop to distinguish between input and textarea
+    rows = 5, // Default rows for textarea
   } = props;
+
   const styles = combineStyles(internalStyles, customStyles);
 
   return (
@@ -25,16 +28,32 @@ const TextInput = (props) => {
         <label htmlFor={name}>{title}</label>
         {isRequired && <span className={styles.required}>*</span>}
       </div>
-      <input
-        type={type}
-        id={name}
-        name={name}
-        value={value}
-        placeholder={placeholder}
-        onChange={onChange}
-        onFocus={onFocus}
-        className={`${styles.input} ${error ? styles.inputError : ""}`}
-      />
+
+      {/* Conditionally render input or textarea based on the prop */}
+      {isTextArea ? (
+        <textarea
+          id={name}
+          name={name}
+          value={value}
+          placeholder={placeholder}
+          onChange={onChange}
+          onFocus={onFocus}
+          rows={rows} // Allow the number of rows to be configurable
+          className={`${styles.input} ${error ? styles.inputError : ""}`}
+        />
+      ) : (
+        <input
+          type={type}
+          id={name}
+          name={name}
+          value={value}
+          placeholder={placeholder}
+          onChange={onChange}
+          onFocus={onFocus}
+          className={`${styles.input} ${error ? styles.inputError : ""}`}
+        />
+      )}
+
       {error && <span className={styles.errorText}>{error}</span>}
     </div>
   );
@@ -50,6 +69,8 @@ TextInput.propTypes = {
   isRequired: PropTypes.bool,
   onChange: PropTypes.func,
   onFocus: PropTypes.func,
+  isTextArea: PropTypes.bool, // New prop to switch between input and textarea
+  rows: PropTypes.number, // Prop to control textarea rows
 };
 
 export default TextInput;

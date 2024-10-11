@@ -19,6 +19,7 @@ export const getProfileCoordinator = async () => {
 export const getProfilePatient = async () => {
   try {
     const response = await fetchPatientProfile();
+    console.log(response);
     return response;
   } catch (error) {
     console.error("Error Fetching Patient", error);

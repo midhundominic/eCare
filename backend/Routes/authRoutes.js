@@ -11,7 +11,8 @@ const profileCoordinator = require("../controllers/profileControllers/coordinato
 const authMiddleware = require("../middleware/auth");
 const uploadMiddleware = require("../middleware/upload");
 const profilePatient = require("../controllers/profileControllers/patientControllers");
-const profileDoctor = require ("../controllers/profileControllers/doctorControllers")
+const profileDoctor = require ("../controllers/profileControllers/doctorControllers");
+const appointmentControllers = require("../controllers/appointmentControllers");
 
 
 //patient
@@ -60,5 +61,10 @@ router.put("/coordinator-update",profileCoordinator.updateCoordinatorProfile);
 router.delete("/doctor/:id",doctorControllers.deleteDoctor);
 router.delete("/patient/:id",patientControllers.deletePatientById);
 router.delete("/coordinator/:id",coordinatoControllers.deleteCoordinator);
+
+//appointments
+router.post("/create-appointment",appointmentControllers.createAppointment);
+router.get("/availability",appointmentControllers.getUnavailableTimeSlots);
+
 
 module.exports = router;
