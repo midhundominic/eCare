@@ -1,4 +1,5 @@
 import { doctorSignup, doctorSignin, doctorView } from "../api/doctor";
+import apiClient from "../api/index";
 
 export const regDoctor = async (payload) => {
   try {
@@ -29,3 +30,24 @@ export const getDoctors = async (payload) => {
     throw error;
   }
 };
+
+export const getDoctorById = async (id) => {
+  try {
+    const response = await apiClient.get(`/doctor/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching doctor by ID", error);
+    throw error;
+  }
+};
+
+export const deleteDoctor = async (id) => {
+  try {
+    const response = await apiClient.delete(`/doctor/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting doctor", error);
+    throw error;
+  }
+};
+

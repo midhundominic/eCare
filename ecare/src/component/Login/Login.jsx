@@ -59,7 +59,7 @@ const Login = () => {
 
         // Check if the token is in the response
         if (response.token) {
-          const { role,firstName,lastName,name,email } = response.data;
+          const { role,firstName,lastName,name,email,doctorId,userId } = response.data;
           let fullName = name;
 
           if (role === 2 || role === 3) {
@@ -70,7 +70,9 @@ const Login = () => {
           localStorage.setItem("userData", JSON.stringify({
           email,
           name: fullName,
-          role
+          role,
+          doctorId,
+          userId,
         })); // Store user data
 
           toast.success("Login Successful.");
@@ -127,9 +129,11 @@ const Login = () => {
                   ...res.data,  // Backend response
                   name: res.data.name || user.displayName,
                   email: res.data.email || user.email,
-                  role: res.data.role || user.role, // Use Firebase displayName as fallback
-                  profilePicture: res.data.profilePicture || profilePicture
+                  role: res.data.data.role || user.role, // Use Firebase displayName as fallback
+                  profilePicture: res.data.profilePicture || profilePicture,
+                  userId: res.data.data.userId 
                 };
+                console.log("11111111111",res);
                
                   localStorage.setItem("token", res.token);  // Store the JWT token received from your backend
                   localStorage.setItem("userData", JSON.stringify({
@@ -137,6 +141,7 @@ const Login = () => {
                     name: userData.name,
                     role: userData.role,
                     profilePicture: userData.profilePicture,
+                    userId : userData.userId
                   })); 
                   toast.success("Sign in successful");
                   navigate(ROUTES.PATIENT_HOME);

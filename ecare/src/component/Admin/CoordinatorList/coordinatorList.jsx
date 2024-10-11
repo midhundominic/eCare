@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import Table from "../../Common/Table";
 import { HEAD_CELLS } from "./constant";
-import { getCoordinator } from "../../../services/coordinatorServices";
+import { getCoordinator, deleteCoordinator } from "../../../services/coordinatorServices";
 import Button from "../../Common/Button";
 import { ROUTES } from "../../../router/routes";
 
@@ -12,13 +13,14 @@ import PageTitle from "../../Common/PageTitle";
 
 const CoordinatorList = () => {
   const [coordinatorArr, setCoordinatorArr] = useState([]);
+  const [selectedCoordinator, setSelectedCoordinator] = useState([]);
   const navigate = useNavigate();
 
-  const formateData = (data) =>
+   const formateData = (data) =>
     data.map((coordinator, index) => {
-      const { firstName, lastName, email, phone, gender } = coordinator;
+      const { _id,firstName, lastName, email, phone, gender } = coordinator;
       return {
-        id: `${index}-${email}`,
+        id: _id,
         name: `${firstName} ${lastName}`,
         email,
         phone,
@@ -39,6 +41,22 @@ const CoordinatorList = () => {
 
     fetchCoordinator();
   }, []);
+
+  const handleDelete = async (idsToDelete) => {
+    try {
+      for (const id of idsToDelete) {
+        await deleteCoordinator(id);
+      }
+      setCoordinatorArr((prevCoordinatorArr) =>
+        prevCoordinatorArr.filter(coordinator => !idsToDelete.includes(coordinator.id))
+      );
+  
+      setSelectedCoordinator([]); // Reset selected doctors
+      toast.success("Coordinator deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting doctors", error);
+    }
+  };
 
   const handleRegisterNewCoor = () => {
     navigate(ROUTES.COORDINATOR_REGISTER);
@@ -61,6 +79,7 @@ const CoordinatorList = () => {
           title="Care Coordinator List"
           headCells={HEAD_CELLS}
           rows={coordinatorArr}
+          handleDelete={handleDelete}
         />
       )}
     </>

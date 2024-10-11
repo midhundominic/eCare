@@ -58,11 +58,3 @@ export const uploadDoctorProfileImage = async (formData) => {
   }
 };
 
-// export const getDoctorPhoto = async () => {
-//   try {
-//     const response = await apiClient.get("/doctor-profile-photo");
-//     return response;
-//   } catch (error) {
-//     throw error;
-//   }
-// };

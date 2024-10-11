@@ -18,7 +18,7 @@ import styles from "./table.module.css";
 import { getComparator } from "./helper";
 
 const EnhancedTable = (props) => {
-  const { title, headCells, dense = false, rows } = props;
+  const { title, headCells, dense = false, rows, handleDelete } = props;
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("name");
   const [selected, setSelected] = React.useState([]);
@@ -77,13 +77,19 @@ const EnhancedTable = (props) => {
       [...rows]
         .sort(getComparator(order, orderBy))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [order, orderBy, page, rowsPerPage]
+    [order, orderBy, page, rowsPerPage,rows]
   );
 
   return (
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} title={title} />
+        <EnhancedTableToolbar 
+          numSelected={selected.length} 
+          title={title} 
+          selected={selected}
+          handleDelete={handleDelete} 
+          setSelected={setSelected} // Pass setSelected to clear selection after deletion
+        />
         <TableContainer className={styles.tableContainer}>
           <Table
             sx={{ minWidth: 750 }}
@@ -173,10 +179,12 @@ const EnhancedTable = (props) => {
   );
 };
 
-export default EnhancedTable;
-
 EnhancedTable.propTypes = {
   title: PropTypes.string,
   dense: PropTypes.bool,
-  //   headCells:
+  headCells: PropTypes.array.isRequired,
+  rows: PropTypes.array.isRequired,
+  handleDelete: PropTypes.func.isRequired,
 };
+
+export default EnhancedTable;

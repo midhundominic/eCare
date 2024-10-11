@@ -23,15 +23,23 @@ import PatientList from "../component/Admin/PatientiList";
 import ForgotPassword from "../component/ForgotPassword";
 import VarifyCode from "../component/VarifyCode";
 import ResetPassword from "../component/ResetPassword";
+import ScheduleAppointment from "../component/Patient/ScheduleAppointment";
 
 const Router = () => {
   const location = useLocation();
   const isAuthRoute = !NON_AUTH_ROUTES.includes(location.pathname);
 
+  console.log("Current location:", location.pathname);
+  console.log("Is auth route:", isAuthRoute);
+
   return (
     <div style={{ width: "100%", height: "100%" }}>
       {isAuthRoute ? (
         <Routes>
+            <Route
+              path={ROUTES.SCHEDULE_APPOINTMENT}
+              element={<ScheduleAppointment />}
+            />
           <Route
             path={ROUTES.DEFAULT}
             element={<Navigate to={ROUTES.LOGIN} />}
@@ -45,11 +53,13 @@ const Router = () => {
         </Routes>
       ) : (
         <Main>
-          <Routes>
+          <Routes> 
+          
+
             <Route path={ROUTES.PATIENT_HOME} element={<PatientHome />} />
             <Route path={ROUTES.ADMIN_HOME} element={<AdminHome />} />
             <Route path={ROUTES.DOCTOR_HOME} element={<DoctorHome />} />
-            
+
             <Route path={ROUTES.DOCTOR_REGISTER} element={<DoctorRegister />} />
             <Route
               path={ROUTES.COORDINATOR_REGISTER}
@@ -77,6 +87,7 @@ const Router = () => {
               element={<CoordinatorList />}
             />
             <Route path={ROUTES.ADMIN_PATIENT_LIST} element={<PatientList />} />
+           
           </Routes>
         </Main>
       )}

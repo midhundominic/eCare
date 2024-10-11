@@ -1,9 +1,9 @@
 const PatientModel = require("../models/patientModel");
+const PatientPersonaModel = require("../models/patientPersonalModel")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const admin = require("firebase-admin");
 require("dotenv").config();
-
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 
@@ -90,7 +90,12 @@ const authWithGoogle = async (req, res) => {
 
     res.status(201).json({
       message: "User login successful!",
-      data: { email: user.email, name: user.name, role: user.role },
+      data: {
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        userId: user._id
+      },
       token,
     });
   } catch (error) {
@@ -103,15 +108,89 @@ const authWithGoogle = async (req, res) => {
 
 const getAllPatient = async (req, res) => {
   try {
-    const patients = await PatientModel.find({});
+    // Aggregate the data from both the patient and personal info collections
+    const patients = await PatientModel.aggregate([
+      {
+        $lookup: {
+          from: "patientpersonalinfos", // MongoDB uses the plural collection name by default
+          localField: "email",
+          foreignField: "email",
+          as: "personalInfo",
+        },
+      },
+      {
+        $unwind: {
+          path: "$personalInfo",
+          preserveNullAndEmptyArrays: true, // Include patients without personal info
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          email: 1,
+          role: 1,
+          date_created: 1,
+          "personalInfo.dateOfBirth": 1,
+          "personalInfo.gender": 1,
+          "personalInfo.weight": 1,
+          "personalInfo.height": 1,
+          "personalInfo.admissionNumber": 1,
+        },
+      },
+    ]);
+
     res.status(201).json({ data: patients });
   } catch (error) {
+    console.error("Error fetching patients:", error);
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
+
+// const deletePatient = async (req, res) => {
+//   try {
+//     const patient = await PatientModel.findByIdAndDelete(req.params.id);
+//     if (!patient) {
+//       return res.status(404).json({ message: "Patient not found" });
+//     }
+//     res.status(201).json({ message: "Patient deleted successfully" });
+//   } catch (error) {
+//     res.status(500).json({ message: "Server error", error: error.message });
+//   }
+// };
+
+const deletePatientById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find and delete the patient in the Patient schema
+    const patient = await PatientModel.findByIdAndDelete(id);
+    if (!patient) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
+
+    // Delete the associated personal information using the patient's email
+    const personalInfo = await PatientPersonaModel.findOneAndDelete({
+      email: patient.email,
+    });
+
+    return res.status(201).json({
+      message: "Patient and associated personal info deleted successfully",
+      patient,
+      personalInfo,
+    });
+  } catch (error) {
+    console.error("Error deleting patient:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
 
 module.exports = {
   signup,
   authWithGoogle,
   getAllPatient,
+  deletePatientById,
 };

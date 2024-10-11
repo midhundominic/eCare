@@ -4,8 +4,14 @@ import { Toolbar, Tooltip, Typography, IconButton, alpha } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 
-const EnhancedTableToolbar = (props) => {
-  const { numSelected, title } = props;
+const EnhancedTableToolbar = ({ numSelected, title, selected, handleDelete, setSelected }) => {
+  const onDeleteClick = () => {
+    if (typeof handleDelete === 'function' && selected.length > 0) {
+      handleDelete(selected); // Ensure handleDelete is a valid function
+      setSelected([]); // Clear the selected doctors after deletion
+    }
+  };
+
   return (
     <Toolbar
       sx={[
@@ -43,7 +49,7 @@ const EnhancedTableToolbar = (props) => {
       )}
       {numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton>
+          <IconButton onClick={onDeleteClick}> {/* Pass selected doctors to delete */}
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -58,8 +64,12 @@ const EnhancedTableToolbar = (props) => {
   );
 };
 
-export default EnhancedTableToolbar;
-
 EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
+  title: PropTypes.string.isRequired,
+  selected: PropTypes.array.isRequired, // Add selected prop
+  handleDelete: PropTypes.func.isRequired, // Add handleDelete prop
+  setSelected: PropTypes.func.isRequired, // Add setSelected prop
 };
+
+export default EnhancedTableToolbar;

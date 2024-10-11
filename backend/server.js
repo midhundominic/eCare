@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const authRoutes = require("./Routes/authRoutes");
+const appointmentRoutes = require("./Routes/appointmentRoutes")
 require('dotenv').config();
 
 const app = express();
@@ -14,8 +15,11 @@ app.use(express.json()); // Parse JSON bodies
 
 // Routes
 app.use("/api", authRoutes); // Use the routes
+app.use('/api/appointments', appointmentRoutes);
+
 
 app.use('/src/assets/doctorProfile', express.static('src/assets/doctorProfile'));
+app.use('/src/assets', express.static('src/assets'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
