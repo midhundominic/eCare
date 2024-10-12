@@ -1,27 +1,6 @@
-// import { scheduleAppointmentAPI, getPatientAppointmentsAPI } from "../api/appointment";
+
 import apiClient from "../api";
 
-// Service to schedule an appointment
-// export const scheduleAppointment = async (payload) => {
-//   try {
-//     const response = await scheduleAppointmentAPI(payload);
-//     return response;
-//   } catch (error) {
-//     console.error("Error scheduling appointment", error);
-//     throw error;
-//   }
-// };
-
-// Service to get patient appointments
-// export const getPatientAppointments = async (patientId) => {
-//   try {
-//     const response = await getPatientAppointmentsAPI(patientId);
-//     return response;
-//   } catch (error) {
-//     console.error("Error fetching appointments", error);
-//     throw error;
-//   }
-// };
 
 export const createAppointment = async (appointmentData) => {
   try {
@@ -41,6 +20,38 @@ export const getUnavailableTimeSlots = async (doctorId, date) => {
     return response.data.unavailableSlots || [];
   } catch (error) {
     console.error("Error fetching unavailable time slots", error);
+    throw error;
+  }
+};
+
+export const getAppointments = async (patientId) => {
+  try {
+    const response = await apiClient.get(`/patient-appointments/${patientId}`);
+    return response;
+  } catch (error) {
+    console.error("Error fetching appointments", error);
+    throw error;
+  }
+};
+
+// Cancel an appointment
+export const cancelAppointment = async (appointmentId) => {
+  try {
+    const response = await apiClient.put(`/cancel-appointment/${appointmentId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error canceling appointment", error);
+    throw error;
+  }
+};
+
+// Reschedule an appointment
+export const rescheduleAppointment = async (appointmentId, rescheduleData) => {
+  try {
+    const response = await apiClient.put(`/reschedule-appointment/${appointmentId}`, rescheduleData);
+    return response.data;
+  } catch (error) {
+    console.error("Error rescheduling appointment", error);
     throw error;
   }
 };

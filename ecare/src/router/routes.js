@@ -1,10 +1,13 @@
+import ScheduledAppointments from "../component/Doctor/ScheduledAppointments";
+
 export const ROUTES = {
   DEFAULT: "/",
   LOGIN: "/login",
   SIGNUP: "/signup",
   PATIENT_HOME: "/patient/home",
   PATIENT_APPOINTMENT: "/patient/appointments",
-  SCHEDULE_APPOINTMENT: "/doctor/schedule/appointment/:id", 
+  SCHEDULED_APPOINTMENT: "/patient/scheduled", 
+  SCHEDULED_APPOINTMENTS:"/doctor/scheduled",
   PATIENT_PROFILE: "/patient/profile",
   ADMIN: "/admin",
   ADMIN_HOME: "/admin/home",
@@ -26,7 +29,8 @@ export const ROUTES = {
 export const NON_AUTH_ROUTES = [
   ROUTES.PATIENT_HOME,
   ROUTES.PATIENT_APPOINTMENT,
-  ROUTES.SCHEDULE_APPOINTMENT,
+  ROUTES.SCHEDULED_APPOINTMENT,
+  ROUTES.SCHEDULED_APPOINTMENTS,
   ROUTES.PATIENT_PROFILE,
   ROUTES.ADMIN_PROFILE,
   ROUTES.DOCTOR_PROFILE,

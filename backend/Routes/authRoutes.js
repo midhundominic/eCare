@@ -30,6 +30,8 @@ router.get("/patients-view",patientControllers.getAllPatient);
 router.post("/doctor-registration", doctorControllers.registerDoctor);
 router.post("/doctor-signin", authControllers.signin);
 router.get("/doctors-view",doctorControllers.getAllDoctors);
+// router.get("/:doctorId/appointments",doctorControllers.getDoctorAppointments);
+router.get("/doctor-appointments/:doctorId",authMiddleware,doctorControllers.getAppointmentsByDoctorId);
 
 //doctorid
 router.get("/doctor/:id", doctorControllers.getDoctorById);
@@ -65,6 +67,9 @@ router.delete("/coordinator/:id",coordinatoControllers.deleteCoordinator);
 //appointments
 router.post("/create-appointment",appointmentControllers.createAppointment);
 router.get("/availability",appointmentControllers.getUnavailableTimeSlots);
+router.get("/patient-appointments/:patientId",authMiddleware,appointmentControllers.getAppointmentsByPatientId);
+router.put("/cancel-appointment/:appointmentId",appointmentControllers.cancelAppointment);
+router.put("/reschedule-appointment/:appointmentId",appointmentControllers.rescheduleAppointment);
 
 
 module.exports = router;
