@@ -20,7 +20,7 @@ const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
     ...profileData,
   });
 
-  const navigate = useNavigate();
+  
 
   // Update formData when profileData changes
   useEffect(() => {

@@ -45,7 +45,7 @@ const getPatientProfile = async (req, res) => {
 // UPDATE patient profile by email
 const updatePatientProfile = async (req, res) => {
   const { email, dateOfBirth, gender, weight, height, profilePhoto } = req.body;
-
+console.log(email, dateOfBirth, gender, weight, height, profilePhoto)
   try {
     // Check if patient exists in PatientModel (core profile)
     const patient = await PatientModel.findOne({ email });

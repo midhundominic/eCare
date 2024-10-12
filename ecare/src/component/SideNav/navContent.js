@@ -5,6 +5,7 @@ import PaymentIcon from "@mui/icons-material/Payment";
 import VideoChatIcon from "@mui/icons-material/VideoChat";
 import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
 import BadgeRoundedIcon from "@mui/icons-material/BadgeRounded";
+import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 
 import { ROUTES } from "../../router/routes";
 
@@ -39,6 +40,12 @@ export const NAV_CONTENT_PATIENT = [
     link: ROUTES.PATIENT_HOME,
     icon: PaymentIcon,
   },
+  {
+    id:6,
+    title: "Scheduled Appointments",
+    link: ROUTES.SCHEDULED_APPOINTMENT,
+    icon: EditCalendarIcon,
+  }
 ];
 
 export const NAV_CONTENT_ADMIN = [
@@ -78,8 +85,8 @@ export const NAV_CONTENT_DOCTOR = [
   {
     id: 2,
     title: "Appointments",
-    link: ROUTES.ADMIN_DOC_LIST,
-    icon: BadgeRoundedIcon,
+    link: ROUTES.SCHEDULED_APPOINTMENTS,
+    icon: CalendarMonthIcon,
   },
   {
     id: 3,

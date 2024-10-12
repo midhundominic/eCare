@@ -2,7 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import { getDoctors } from "../../../services/doctorServices";
-import { createAppointment, getUnavailableTimeSlots } from "../../../services/appointmentServices";
+import {
+  createAppointment,
+  getUnavailableTimeSlots,
+} from "../../../services/appointmentServices";
 import { getProfilePatient } from "../../../services/profileServices";
 import Modal from "react-modal";
 import "./appointment.css";
@@ -77,14 +80,19 @@ const DoctorProfiles = () => {
 
   const handleDateSelect = async (date) => {
     setAppointmentDate(date);
-  
+
     if (selectedDoctor && date) {
       try {
         // Use the service function to fetch unavailable slots
-        const unavailableSlots = await getUnavailableTimeSlots(selectedDoctor._id, date);
-  
+        const unavailableSlots = await getUnavailableTimeSlots(
+          selectedDoctor._id,
+          date
+        );
+
         // Filter out unavailable time slots
-        setAvailableTimeSlots(timeSlots.filter((slot) => !unavailableSlots.includes(slot)));
+        setAvailableTimeSlots(
+          timeSlots.filter((slot) => !unavailableSlots.includes(slot))
+        );
       } catch (error) {
         console.error("Error fetching time slot availability:", error);
         toast.error("Error fetching time slots. Please try again later.");

@@ -14,6 +14,7 @@ const createAppointment = async (req, res) => {
       doctorId,
       appointmentDate,
       timeSlot,
+      status: { $ne: "canceled" },
     });
 
     if (existingAppointment) {
@@ -63,6 +64,7 @@ const getUnavailableTimeSlots = async (req, res) => {
     const appointments = await AppointmentModel.find({
       doctorId,
       appointmentDate: new Date(date),
+      status: { $ne: "canceled" },
     });
 
     // Extract the unavailable time slots
@@ -77,4 +79,81 @@ const getUnavailableTimeSlots = async (req, res) => {
   }
 };
 
-module.exports = { createAppointment, getUnavailableTimeSlots };
+const getAppointmentsByPatientId = async (req, res) => {
+  const { patientId } = req.params;
+
+  try {
+    const appointments = await AppointmentModel.find({ patientId }).populate(
+      "doctorId",
+      "firstName lastName specialization"
+    );
+    res.status(201).json({ appointments });
+  } catch (error) {
+    console.error("Error fetching appointments:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Cancel an appointment
+const cancelAppointment = async (req, res) => {
+  const { appointmentId } = req.params;
+
+  try {
+    const appointment = await AppointmentModel.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+    // Delete the appointment instead of marking it as "canceled"
+    await appointment.deleteOne();
+
+    // appointment.status = "canceled";
+    // await appointment.save();
+    res.status(201).json({ message: "Appointment canceled successfully" });
+  } catch (error) {
+    console.error("Error canceling appointment:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Reschedule an appointment
+const rescheduleAppointment = async (req, res) => {
+  const { appointmentId } = req.params;
+  const { appointmentDate, timeSlot } = req.body;
+
+  try {
+    const appointment = await AppointmentModel.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    // Check if the new time slot is available
+    const existingAppointment = await AppointmentModel.findOne({
+      doctorId: appointment.doctorId,
+      appointmentDate,
+      timeSlot,
+    });
+
+    if (existingAppointment) {
+      return res.status(400).json({ message: "Time slot already booked" });
+    }
+
+    // Update appointment details
+    appointment.appointmentDate = appointmentDate;
+    appointment.timeSlot = timeSlot;
+    appointment.status = "rescheduled";
+    await appointment.save();
+
+    res.status(201).json({ message: "Appointment rescheduled successfully" });
+  } catch (error) {
+    console.error("Error rescheduling appointment:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = {
+  createAppointment,
+  getUnavailableTimeSlots,
+  getAppointmentsByPatientId,
+  cancelAppointment,
+  rescheduleAppointment,
+};

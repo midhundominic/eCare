@@ -31,7 +31,11 @@ const DoctorRegistration = () => {
     let error = "";
     switch (name) {
       case "firstName":
-        if (!value) error = "First name is required";
+        if (!value) {
+          error = "First name is required";
+        } else if (value.length < 3) {
+          error = "First name must be at least 3 characters long";
+        }
         break;
       case "lastName":
         if (!value) error = "Last name is required";
@@ -40,20 +44,30 @@ const DoctorRegistration = () => {
         if (!/\S+@\S+\.\S+/.test(value)) error = "Enter a valid email";
         break;
       case "phone":
-        if (!value) error = "Phone number is required";
+        if (!value) {
+          error = "Phone number is required";
+        } else if (!/^\d{10}$/.test(value)) {
+          error = "Phone number must be exactly 10 digits and contain only numbers";
+        }
         break;
       case "password":
-        if (!/[!@#$%^&*(),.?":{}|<>]/g.test(value))
-          error = "Password must contain a special character";
-        if (value.length < 8)
+        if (!value) {
+          error = "Please enter a password";
+        } else if (!/[!@#$%^&*(),.?":{}|<>]/g.test(value)) {
+          error = "Password must contain at least one special character";
+        } else if (value.length < 8) {
           error = "Password must be at least 8 characters long";
+        }
         break;
       case "c_password":
-        if (value !== formData.password) error = "Passwords do not match";
+        if (value !== formData.password) {
+          error = "Passwords do not match";
+        }
         break;
       case "aboutDoctor":
-        if (value.length < 50)
+        if (value.length < 50) {
           error = "About section must be at least 50 characters long";
+        }
         break;
       default:
         break;
@@ -222,6 +236,7 @@ const DoctorRegistration = () => {
             onChange={handleChange}
             isRequired={true}
             styles={{ inputGroup: styles.customizeInputGroup }}
+            error={formError.password}
           />
           <TextInput
             type="password"
@@ -232,6 +247,7 @@ const DoctorRegistration = () => {
             onChange={handleChange}
             isRequired={true}
             styles={{ inputGroup: styles.customizeInputGroup }}
+            error={formError.c_password}
           />
 
           <TextInput
