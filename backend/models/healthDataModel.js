@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const HealthDataSchema = new mongoose.Schema({
   patientId: { 
@@ -11,26 +11,20 @@ const HealthDataSchema = new mongoose.Schema({
     ref: "coordinator", 
     required: true 
   },
-  bloodPressure: {
-    systolic: { type: Number },
-    diastolic: { type: Number },
-  },
-  bloodSugar: { type: Number }, // mg/dL
-  cholesterol: { type: Number }, // mg/dL
-  thyroid: { type: Number }, // TSH level (µIU/mL)
-  heartRate: { type: Number }, // bpm
-  oxygenLevel: { type: Number }, // SpO2 (%)
-  weight: { type: Number }, // kg
-  height: { type: Number }, // cm
-  medication: { type: String }, // Description of medication given
-  observation: { type: String }, // Coordinator or doctor’s notes
+  fields: [
+    {
+      label: { type: String, required: true },  // Dynamic field label (e.g. 'Blood Pressure')
+      value: { type: mongoose.Schema.Types.Mixed, required: true }, // Dynamic field value
+      unit: { type: String }, // Optional unit (e.g. mmHg for blood pressure)
+    }
+  ],
   dateEntered: { 
     type: Date, 
     required: true, 
     default: Date.now 
-  }
+  },
+  patientComment: { type: String, default: "" } // Optional patient comment
 });
 
-const HealthData = mongoose.model("healthData", HealthDataSchema);
-
+const HealthData = mongoose.model("HealthData", HealthDataSchema);
 module.exports = HealthData;

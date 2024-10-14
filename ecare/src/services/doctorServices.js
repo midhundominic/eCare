@@ -60,3 +60,23 @@ export const getDoctorAppointments = async (doctorId) => {
     throw error;
   }
 };
+
+export const applyForLeave = async (leaveData) => {
+  try {
+    const response = await apiClient.post(`/leaves/apply/${leaveData.doctorId}`, leaveData);
+    return response.data;
+  } catch (error) {
+    console.error("Error applying for leave", error);
+    throw error;
+  }
+};
+
+export const fetchLeaveStatus = async (doctorId) => {
+  try {
+    const response = await apiClient.get(`/leaves/status/${doctorId}`);
+    return response.data.status; // Adjust based on your backend response
+  } catch (error) {
+    console.error("Error fetching leave status", error);
+    throw error;
+  }
+};

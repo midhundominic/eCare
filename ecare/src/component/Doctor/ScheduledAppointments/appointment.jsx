@@ -40,8 +40,7 @@ const DoctorAppointments = () => {
           <div className="appointment-card-content">
             <div className="patient-details">
               <p>
-                Patient: {appointment.patientId.firstName}{" "}
-                {appointment.patientId.lastName}
+                Patient: {appointment.patientId.name}{" "}
               </p>
               <p>
                 Date: {dayjs(appointment.appointmentDate).format("YYYY-MM-DD")}

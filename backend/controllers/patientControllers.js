@@ -1,5 +1,5 @@
 const PatientModel = require("../models/patientModel");
-const PatientPersonaModel = require("../models/patientPersonalModel")
+const PatientPersonaModel = require("../models/patientPersonalModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const admin = require("firebase-admin");
@@ -94,7 +94,7 @@ const authWithGoogle = async (req, res) => {
         email: user.email,
         name: user.name,
         role: user.role,
-        userId: user._id
+        userId: user._id,
       },
       token,
     });
@@ -108,37 +108,21 @@ const authWithGoogle = async (req, res) => {
 
 const getAllPatient = async (req, res) => {
   try {
-    // Aggregate the data from both the patient and personal info collections
-    const patients = await PatientModel.aggregate([
+    const patients = await PatientModel.find(
+      {},
       {
-        $lookup: {
-          from: "patientpersonalinfos", // MongoDB uses the plural collection name by default
-          localField: "email",
-          foreignField: "email",
-          as: "personalInfo",
-        },
-      },
-      {
-        $unwind: {
-          path: "$personalInfo",
-          preserveNullAndEmptyArrays: true, // Include patients without personal info
-        },
-      },
-      {
-        $project: {
-          _id: 1,
-          name: 1,
-          email: 1,
-          role: 1,
-          date_created: 1,
-          "personalInfo.dateOfBirth": 1,
-          "personalInfo.gender": 1,
-          "personalInfo.weight": 1,
-          "personalInfo.height": 1,
-          "personalInfo.admissionNumber": 1,
-        },
-      },
-    ]);
+        _id: 1,
+        name: 1,
+        email: 1,
+        role: 1,
+        date_created: 1,
+        dateOfBirth: 1,
+        gender: 1,
+        weight: 1,
+        height: 1,
+        admissionNumber: 1,
+      }
+    );
 
     res.status(201).json({ data: patients });
   } catch (error) {
@@ -158,22 +142,19 @@ const deletePatientById = async (req, res) => {
     }
 
     // Delete the associated personal information using the patient's email
-    const personalInfo = await PatientPersonaModel.findOneAndDelete({
-      email: patient.email,
-    });
+    // const personalInfo = await PatientPersonaModel.findOneAndDelete({
+    //   email: patient.email,
+    // });
 
     return res.status(201).json({
-      message: "Patient and associated personal info deleted successfully",
+      message: "Patient deleted successfully",
       patient,
-      personalInfo,
     });
   } catch (error) {
     console.error("Error deleting patient:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
-
 
 module.exports = {
   signup,

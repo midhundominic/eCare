@@ -59,7 +59,7 @@ const Login = () => {
 
         // Check if the token is in the response
         if (response.token) {
-          const { role,firstName,lastName,name,email,doctorId,userId } = response.data;
+          const { role,firstName,lastName,name,email,doctorId,userId,coordinatorId } = response.data;
           let fullName = name;
 
           if (role === 2 || role === 3) {
@@ -73,6 +73,7 @@ const Login = () => {
           role,
           doctorId,
           userId,
+          coordinatorId,
         })); // Store user data
 
           toast.success("Login Successful.");

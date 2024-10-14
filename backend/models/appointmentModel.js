@@ -12,12 +12,12 @@ const AppointmentSchema = new mongoose.Schema({
     ref: "doctor",
     required: true,
   },
-  appointmentDate: { 
-    type: Date, 
-    required: true 
+  appointmentDate: {
+    type: Date,
+    required: true,
   },
-  timeSlot: { 
-    type: String, 
+  timeSlot: {
+    type: String,
     enum: [
       "9:30 AM - 10:00 AM",
       "10:00 AM - 10:30 AM",
@@ -26,9 +26,9 @@ const AppointmentSchema = new mongoose.Schema({
       "11:30 AM - 12:00 PM",
       "12:00 PM - 12:30 PM",
       "1:30 PM - 2:00 PM",
-      "2:00 PM - 2:30 PM"
+      "2:00 PM - 2:30 PM",
     ],
-    required: true
+    required: true,
   },
   status: {
     type: String,

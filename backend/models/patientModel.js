@@ -3,13 +3,25 @@ const bcrypt = require("bcrypt");
 const dayjs = require("dayjs");
 
 const PatientSchema = new mongoose.Schema({
+  // Basic info
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: false },
   role: { type: Number, required: true },
   date_created: { type: Date, required: true, default: () => dayjs().toDate() },
-  resetCode: { type: String,default:'' },
-  resetCodeExpiration: { type: Date,default:Date.now },
+  resetCode: { type: String, default: "" },
+  resetCodeExpiration: { type: Date, default: Date.now },
+
+
+  dateOfBirth: { type: Date, required: false ,default: ""},
+  gender: { type: String, required: false, default: "" },
+  weight: { type: String, required: false, default: "" },
+  height: { type: String, required: false, default: ""},
+  profilePhoto: { type: String ,required: false}, // URL to the profile photo
+  admissionNumber: { type: String, unique: true, sparse: true,required: false }, // Unique admission number
+  isProfileComplete: { type: Boolean, default: false },
+  lastUpdated: { type: Date, default: Date.now },
+  address: { type: String, required: false ,default: ""},
 });
 
 // Pre-save hook to hash password before saving

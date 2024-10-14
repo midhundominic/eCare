@@ -87,6 +87,7 @@ const signin = async (req, res) => {
       return res.status(201).json({
         message: "Login Successful",
         data: {
+          coordinatorId: coordinator._id,
           email: coordinator.email,
           role: coordinator.role,
           firstName: coordinator.firstName,

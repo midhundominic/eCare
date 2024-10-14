@@ -16,10 +16,10 @@ const LogoutButton = () => {
     navigate(ROUTES.LOGIN, { replace: true });
 
     // Prevent going back to the protected route
-    // window.history.pushState(null, null, window.location.href);
-    // window.addEventListener("popstate", () => {
-    //   navigate(ROUTES.LOGIN, { replace: true });
-    // });
+    window.history.pushState(null, null, window.location.href);
+    window.addEventListener("popstate", () => {
+      navigate(ROUTES.LOGIN, { replace: true });
+    });
   };
 
   return (

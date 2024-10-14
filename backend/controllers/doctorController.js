@@ -1,5 +1,6 @@
 const DoctorModel = require("../models/doctorModel");
 const Appointment = require("../models/appointmentModel");
+const DoctorLeave = require("../models/doctorLeaveModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -121,7 +122,7 @@ const getAppointmentsByDoctorId = async (req, res) => {
   try {
     const appointments = await Appointment.find({ doctorId }).populate(
       "patientId",
-      "firstName lastName"
+      "name"
     );
     res.status(201).json({ appointments });
   } catch (error) {
@@ -130,6 +131,39 @@ const getAppointmentsByDoctorId = async (req, res) => {
   }
 };
 
+//Leave 
+const applyForLeave = async (req, res) => {
+  try {
+    const { leaveDate, reason } = req.body;
+    const { doctorId } = req.params;  // Get doctorId from route params
+
+    const leaveExists = await DoctorLeave.findOne({ doctorId, leaveDate });
+    if (leaveExists) {
+      return res.status(400).json({ message: "Leave already applied for this date" });
+    }
+
+    const newLeave = new DoctorLeave({ doctorId, leaveDate, reason });
+    await newLeave.save();
+
+    res.status(201).json({ message: "Leave request submitted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error applying for leave", error });
+  }
+};
+
+const getLeaveStatus = async (req, res) => {
+  try {
+    const { doctorId } = req.params;
+    const leaveRequest = await DoctorLeave.findOne({ doctorId }).sort({ requestDate: -1 }); // Get the latest leave request
+    if (!leaveRequest) {
+      return res.status(404).json({ message: "No leave request found" });
+    }
+
+    res.status(201).json({ status: leaveRequest.status });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching leave status", error });
+  }
+};
 
 module.exports = {
   registerDoctor,
@@ -138,4 +172,6 @@ module.exports = {
   deleteDoctor,
   getDoctorAppointments,
   getAppointmentsByDoctorId,
+  applyForLeave,
+  getLeaveStatus,
 };

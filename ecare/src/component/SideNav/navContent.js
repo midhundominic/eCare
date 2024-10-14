@@ -6,6 +6,7 @@ import VideoChatIcon from "@mui/icons-material/VideoChat";
 import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
 import BadgeRoundedIcon from "@mui/icons-material/BadgeRounded";
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
+import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 
 import { ROUTES } from "../../router/routes";
 
@@ -25,19 +26,19 @@ export const NAV_CONTENT_PATIENT = [
   {
     id: 3,
     title: "Consultation",
-    link: ROUTES.PATIENT_HOME,
+    link: ROUTES.PATIENT_CONSULTATION,
     icon: VideoChatIcon,
   },
   {
     id: 4,
     title: "Records",
-    link: ROUTES.PATIENT_HOME,
+    link: ROUTES.PATIENT_RECORDS,
     icon: LibraryBooksIcon,
   },
   {
     id: 5,
     title: "Payments",
-    link: ROUTES.PATIENT_HOME,
+    link: ROUTES.PATIENT_PAYMENTS,
     icon: PaymentIcon,
   },
   {
@@ -73,6 +74,18 @@ export const NAV_CONTENT_ADMIN = [
     link: ROUTES.ADMIN_COORDINATOR_LIST,
     icon: PeopleRoundedIcon,
   },
+  {
+    id:5,
+    title:"Appointments",
+    link: ROUTES.ADMIN_APPOINTMENTS,
+    icon: CalendarMonthIcon,
+  },
+  {
+    id:6,
+    title:"Leave",
+    link: ROUTES.ADMIN_LEAVE,
+    icon: EditCalendarIcon,
+  },
 ];
 
 export const NAV_CONTENT_DOCTOR = [
@@ -91,8 +104,14 @@ export const NAV_CONTENT_DOCTOR = [
   {
     id: 3,
     title: "Patients",
-    link: ROUTES.DOCTOR_REGISTER,
+    link: ROUTES.DOCTOR_PATIENTLIST,
     icon: PeopleRoundedIcon,
+  },
+  {
+    id: 4,
+    title: "Leave Appilication",
+    link: ROUTES.DOCTOR_LEAVE,
+    icon: EditCalendarIcon,
   },
 ];
 
@@ -100,15 +119,15 @@ export const NAV_CONTENT_COORDINATOR = [
   {
     id: 1,
     title: "Dashboard",
-    link: ROUTES.DEFAULT_HOME,
+    link: ROUTES.PATIENT_HOME,
     icon: DashboardCustomizeRoundedIcon,
   },
  
   {
     id: 2,
-    title: "Patients",
-    link: ROUTES.DOCTOR_REGISTER,
-    icon: PeopleRoundedIcon,
+    title: "Records",
+    link: ROUTES.HEALTH_RECORDS,
+    icon: AutoStoriesIcon,
   },
 ];
 
