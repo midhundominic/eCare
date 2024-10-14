@@ -3,7 +3,7 @@ import {
   getAppointments,
   cancelAppointment,
   rescheduleAppointment,
-  getUnavailableTimeSlots, // Import this to fetch unavailable time slots
+  getUnavailableTimeSlots,
 } from "../../../services/appointmentServices";
 import Modal from "react-modal";
 import dayjs from "dayjs";
@@ -19,6 +19,7 @@ const PatientAppointments = () => {
   const [rescheduleDate, setRescheduleDate] = useState("");
   const [rescheduleTimeSlot, setRescheduleTimeSlot] = useState("");
   const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
+  
   const timeSlots = [
     "9:30 AM - 10:00 AM",
     "10:00 AM - 10:30 AM",
@@ -73,19 +74,55 @@ const PatientAppointments = () => {
     setRescheduleTimeSlot(""); // Reset time slot
   };
 
+  // Function to get next 7 days excluding Sundays
+  const getNextSevenDays = () => {
+    const days = [];
+    let i = 0;
+
+    while (days.length < 7) {
+      const day = dayjs().add(i, "day");
+      // Exclude Sundays (day 0 in dayjs is Sunday)
+      if (day.day() !== 0) {
+        days.push(day);
+      }
+      i++;
+    }
+
+    return days;
+  };
+
+  const availableDates = getNextSevenDays();
+
   const handleDateSelect = async (date) => {
     setRescheduleDate(date);
-
+  
+    const isToday = dayjs().format("YYYY-MM-DD") === date;
+  
+    // If the selected date is today, filter out past time slots
+    let filteredTimeSlots = timeSlots;
+    if (isToday) {
+      const currentTime = dayjs(); // Get the current time
+  
+      filteredTimeSlots = timeSlots.filter((slot) => {
+        const [startTime] = slot.split(" - "); // Extract the start time from the slot
+        const slotTime = dayjs(`${date} ${startTime}`, "YYYY-MM-DD h:mm A"); // Combine the date and start time
+  
+        return slotTime.isAfter(currentTime); // Keep the slot only if it's in the future
+      });
+    }
+  
+    setAvailableTimeSlots(filteredTimeSlots); // Reset available time slots for the selected date
+  
     if (selectedAppointment && date) {
       try {
         const unavailableSlots = await getUnavailableTimeSlots(
-          selectedAppointment.doctorId._id, // Get doctor ID from appointment
+          selectedAppointment.doctorId._id,
           date
         );
-
+  
         // Filter out unavailable time slots
-        setAvailableTimeSlots(
-          timeSlots.filter((slot) => !unavailableSlots.includes(slot))
+        setAvailableTimeSlots((prevSlots) =>
+          prevSlots.filter((slot) => !unavailableSlots.includes(slot))
         );
       } catch (error) {
         console.error("Error fetching unavailable time slots:", error);
@@ -93,6 +130,7 @@ const PatientAppointments = () => {
       }
     }
   };
+  
 
   const handleReschedule = async () => {
     try {
@@ -100,10 +138,10 @@ const PatientAppointments = () => {
         appointmentDate: rescheduleDate,
         timeSlot: rescheduleTimeSlot,
       };
-  
+
       // Call the reschedule API
       await rescheduleAppointment(selectedAppointment._id, rescheduleData);
-  
+
       // Update the appointments state after successful reschedule
       setAppointments((prevAppointments) =>
         prevAppointments.map((appointment) =>
@@ -117,16 +155,15 @@ const PatientAppointments = () => {
             : appointment
         )
       );
-  
+
       toast.success("Appointment rescheduled successfully");
-  
+
       // Close the modal
       setModalIsOpen(false);
     } catch (error) {
       toast.error("Error rescheduling appointment");
     }
   };
-  
 
   return (
     <div className="appointments-list">
@@ -175,21 +212,18 @@ const PatientAppointments = () => {
         <div className="form-group date-picker">
           <label>Select Date:</label>
           <div className="date-options">
-            {[...Array(7)].map((_, index) => {
-              const day = dayjs().add(index, "day");
-              return (
-                <button
-                  key={index}
-                  className={`date-btn ${
-                    rescheduleDate === day.format("YYYY-MM-DD") ? "selected" : ""
-                  }`}
-                  onClick={() => handleDateSelect(day.format("YYYY-MM-DD"))}
-                >
-                  <div>{day.format("ddd").toUpperCase()}</div>
-                  <div>{day.format("DD")}</div>
-                </button>
-              );
-            })}
+            {availableDates.map((day, index) => (
+              <button
+                key={index}
+                className={`date-btn ${
+                  rescheduleDate === day.format("YYYY-MM-DD") ? "selected" : ""
+                }`}
+                onClick={() => handleDateSelect(day.format("YYYY-MM-DD"))}
+              >
+                <div>{day.format("ddd").toUpperCase()}</div>
+                <div>{day.format("DD")}</div>
+              </button>
+            ))}
           </div>
         </div>
 
@@ -216,14 +250,12 @@ const PatientAppointments = () => {
         </div>
 
         {/* Confirm Reschedule Button */}
-        
         <button className="submit-btn" onClick={handleReschedule}>
           Confirm Reschedule
         </button>
         <button className="cancel-btn" onClick={() => setModalIsOpen(false)}>
           Cancel
         </button>
-      
       </Modal>
     </div>
   );

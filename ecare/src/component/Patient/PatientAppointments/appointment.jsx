@@ -1,15 +1,10 @@
-// appointment.jsx
-
 import React, { useEffect, useState } from "react";
 import { getDoctors } from "../../../services/doctorServices";
-import {
-  createAppointment,
-  getUnavailableTimeSlots,
-} from "../../../services/appointmentServices";
+import { createAppointment, getUnavailableTimeSlots } from "../../../services/appointmentServices";
 import { getProfilePatient } from "../../../services/profileServices";
 import Modal from "react-modal";
-import "./appointment.css";
 import dayjs from "dayjs";
+import "./appointment.css";
 import { toast } from "react-toastify";
 
 const DoctorProfiles = () => {
@@ -34,9 +29,16 @@ const DoctorProfiles = () => {
 
   const getNextSevenDays = () => {
     const days = [];
-    for (let i = 0; i < 7; i++) {
-      days.push(dayjs().add(i, "day"));
+    let i = 0;
+
+    while (days.length < 7) {
+      const day = dayjs().add(i, "day");
+      if (day.day() !== 0) {
+        days.push(day);
+      }
+      i++;
     }
+
     return days;
   };
 
@@ -55,7 +57,8 @@ const DoctorProfiles = () => {
     const fetchPatientProfile = async () => {
       try {
         const profileData = await getProfilePatient();
-        setPatientId(profileData?.patient?._id);
+        setPatientId(profileData.data.patientId);
+        console.log("Patient ID fetched: ", profileData.data.patientId);
       } catch (error) {
         console.error("Error fetching patient profile:", error);
       }
@@ -68,7 +71,7 @@ const DoctorProfiles = () => {
   const openModal = (doctor) => {
     setSelectedDoctor(doctor);
     setModalIsOpen(true);
-    setAvailableTimeSlots(timeSlots); // Reset time slots on modal open
+    setAvailableTimeSlots(timeSlots);
     setAppointmentDate("");
     setTimeSlot("");
   };
@@ -83,16 +86,23 @@ const DoctorProfiles = () => {
 
     if (selectedDoctor && date) {
       try {
-        // Use the service function to fetch unavailable slots
         const unavailableSlots = await getUnavailableTimeSlots(
           selectedDoctor._id,
           date
         );
 
-        // Filter out unavailable time slots
-        setAvailableTimeSlots(
-          timeSlots.filter((slot) => !unavailableSlots.includes(slot))
-        );
+        const now = dayjs();
+        const selectedDate = dayjs(date);
+
+        const filteredSlots = timeSlots.filter((slot) => {
+          const [startTime] = slot.split(" - ");
+          const slotTime = dayjs(`${date} ${startTime}`, "YYYY-MM-DD hh:mm A");
+
+          // Filter out slots that are either unavailable or in the past
+          return !unavailableSlots.includes(slot) && (selectedDate.isAfter(now, "day") || slotTime.isAfter(now));
+        });
+
+        setAvailableTimeSlots(filteredSlots);
       } catch (error) {
         console.error("Error fetching time slot availability:", error);
         toast.error("Error fetching time slots. Please try again later.");
@@ -128,18 +138,13 @@ const DoctorProfiles = () => {
               className="doctor-image"
             />
             <div className="overlay">
-              <button
-                className="appointment-btn"
-                onClick={() => openModal(doctor)}
-              >
+              <button className="appointment-btn" onClick={() => openModal(doctor)}>
                 Get Appointment
               </button>
             </div>
           </div>
           <div className="doctor-details">
-            <h3>
-              Dr. {doctor.firstName} {doctor.lastName}
-            </h3>
+            <h3>Dr. {doctor.firstName} {doctor.lastName}</h3>
             <p>{doctor.specialization}</p>
             {doctor.aboutDoctor && doctor.aboutDoctor.length ? (
               <p>{doctor.aboutDoctor}</p>
@@ -149,15 +154,9 @@ const DoctorProfiles = () => {
       ))}
 
       {/* Modal for scheduling appointment */}
-      <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        className="appointment-modal"
-        overlayClassName="appointment-modal-overlay"
-      >
+      <Modal isOpen={modalIsOpen} onRequestClose={closeModal} className="appointment-modal" overlayClassName="appointment-modal-overlay">
         <h2>
-          Schedule Appointment with <br /> Dr. {selectedDoctor?.firstName}{" "}
-          {selectedDoctor?.lastName}
+          Schedule Appointment with <br /> Dr. {selectedDoctor?.firstName} {selectedDoctor?.lastName}
         </h2>
 
         {/* Date selection */}
@@ -167,9 +166,7 @@ const DoctorProfiles = () => {
             {availableDates.map((day, index) => (
               <button
                 key={index}
-                className={`date-btn ${
-                  appointmentDate === day.format("YYYY-MM-DD") ? "selected" : ""
-                }`}
+                className={`date-btn ${appointmentDate === day.format("YYYY-MM-DD") ? "selected" : ""}`}
                 onClick={() => handleDateSelect(day.format("YYYY-MM-DD"))}
               >
                 <div>{day.format("ddd").toUpperCase()}</div>
@@ -184,18 +181,19 @@ const DoctorProfiles = () => {
           <label>Select Time Slot:</label>
           <div className="time-slot-options">
             {timeSlots.map((slot) => {
-              // Check if the slot is available
               const isUnavailable = !availableTimeSlots.includes(slot);
+              const [startTime] = slot.split(" - ");
+              const slotTime = dayjs(`${appointmentDate} ${startTime}`, "YYYY-MM-DD hh:mm A");
+              const isPast = slotTime.isBefore(dayjs());
+
               return (
                 <button
                   key={slot}
-                  className={`time-slot-btn ${
-                    timeSlot === slot ? "selected" : ""
-                  } ${isUnavailable ? "unavailable" : ""}`}
-                  onClick={() => !isUnavailable && setTimeSlot(slot)} // Only set time if it's available
-                  disabled={isUnavailable} // Disable button if unavailable
+                  className={`time-slot-btn ${timeSlot === slot ? "selected" : ""} ${isUnavailable || isPast ? "unavailable" : ""}`}
+                  onClick={() => !isUnavailable && !isPast && setTimeSlot(slot)}
+                  disabled={isUnavailable || isPast} // Disable button if unavailable or in the past
                 >
-                  {slot}
+                  {slot} {isPast ? " (Past)" : ""}
                 </button>
               );
             })}

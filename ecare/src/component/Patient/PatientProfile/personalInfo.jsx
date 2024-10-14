@@ -8,29 +8,39 @@ import UpdateButtons from "./UpdateButtons/updateButtons";
 import RadioButton from "../../Common/RadioButton";
 import DatePicker from "../../Common/DatePicker";
 import dayjs from "dayjs";
-import { useNavigate } from "react-router-dom";
-import { ROUTES } from "../../../router/routes";
 
 const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
   const [formData, setFormData] = useState({
-    dateOfBirth: profileData.dateOfBirth ? dayjs(profileData.dateOfBirth) : null, // Ensure this is a Day.js object
-    gender: profileData.gender || "",
+    name: profileData.name || "",
+    email: "", // Email will be fetched from localStorage
+    dateOfBirth: profileData.dateOfBirth
+      ? dayjs(profileData.dateOfBirth)
+      : null,
+    gender: profileData.gender || "male", // Provide a default value for gender
     weight: profileData.weight || "",
     height: profileData.height || "",
-    ...profileData,
   });
 
-  
-
-  // Update formData when profileData changes
   useEffect(() => {
-    setFormData({
-      dateOfBirth: profileData.dateOfBirth ? dayjs(profileData.dateOfBirth) : null, // Ensure it's a Day.js object
-      gender: profileData.gender || "",
+    // Fetch the email from localStorage
+    const fetchEmail = () => {
+      const userData = JSON.parse(localStorage.getItem("userData"));
+      const email = userData?.email || "";
+      setFormData((prevState) => ({ ...prevState, email }));
+    };
+
+    fetchEmail();
+
+    setFormData((prevState) => ({
+      ...prevState,
+      name: profileData.name || "",
+      dateOfBirth: profileData.dateOfBirth
+        ? dayjs(profileData.dateOfBirth)
+        : null,
+      gender: profileData.gender || "", // Set default value if empty
       weight: profileData.weight || "",
       height: profileData.height || "",
-      ...profileData,
-    });
+    }));
   }, [profileData]);
 
   const handleChange = (event) => {
@@ -43,7 +53,7 @@ const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
   };
 
   const handleSaveClick = () => {
-    handleSave(formData); // Save updated profile data
+    handleSave(formData);
   };
 
   return (
@@ -55,25 +65,44 @@ const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
       {isEditing ? (
         <>
           <div className={styles.personalInfoRoot}>
+            {/* Name Field */}
+            <TextInput
+              type="text"
+              title="Name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Enter your name"
+              isRequired={true}
+            />
+
+            {/* Email Field (non-editable) */}
+            <TextInput
+              type="email"
+              title="Email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Enter your email"
+              isRequired={true}
+              isDisabled={true} 
+            />
+
+            {/* Date of Birth Field */}
             <DatePicker
               name="dateOfBirth"
               title="Date of birth"
-              value={formData.dateOfBirth} // Should be a Day.js object here
-              onChange={(date) => {
-                setFormData((prevState) => ({
-                  ...prevState,
-                  dateOfBirth: date ? dayjs(date) : null, // Ensure value is always a Day.js object
-                }));
-              }}
+              value={formData.dateOfBirth}
+              onChange={handleChange}
               isRequired
             />
 
-            {/* Gender, Weight, Height Fields */}
+            {/* Gender Field */}
             <RadioButton
               isRequired
               name="gender"
               title="Gender"
-              value={formData.gender}
+              value={formData.gender} // Ensure value is set, default "male"
               labels={[
                 { value: "male", label: "Male" },
                 { value: "female", label: "Female" },
@@ -109,9 +138,15 @@ const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
       ) : (
         <div className={styles.personalInfoRoot}>
           {/* Display text info when not editing */}
+          <TextInfo title="Name" info={formData.name || "N/A"} />
+          <TextInfo title="Email" info={formData.email || "N/A"} />
           <TextInfo
             title="Date of Birth"
-            info={formData.dateOfBirth ? dayjs(formData.dateOfBirth).format("DD-MM-YYYY") : "N/A"}
+            info={
+              formData.dateOfBirth
+                ? dayjs(formData.dateOfBirth).format("DD-MM-YYYY")
+                : "N/A"
+            }
           />
           <TextInfo title="Gender" info={formData.gender || "N/A"} />
           <TextInfo title="Weight" info={`${formData.weight || "N/A"} kg`} />

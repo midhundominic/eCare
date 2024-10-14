@@ -17,8 +17,8 @@ const PatientList = () => {
 
   const formatData = (data) => {
     return data.map((patient, index) => {
-      const { _id, name, email, personalInfo } = patient; // Include _id from patient
-      const { dateOfBirth, gender, weight, height, admissionNumber } = personalInfo || {}; // Handle cases where personalInfo is missing
+      const { _id, name, email, personalInfo,dateOfBirth ,gender,weight,height,admissionNumber} = patient; // Include _id from patient
+       // Handle cases where personalInfo is missing
   
       return {
         id: `${index}-${email}`, // Unique ID for the table row

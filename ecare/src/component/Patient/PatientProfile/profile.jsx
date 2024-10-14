@@ -3,25 +3,26 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import EditButton from "../../Common/EditButton/editButton";
 import PersonalInfo from "./personalInfo";
 import LogoutButton from "../../LogoutButton";
-import { getProfilePatient, updateProfilePatient } from "../../../services/profileServices";
+import {
+  getProfilePatient,
+  updateProfilePatient,
+} from "../../../services/profileServices";
 import styles from "./patientProfile.module.css";
-import AddressInfo from "./addressInfo";
 
 const Profile = () => {
-  const [profileData, setProfileData] = useState(null);  // Initialize with null
+  const [profileData, setProfileData] = useState(null); // Initialize with null
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    // Fetch profile data from backend
     const fetchProfile = async () => {
       try {
         const res = await getProfilePatient();
-        setProfileData(res);  // Assign profile data
+        setProfileData(res.data); // Assign the profile data properly
       } catch (error) {
         console.error("Error fetching profile data", error);
       } finally {
-        setIsLoading(false);  // Stop loading spinner
+        setIsLoading(false);
       }
     };
     fetchProfile();
@@ -29,9 +30,15 @@ const Profile = () => {
 
   const handleSave = async (updatedData) => {
     try {
-      const res = await updateProfilePatient(updatedData); // Update PUT request
-      setProfileData(res);  // Update the local state with new profile data
-      setIsEditing(false);  // Exit edit mode
+      await updateProfilePatient(updatedData); // Update profile on the backend
+      
+      // Directly update the local state with the updated form data
+      setProfileData((prevData) => ({
+        ...prevData,
+        ...updatedData, // Merge updated data into profileData
+      }));
+      
+      setIsEditing(false); // Exit edit mode
     } catch (error) {
       console.error("Error updating profile", error);
     }
@@ -41,11 +48,11 @@ const Profile = () => {
     return <div>Loading...</div>;
   }
 
-  // Ensure that profileData is defined
-  if (!profileData || !profileData.personalInfo) {
+  // Ensure profileData is defined and the profile has essential data (name, etc.)
+  if (!profileData || !profileData.name) {
     return <div>Please complete your profile information.</div>;
   }
-
+  console.log(profileData)
   return (
     <div className={styles.profileRoot}>
       <h2 className={styles.title}>Profile</h2>
@@ -54,9 +61,9 @@ const Profile = () => {
           <AccountCircleIcon style={{ color: "gray", fontSize: "84px" }} />
           <div className={styles.nameContainer}>
             <span className={styles.profileName}>
-              {profileData.patient?.name || "No Name Provided"}
+              {profileData.name || "No Name Provided"}
             </span>
-            <span>{profileData.patient?.email}</span>
+            <span>{profileData.email}</span>
           </div>
         </div>
         <EditButton onClick={() => setIsEditing(true)} />
@@ -65,12 +72,11 @@ const Profile = () => {
       <LogoutButton />
 
       <PersonalInfo
-        profileData={profileData.personalInfo}  // Pass the correct profile data
+        profileData={profileData} // Pass the correct profile data
         isEditing={isEditing}
         setIsEditing={setIsEditing}
         handleSave={handleSave}
       />
-      {/* <AddressInfo profileData={profileData.personalInfo} /> */}
     </div>
   );
 };

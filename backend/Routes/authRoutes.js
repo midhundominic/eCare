@@ -13,7 +13,7 @@ const uploadMiddleware = require("../middleware/upload");
 const profilePatient = require("../controllers/profileControllers/patientControllers");
 const profileDoctor = require ("../controllers/profileControllers/doctorControllers");
 const appointmentControllers = require("../controllers/appointmentControllers");
-
+const coordinatorHealthControllers = require("../controllers/coordinatorHealthControllers");
 
 //patient
 
@@ -30,7 +30,7 @@ router.get("/patients-view",patientControllers.getAllPatient);
 router.post("/doctor-registration", doctorControllers.registerDoctor);
 router.post("/doctor-signin", authControllers.signin);
 router.get("/doctors-view",doctorControllers.getAllDoctors);
-// router.get("/:doctorId/appointments",doctorControllers.getDoctorAppointments);
+router.get("/:doctorId/appointments",doctorControllers.getDoctorAppointments);
 router.get("/doctor-appointments/:doctorId",authMiddleware,doctorControllers.getAppointmentsByDoctorId);
 
 //doctorid
@@ -70,6 +70,28 @@ router.get("/availability",appointmentControllers.getUnavailableTimeSlots);
 router.get("/patient-appointments/:patientId",authMiddleware,appointmentControllers.getAppointmentsByPatientId);
 router.put("/cancel-appointment/:appointmentId",appointmentControllers.cancelAppointment);
 router.put("/reschedule-appointment/:appointmentId",appointmentControllers.rescheduleAppointment);
+
+//Heath Data
+// router.post("healthdata/add",coordinatoControllers.addHealthData);
+// router.get("healthdata/patient/:patientId",coordinatoControllers.getPatientHealthRecords);
+// router.put("healthdata/edit/:id",coordinatoControllers.editHealthData);
+router.get('/healthdata-patients',coordinatorHealthControllers.getAllPatients);
+router.post('/healthdata-records',coordinatorHealthControllers.addHealthRecord);
+router.get('/healthdata-records/:patientId',coordinatorHealthControllers.getPatientRecords);
+router.put('/healthdata-records/:id',coordinatorHealthControllers.updateHealthRecord);
+
+//admin Appointments
+
+router.get('/appointments', appointmentControllers.getAllAppointments);
+router.put('/admin/cancel-appointment/:appointmentId', appointmentControllers.cancelAppointment);
+router.put('/admin/reschedule-appointment/:appointmentId', appointmentControllers.rescheduleAppointment);
+router.get("/appointments/unavailable-slots", appointmentControllers.getUnavailableTimeSlots);
+
+//Leave
+router.get("/leaves",adminControllers.getLeaveRequests);
+router.post("/leaves/status",adminControllers.updateLeaveStatus);
+router.post("/leaves/apply/:doctorId",doctorControllers.applyForLeave);
+router.get("/leaves/status/:doctorId", doctorControllers.getLeaveStatus);
 
 
 module.exports = router;
