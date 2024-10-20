@@ -71,12 +71,24 @@ export const applyForLeave = async (leaveData) => {
   }
 };
 
+// New method to fetch leave status
 export const fetchLeaveStatus = async (doctorId) => {
   try {
-    const response = await apiClient.get(`/leaves/status/${doctorId}`);
-    return response.data.status; // Adjust based on your backend response
+    const response = await apiClient.get(`/leaves/${doctorId}`);
+    console.log("111111111",response.data.leaveRequests);
+    return response.data.leaveRequests; // Adjust based on your API response
   } catch (error) {
     console.error("Error fetching leave status", error);
+    throw error;
+  }
+};
+
+export const cancelLeave = async (leaveId) => {
+  try {
+    const response = await apiClient.delete(`/leaves/cancel/${leaveId}`);
+    return response.data; // Return the response message
+  } catch (error) {
+    console.error("Error canceling leave", error);
     throw error;
   }
 };

@@ -7,6 +7,7 @@ import rightArrow from "../../assets/icons/ic_arrow_right.png";
 
 const LoginButton = (props) => {
   const {
+    id,
     primaryText,
     secondaryText,
     onGoogleSignIn,
@@ -17,6 +18,7 @@ const LoginButton = (props) => {
   return (
     <div className="buttons-container">
       <button
+        id={id}
         type="submit"
         className={`login-btn ${isGoogleHovered ? "round" : ""}`}
         disabled={isDisabled}
@@ -42,6 +44,7 @@ const LoginButton = (props) => {
 export default LoginButton;
 
 LoginButton.propTypes = {
+  id: PropTypes.string, 
   primaryText: PropTypes.string.isRequired,
   secondaryText: PropTypes.string.isRequired,
   onGoogleSignIn: PropTypes.func,

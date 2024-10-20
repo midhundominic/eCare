@@ -14,12 +14,15 @@ import TextInput from "../Common/TestInputPassword";
 import Checkbox from "../Common/Checkbox";
 import { ROUTES } from "../../router/routes";
 import LoginButton from "../LoginButton";
+import { usePatient } from "../../context/patientContext";
 
 const auth = getAuth(firebaseApp);
 const googleProvider = new GoogleAuthProvider();
 
 const Login = () => {
   const navigate = useNavigate();
+  const { setPatient } = usePatient();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -59,22 +62,36 @@ const Login = () => {
 
         // Check if the token is in the response
         if (response.token) {
-          const { role,firstName,lastName,name,email,doctorId,userId,coordinatorId } = response.data;
+          const {
+            role,
+            firstName,
+            lastName,
+            name,
+            email,
+            doctorId,
+            userId,
+            coordinatorId,
+          } = response.data;
           let fullName = name;
 
+          setPatient(response.data);
           if (role === 2 || role === 3) {
             fullName = `${firstName} ${lastName}`;
           }
 
           localStorage.setItem("token", response.token); // Store token
-          localStorage.setItem("userData", JSON.stringify({
-          email,
-          name: fullName,
-          role,
-          doctorId,
-          userId,
-          coordinatorId,
-        })); // Store user data
+
+          localStorage.setItem(
+            "userData",
+            JSON.stringify({
+              email,
+              name: fullName,
+              role,
+              doctorId,
+              userId,
+              coordinatorId,
+            })
+          ); // Store user data
 
           toast.success("Login Successful.");
 
@@ -112,60 +129,63 @@ const Login = () => {
       .then((result) => {
         const user = result.user;
         const profilePicture = user.photoURL;
-        
+
         // Get the Firebase ID token
-        user.getIdToken().then((tokenId) => {
-          const fields = {
-            name: user.displayName,
-            email: user.email,
-            tokenId,  // Send the Firebase ID token to the backend
-          };
-  
-          // Call the backend service to verify the token and login
-          authWithGoogleService(fields)
-            .then((res) => {
-              setIsLoading(false); // Reset loading state
-              if (!res.error) {
-                const userData={
-                  ...res.data,  // Backend response
-                  name: res.data.name || user.displayName,
-                  email: res.data.email || user.email,
-                  role: res.data.data.role || user.role, // Use Firebase displayName as fallback
-                  profilePicture: res.data.profilePicture || profilePicture,
-                  userId: res.data.data.userId 
-                };
-                console.log("11111111111",res);
-               
-                  localStorage.setItem("token", res.token);  // Store the JWT token received from your backend
-                  localStorage.setItem("userData", JSON.stringify({
-                    email: userData.email,
-                    name: userData.name,
-                    role: userData.role,
-                    profilePicture: userData.profilePicture,
-                    userId : userData.userId
-                  })); 
+        user
+          .getIdToken()
+          .then((tokenId) => {
+            const fields = {
+              name: user.displayName,
+              email: user.email,
+              tokenId, // Send the Firebase ID token to the backend
+            };
+
+            // Call the backend service to verify the token and login
+            authWithGoogleService(fields)
+              .then((res) => {
+                setIsLoading(false); // Reset loading state
+                if (!res.error) {
+                  const userData = {
+                    ...res.data, // Backend response
+                    name: res.data.name || user.displayName,
+                    email: res.data.email || user.email,
+                    role: res.data.data.role || user.role, // Use Firebase displayName as fallback
+                    profilePicture: res.data.profilePicture || profilePicture,
+                    userId: res.data.data.userId,
+                  };
+                  setPatient(userData);
+                  localStorage.setItem("token", res.token); // Store the JWT token received from your backend
+                  localStorage.setItem(
+                    "userData",
+                    JSON.stringify({
+                      email: userData.email,
+                      name: userData.name,
+                      role: userData.role,
+                      profilePicture: userData.profilePicture,
+                      userId: userData.userId,
+                    })
+                  );
                   toast.success("Sign in successful");
                   navigate(ROUTES.PATIENT_HOME);
-                
-              } else {
-                toast.error(res.msg);
-              }
-            })
-            .catch((error) => {
-              setIsLoading(false); // Reset loading state
-              toast.error(error.response?.data.message || error.message);
-            });
-        }).catch((error) => {
-          setIsLoading(false); // Reset loading state
-          toast.error("Error getting Firebase ID token: " + error.message);
-        });
+                } else {
+                  toast.error(res.msg);
+                }
+              })
+              .catch((error) => {
+                setIsLoading(false); // Reset loading state
+                toast.error(error.response?.data.message || error.message);
+              });
+          })
+          .catch((error) => {
+            setIsLoading(false); // Reset loading state
+            toast.error("Error getting Firebase ID token: " + error.message);
+          });
       })
       .catch((error) => {
         setIsLoading(false); // Reset loading state
         toast.error(error.message);
       });
   };
-  
 
   return (
     <div className={styles.loginContainer}>
@@ -184,6 +204,7 @@ const Login = () => {
             type="text"
             title="Email"
             name="email"
+            id="name"
             onChange={handleChange}
             onFocus={validateForm}
             value={formData.email}
@@ -194,6 +215,7 @@ const Login = () => {
             type="password"
             title="Password"
             name="password"
+            id="password"
             onChange={handleChange}
             onFocus={validateForm}
             value={formData.password}
@@ -214,6 +236,7 @@ const Login = () => {
 
           <div className={styles.buttonWrapper}>
             <LoginButton
+              id="submitbutton"
               primaryText="Login"
               secondaryText="Sign in with Google"
               onGoogleSignIn={signInWithGoogle} // Google Sign-In

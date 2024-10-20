@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getLeaveRequests, updateLeaveStatus } from "../../../services/adminServices";
 import { toast } from "react-toastify";
+import './leave.css';
 
 const LeaveRequests = () => {
   const [leaveRequests, setLeaveRequests] = useState([]);
@@ -39,8 +40,9 @@ const LeaveRequests = () => {
           <p>
             Doctor: {leave.doctorId.firstName} {leave.doctorId.lastName}
           </p>
-          <p>Date: {new Date(leave.leaveDate).toLocaleDateString()}</p>
-          <p>Status: {leave.reason}</p>
+          <p>Start Date: {new Date(leave.startDate).toLocaleDateString()}</p>
+          <p>End Date: {new Date(leave.endDate).toLocaleDateString()}</p>
+          <p>Reason: {leave.reason}</p>
           <p>Status: {leave.status}</p>
           <button onClick={() => handleUpdateStatus(leave._id, "approved")}>
             Approve

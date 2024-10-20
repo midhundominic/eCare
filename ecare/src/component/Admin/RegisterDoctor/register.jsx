@@ -203,12 +203,12 @@ const DoctorRegistration = () => {
             error={formError.specialization}
             options={[
               { value: "", label: "Select Specialization" },
-              { value: "General Physician", label: "General Physician" },
-              { value: "Dermatologist", label: "Dermatologist" },
-              { value: "Gynecologist", label: "Gynecologist" },
-              { value: "Neurologist", label: "Neurologist" },
-              { value: "Gastroenterologist", label: "Gastroenterologist" },
-              { value: "Surgeon", label: "Surgeon" },
+              { value: "General Medicine", label: "General Medicine" },
+              { value: "Dermatology", label: "Dermatology" },
+              { value: "Gynecology", label: "Gynecology" },
+              { value: "Neurology", label: "Neurology" },
+              { value: "Gastroenterology", label: "Gastroenterology" },
+              { value: "General Surgery", label: "General Surgery" },
             ]}
           />
 

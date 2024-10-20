@@ -134,15 +134,22 @@ const getAppointmentsByDoctorId = async (req, res) => {
 //Leave 
 const applyForLeave = async (req, res) => {
   try {
-    const { leaveDate, reason } = req.body;
-    const { doctorId } = req.params;  // Get doctorId from route params
+    const { startDate, endDate, reason } = req.body;
+    const { doctorId } = req.params;
 
-    const leaveExists = await DoctorLeave.findOne({ doctorId, leaveDate });
+    // Check if leave already exists in the given date range
+    const leaveExists = await DoctorLeave.findOne({
+      doctorId,
+      $or: [
+        { startDate: { $lte: endDate }, endDate: { $gte: startDate } }
+      ]
+    });
+
     if (leaveExists) {
-      return res.status(400).json({ message: "Leave already applied for this date" });
+      return res.status(400).json({ message: "Leave already applied for these dates" });
     }
 
-    const newLeave = new DoctorLeave({ doctorId, leaveDate, reason });
+    const newLeave = new DoctorLeave({ doctorId, startDate, endDate, reason });
     await newLeave.save();
 
     res.status(201).json({ message: "Leave request submitted successfully" });
@@ -151,17 +158,29 @@ const applyForLeave = async (req, res) => {
   }
 };
 
-const getLeaveStatus = async (req, res) => {
+const getLeaveRequests = async (req, res) => {
   try {
     const { doctorId } = req.params;
-    const leaveRequest = await DoctorLeave.findOne({ doctorId }).sort({ requestDate: -1 }); // Get the latest leave request
-    if (!leaveRequest) {
-      return res.status(404).json({ message: "No leave request found" });
+    const leaveRequests = await DoctorLeave.find({ doctorId });
+    res.status(201).json({ leaveRequests });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching leave requests", error });
+  }
+};
+
+const cancelLeave = async (req, res) => {
+  try {
+    const { leaveId } = req.params;
+    const leave = await DoctorLeave.findById(leaveId);
+
+    if (!leave) {
+      return res.status(404).json({ message: "Leave request not found" });
     }
 
-    res.status(201).json({ status: leaveRequest.status });
+    await DoctorLeave.deleteOne({ _id: leaveId });
+    res.status(201).json({ message: "Leave request canceled successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching leave status", error });
+    res.status(500).json({ message: "Error canceling leave request", error });
   }
 };
 
@@ -173,5 +192,6 @@ module.exports = {
   getDoctorAppointments,
   getAppointmentsByDoctorId,
   applyForLeave,
-  getLeaveStatus,
+  getLeaveRequests,
+  cancelLeave,
 };
