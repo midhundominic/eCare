@@ -5,8 +5,8 @@ import PaymentIcon from "@mui/icons-material/Payment";
 import VideoChatIcon from "@mui/icons-material/VideoChat";
 import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
 import BadgeRoundedIcon from "@mui/icons-material/BadgeRounded";
-import EditCalendarIcon from '@mui/icons-material/EditCalendar';
-import AutoStoriesIcon from '@mui/icons-material/AutoStories';
+import EditCalendarIcon from "@mui/icons-material/EditCalendar";
+import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 
 import { ROUTES } from "../../router/routes";
 
@@ -31,9 +31,9 @@ export const NAV_CONTENT_PATIENT = [
   },
   {
     id: 4,
-    title: "Records",
-    link: ROUTES.PATIENT_RECORDS,
-    icon: LibraryBooksIcon,
+    title: "Bookings",
+    link: ROUTES.SCHEDULED_APPOINTMENT,
+    icon: EditCalendarIcon,
   },
   {
     id: 5,
@@ -42,11 +42,11 @@ export const NAV_CONTENT_PATIENT = [
     icon: PaymentIcon,
   },
   {
-    id:6,
-    title: "Scheduled Appointments",
-    link: ROUTES.SCHEDULED_APPOINTMENT,
-    icon: EditCalendarIcon,
-  }
+    id: 6,
+    title: "Records",
+    link: ROUTES.PATIENT_RECORDS,
+    icon: LibraryBooksIcon,
+  },
 ];
 
 export const NAV_CONTENT_ADMIN = [
@@ -69,20 +69,20 @@ export const NAV_CONTENT_ADMIN = [
     icon: PeopleRoundedIcon,
   },
   {
-    id:4,
-    title:"Care Coordinator",
+    id: 4,
+    title: "Care Coordinator",
     link: ROUTES.ADMIN_COORDINATOR_LIST,
     icon: PeopleRoundedIcon,
   },
   {
-    id:5,
-    title:"Appointments",
+    id: 5,
+    title: "Appointments",
     link: ROUTES.ADMIN_APPOINTMENTS,
     icon: CalendarMonthIcon,
   },
   {
-    id:6,
-    title:"Leave",
+    id: 6,
+    title: "Leave",
     link: ROUTES.ADMIN_LEAVE,
     icon: EditCalendarIcon,
   },
@@ -122,7 +122,7 @@ export const NAV_CONTENT_COORDINATOR = [
     link: ROUTES.PATIENT_HOME,
     icon: DashboardCustomizeRoundedIcon,
   },
- 
+
   {
     id: 2,
     title: "Records",
@@ -130,4 +130,3 @@ export const NAV_CONTENT_COORDINATOR = [
     icon: AutoStoriesIcon,
   },
 ];
-

@@ -4,8 +4,6 @@ const DoctorModel = require("../models/doctorModel");
 const DoctorLeave = require("../models/doctorLeaveModel");
 const { sendEmail } = require("../services/emailservice");
 
-// Create a new appointment
-// Create a new appointment
 const createAppointment = async (req, res) => {
   const { patientId, doctorId, appointmentDate, timeSlot } = req.body;
 
@@ -14,27 +12,18 @@ const createAppointment = async (req, res) => {
   }
 
   try {
-    // Check if the doctor is on leave on the selected appointment date
+    // Check if the doctor is on leave during the selected appointment date
     const doctorLeave = await DoctorLeave.findOne({
       doctorId,
-      leaveDate: new Date(appointmentDate),
+      startDate: { $lte: new Date(appointmentDate) }, // Corrected field names
+      endDate: { $gte: new Date(appointmentDate) },
       status: "approved",
     });
 
     if (doctorLeave) {
-      return res.status(400).json({ message: "Doctor is on leave on the selected date" });
-    }
-
-    // Check if the requested time slot for the doctor is already booked on the specified date
-    const existingAppointment = await AppointmentModel.findOne({
-      doctorId,
-      appointmentDate: new Date(appointmentDate),
-      timeSlot,
-      status: { $ne: "canceled" },
-    });
-
-    if (existingAppointment) {
-      return res.status(400).json({ message: "Time slot already booked" });
+      return res
+        .status(400)
+        .json({ message: "Doctor is on leave on the selected date" });
     }
 
     // Ensure the appointment is in the future
@@ -45,10 +34,25 @@ const createAppointment = async (req, res) => {
     const selectedStartTime = new Date(`${appointmentDate} ${startTime}`);
     const selectedEndTime = new Date(`${appointmentDate} ${endTime}`);
 
-    if (selectedDate.toDateString() === now.toDateString() && selectedStartTime <= now) {
+    if (
+      selectedDate.toDateString() === now.toDateString() &&
+      selectedStartTime <= now
+    ) {
       return res.status(400).json({
         message: "You cannot book an appointment for a past time slot.",
       });
+    }
+
+    // Check if the time slot is already booked
+    const existingAppointment = await AppointmentModel.findOne({
+      doctorId,
+      appointmentDate: new Date(appointmentDate),
+      timeSlot,
+      status: { $ne: "canceled" },
+    });
+
+    if (existingAppointment) {
+      return res.status(400).json({ message: "Time slot already booked" });
     }
 
     // Create the appointment
@@ -67,9 +71,7 @@ const createAppointment = async (req, res) => {
   }
 };
 
-
-
-
+// Similarly update `getUnavailableTimeSlots` and other controllers
 const getUnavailableTimeSlots = async (req, res) => {
   const { doctorId, date } = req.query;
 
@@ -78,10 +80,11 @@ const getUnavailableTimeSlots = async (req, res) => {
   }
 
   try {
-    // Check if the doctor is on leave on the given date
+    // Check if the doctor is on leave during the given date
     const leaveOnDate = await DoctorLeave.findOne({
       doctorId,
-      leaveDate: new Date(date),
+      startDate: { $lte: new Date(date) }, // Corrected field names
+      endDate: { $gte: new Date(date) },
       status: "approved",
     });
 
@@ -93,14 +96,13 @@ const getUnavailableTimeSlots = async (req, res) => {
       });
     }
 
-    // If the doctor is not on leave, proceed to find unavailable time slots from appointments
+    // Fetch unavailable slots from appointments
     const appointments = await AppointmentModel.find({
       doctorId,
       appointmentDate: new Date(date),
       status: { $ne: "canceled" },
     });
 
-    // Extract the unavailable time slots
     const unavailableSlots = appointments.map(
       (appointment) => appointment.timeSlot
     );
@@ -112,7 +114,6 @@ const getUnavailableTimeSlots = async (req, res) => {
   }
 };
 
-
 const getAppointmentsByPatientId = async (req, res) => {
   const { patientId } = req.params;
 
@@ -121,7 +122,26 @@ const getAppointmentsByPatientId = async (req, res) => {
       "doctorId",
       "firstName lastName specialization"
     );
-    res.status(201).json({ appointments });
+
+    // Get approved leave dates for doctors with the patient's appointments
+    const leaveDates = await DoctorLeave.find({
+      doctorId: { $in: appointments.map((app) => app.doctorId) },
+      status: "approved", // Ensure only approved leaves are considered
+    });
+
+    const leaveAppointmentIds = appointments
+      .filter((appointment) =>
+        leaveDates.some(
+          (leave) =>
+            leave.doctorId.toString() === appointment.doctorId._id.toString() &&
+            new Date(leave.startDate) <=
+              new Date(appointment.appointmentDate) &&
+            new Date(leave.endDate) >= new Date(appointment.appointmentDate)
+        )
+      )
+      .map((appointment) => appointment._id);
+
+    res.status(201).json({ appointments, leaveAppointmentIds });
   } catch (error) {
     console.error("Error fetching appointments:", error);
     res.status(500).json({ message: "Server error" });
@@ -131,6 +151,7 @@ const getAppointmentsByPatientId = async (req, res) => {
 // Cancel an appointment
 const cancelAppointment = async (req, res) => {
   const { appointmentId } = req.params;
+  console.log(req.params);
 
   try {
     const appointment = await AppointmentModel.findById(appointmentId);
@@ -139,9 +160,6 @@ const cancelAppointment = async (req, res) => {
     }
     // Delete the appointment instead of marking it as "canceled"
     await appointment.deleteOne();
-
-    // appointment.status = "canceled";
-    // await appointment.save();
 
     const patient = await PatientModel.findById(appointment.patientId);
     const doctor = await DoctorModel.findById(appointment.doctorId);
@@ -169,11 +187,15 @@ const rescheduleAppointment = async (req, res) => {
     // Check if doctor is on leave on the selected date
     const doctorLeave = await DoctorLeave.findOne({
       doctorId: appointment.doctorId,
-      leaveDate: appointmentDate,
+      startDate: { $lte: new Date(appointmentDate) },
+      endDate: { $gte: new Date(appointmentDate) },
+      status: "approved",
     });
 
     if (doctorLeave) {
-      return res.status(400).json({ message: "Doctor is on leave on the selected date" });
+      return res
+        .status(400)
+        .json({ message: "Doctor is on leave on the selected date" });
     }
 
     // Check if the new time slot is available
@@ -181,6 +203,7 @@ const rescheduleAppointment = async (req, res) => {
       doctorId: appointment.doctorId,
       appointmentDate,
       timeSlot,
+      status: { $ne: "canceled" },
     });
 
     if (existingAppointment) {
@@ -205,7 +228,6 @@ const rescheduleAppointment = async (req, res) => {
   }
 };
 
-
 const getAllAppointments = async (req, res) => {
   try {
     const appointments = await AppointmentModel.find({})
@@ -217,8 +239,6 @@ const getAllAppointments = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
-
 
 module.exports = {
   createAppointment,

@@ -31,18 +31,17 @@ const adminSignin = async (req, res) => {
 
 const getLeaveRequests = async (req, res) => {
   try {
-    const leaveRequests = await DoctorLeave.find().populate("doctorId", "firstName lastName specialization");
+    const leaveRequests = await DoctorLeave.find().populate("doctorId");
     res.status(201).json({ leaveRequests });
   } catch (error) {
     res.status(500).json({ message: "Error fetching leave requests", error });
   }
 };
 
-// Approve or reject a leave request
 const updateLeaveStatus = async (req, res) => {
   try {
     const { leaveId, status } = req.body;
-    console.log(req.body);
+    
     const leave = await DoctorLeave.findById(leaveId);
     if (!leave) {
       return res.status(404).json({ message: "Leave request not found" });
@@ -51,7 +50,7 @@ const updateLeaveStatus = async (req, res) => {
     leave.status = status;
     await leave.save();
 
-    res.status(201).json({ message: `Leave ${status} successfully` });
+    res.status(201).json({ message: "Leave status updated successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error updating leave status", error });
   }

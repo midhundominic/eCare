@@ -91,7 +91,11 @@ router.get("/appointments/unavailable-slots", appointmentControllers.getUnavaila
 router.get("/leaves",adminControllers.getLeaveRequests);
 router.post("/leaves/status",adminControllers.updateLeaveStatus);
 router.post("/leaves/apply/:doctorId",doctorControllers.applyForLeave);
-router.get("/leaves/status/:doctorId", doctorControllers.getLeaveStatus);
+router.get("/leaves/:doctorId",doctorControllers.getLeaveRequests);
+router.delete("/leaves/cancel/:leaveId", doctorControllers.cancelLeave);
 
+
+router.get("/leaves/:doctorId",doctorControllers.getLeaveRequests);
+router.delete("/leaves/cancel/:leaveId", doctorControllers.cancelLeave);
 
 module.exports = router;

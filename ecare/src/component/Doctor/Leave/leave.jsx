@@ -1,21 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { applyForLeave, fetchLeaveStatus } from "../../../services/doctorServices";
+import { applyForLeave, fetchLeaveStatus, cancelLeave } from "../../../services/doctorServices";
 import { toast } from "react-toastify";
+import "react-datepicker/dist/react-datepicker.css"; // Import date picker styles
+import DatePicker from "react-datepicker"; // Add this package for range picking
+import "./leave.css";
 
 const ApplyLeave = () => {
-  const [leaveDate, setLeaveDate] = useState("");
+  const [leaveDates, setLeaveDates] = useState([null, null]); // Store a date range
   const [reason, setReason] = useState("");
-  const [leaveStatus, setLeaveStatus] = useState("");
+  const [leaveRequests, setLeaveRequests] = useState([]);
 
-  // Fetch leave status when the component mounts
+  const [startDate, endDate] = leaveDates;
+
   useEffect(() => {
     const getLeaveStatus = async () => {
       const userData = JSON.parse(localStorage.getItem("userData"));
-      const doctorId = userData.doctorId;
+      const doctorId = userData?.doctorId;
       if (doctorId) {
         try {
           const status = await fetchLeaveStatus(doctorId);
-          setLeaveStatus(status);
+          setLeaveRequests(status);
         } catch (error) {
           toast.error("Error fetching leave status");
         }
@@ -25,40 +29,53 @@ const ApplyLeave = () => {
   }, []);
 
   const handleSubmit = async () => {
-    const selectedDate = new Date(leaveDate);
     const today = new Date();
 
-    // Validate if the leave date is in the past
-    if (selectedDate < today.setHours(0, 0, 0, 0)) {
-      toast.error("You cannot apply for leave on a past date.");
+    if (!startDate || !endDate || startDate < today || endDate < today) {
+      toast.error("You cannot apply for leave in the past or without selecting dates.");
       return;
     }
 
     try {
-      const userData = JSON.parse(localStorage.getItem("userData")); // Assuming you store doctorId
+      const userData = JSON.parse(localStorage.getItem("userData"));
       const doctorId = userData.doctorId;
       if (!doctorId) {
         toast.error("Doctor ID not found");
         return;
       }
 
-      await applyForLeave({ doctorId, leaveDate, reason });
+      await applyForLeave({ doctorId, startDate, endDate, reason });
       toast.success("Leave request submitted");
-      // Fetch updated leave status
-      const status = await fetchLeaveStatus(doctorId);
-      setLeaveStatus(status);
+      setLeaveDates([null, null]); // Clear the date fields
+      setReason(""); // Clear the reason field
+      setLeaveRequests([...leaveRequests, { startDate, endDate, reason, status: "pending" }]); // Add new request to the state
     } catch (error) {
       toast.error("Error submitting leave request");
     }
   };
 
+  const handleCancelLeave = async (leaveId) => {
+    try {
+      await cancelLeave(leaveId);
+      toast.success("Leave request canceled");
+      setLeaveRequests(leaveRequests.filter((request) => request._id !== leaveId));
+    } catch (error) {
+      toast.error("Error canceling leave request");
+    }
+  };
+
   return (
-    <div>
+    <div className="leave-container">
       <h2>Apply for Leave</h2>
-      <input
-        type="date"
-        value={leaveDate}
-        onChange={(e) => setLeaveDate(e.target.value)}
+      <DatePicker
+        selectsRange
+        startDate={startDate}
+        endDate={endDate}
+        onChange={(update) => setLeaveDates(update)}
+        minDate={new Date()} // Prevent past date selection
+        isClearable={true}
+        placeholderText="Select leave date range"
+        className="custom-date-picker" // Add this class for custom styling
       />
       <input
         type="text"
@@ -67,7 +84,19 @@ const ApplyLeave = () => {
         onChange={(e) => setReason(e.target.value)}
       />
       <button onClick={handleSubmit}>Submit</button>
-      <h3>Leave Status: {leaveStatus || "No leave requested yet."}</h3>
+
+      <h3>Your Leave Requests</h3>
+      <div className="leave-requests">
+        {leaveRequests.map((request) => (
+          <div key={request._id} className="leave-request">
+            <p>Start Date: {new Date(request.startDate).toLocaleDateString()}</p>
+            <p>End Date: {new Date(request.endDate).toLocaleDateString()}</p>
+            <p>Reason: {request.reason}</p>
+            <p>Status: {request.status}</p>
+            <button className="cancel-button" onClick={() => handleCancelLeave(request._id)}>Cancel Leave</button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

@@ -11,6 +11,7 @@ const Button = (props) => {
     children,
     onClick,
     styles: customStyles = {},
+    isDisabled = false,
   } = props;
 
   const styles = combineStyles(internalStyles, customStyles);
@@ -25,7 +26,12 @@ const Button = (props) => {
   });
 
   return (
-    <button name={name} className={buttonStyle} onClick={onClick}>
+    <button
+      name={name}
+      className={buttonStyle}
+      onClick={onClick}
+      disabled={isDisabled}
+    >
       {children}
     </button>
   );
@@ -37,4 +43,5 @@ Button.propTypes = {
   name: PropTypes.string,
   variant: PropTypes.oneOf(["primary", "secondary"]),
   onclick: PropTypes.func,
+  isDisabled: PropTypes.bool,
 };

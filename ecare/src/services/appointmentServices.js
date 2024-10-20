@@ -38,7 +38,7 @@ export const getAppointments = async (patientId) => {
 export const cancelAppointment = async (appointmentId) => {
   try {
     const response = await apiClient.put(`/cancel-appointment/${appointmentId}`);
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error canceling appointment", error);
     throw error;
@@ -49,6 +49,16 @@ export const cancelAppointment = async (appointmentId) => {
 export const rescheduleAppointment = async (appointmentId, rescheduleData) => {
   try {
     const response = await apiClient.put(`/reschedule-appointment/${appointmentId}`, rescheduleData);
+    return response.data;
+  } catch (error) {
+    console.error("Error rescheduling appointment", error);
+    throw error;
+  }
+};
+
+export const leaveCheck = async () =>{
+  try{
+    const response = await apiClient.get(`/appointments/patient/${patientId}`);
     return response.data;
   } catch (error) {
     console.error("Error rescheduling appointment", error);

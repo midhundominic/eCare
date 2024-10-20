@@ -8,9 +8,9 @@ import { getDoctors, deleteDoctor } from "../../../services/doctorServices";
 import Button from "../../Common/Button";
 import { ROUTES } from "../../../router/routes";
 
-
 import styles from "./doctorsList.module.css";
 import PageTitle from "../../Common/PageTitle";
+import NothingToShow from "../../Common/NothingToShow";
 
 const DoctorsList = () => {
   const [doctorsArr, setDoctorsArr] = useState([]);
@@ -28,7 +28,7 @@ const DoctorsList = () => {
         phone,
         experience,
       } = doctor;
-     
+
       return {
         id: _id,
         name: `${firstName} ${lastName}`,
@@ -59,11 +59,11 @@ const DoctorsList = () => {
       for (const id of idsToDelete) {
         await deleteDoctor(id);
       }
-     
+
       setDoctorsArr((prevDoctorsArr) =>
-        prevDoctorsArr.filter(doctor => !idsToDelete.includes(doctor.id))
+        prevDoctorsArr.filter((doctor) => !idsToDelete.includes(doctor.id))
       );
-  
+
       setSelectedDoctors([]); // Reset selected doctors
       toast.success("Doctor deleted successfully!");
     } catch (error) {
@@ -77,22 +77,31 @@ const DoctorsList = () => {
 
   return (
     <>
-      <PageTitle>Doctors</PageTitle>
-      <div className={styles.buttonContainer}>
-        <Button
-          variant="primary"
+      {doctorsArr.length ? (
+        <>
+          <PageTitle>Doctors</PageTitle>
+          <div className={styles.buttonContainer}>
+            <Button
+              variant="primary"
+              onClick={handleRegisterNewDoc}
+              styles={{ btnPrimary: styles.newButton }}
+            >
+              New Doctor
+            </Button>
+          </div>
+
+          <Table
+            title="Doctors List"
+            headCells={HEAD_CELLS}
+            rows={doctorsArr}
+            handleDelete={handleDelete}
+          />
+        </>
+      ) : (
+        <NothingToShow
+          buttonText="Let's get started!"
+          caption="You're about to set up the first doctor profile."
           onClick={handleRegisterNewDoc}
-          styles={{ btnPrimary: styles.newButton }}
-        >
-          New Doctor
-        </Button>
-      </div>
-      {doctorsArr.length > 0 && (
-        <Table
-          title="Doctors List"
-          headCells={HEAD_CELLS}
-          rows={doctorsArr}
-          handleDelete={handleDelete}
         />
       )}
     </>
