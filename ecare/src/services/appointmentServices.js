@@ -17,7 +17,7 @@ export const getUnavailableTimeSlots = async (doctorId, date) => {
     const response = await apiClient.get("/availability", {
       params: { doctorId, date },
     });
-    return response.data.unavailableSlots || [];
+    return response;
   } catch (error) {
     console.error("Error fetching unavailable time slots", error);
     throw error;

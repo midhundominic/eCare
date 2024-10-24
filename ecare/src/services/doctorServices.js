@@ -92,3 +92,51 @@ export const cancelLeave = async (leaveId) => {
     throw error;
   }
 };
+
+
+export const getAppointmentDetails = async (appointmentId) => {
+  try {
+    const response = await apiClient.get(`/appointments/${appointmentId}`);
+    console.log("1111",response)
+    return response.data;
+    
+  } catch (error) {
+    console.error("Error fetching appointment details:", error);
+    throw error;
+  }
+};
+
+
+
+export const markPatientAbsent = async (appointmentId) => {
+  try {
+    const response = await apiClient.put(`/appointments/${appointmentId}/absent`);
+    return response.data;
+  } catch (error) {
+    console.error("Error marking patient as absent", error);
+    throw error;
+  }
+};
+
+export const startConsultation = async (appointmentId) => {
+  try {
+    const response = await apiClient.put(`/appointments/${appointmentId}/start-consultation`);
+    return response.data;
+  } catch (error) {
+    console.error("Error starting consultation", error);
+    throw error;
+  }
+};
+
+
+
+export const submitPrescription = async (appointmentId, prescriptionData) => {
+  try {
+    const response = await apiClient.post(`/appointments/${appointmentId}/prescription`, prescriptionData);
+    console.log("```````",response);
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting prescription", error.response?.data || error.message);
+    throw error;
+  }
+};

@@ -34,6 +34,10 @@ import HealthRecords from "../component/Coordinator/HealthRecords";
 import AdminAppointments from "../component/Admin/Appointments";
 import DoctorPatientList from "../component/Doctor/PatientsList";
 
+import PrescribeForm from "../component/Doctor/PrescribeForm";
+import TestResults from "../component/Coordinator/TestResult";
+import DoctorAppointments from "../component/Doctor/ScheduledAppointments";
+
 const Router = () => {
   const location = useLocation();
   const isAuthRoute = !NON_AUTH_ROUTES.includes(location.pathname);
@@ -54,7 +58,7 @@ const Router = () => {
           <Route path={ROUTES.RESET_PASSWORD} element={<ResetPassword />} />
         </Routes>
       ) : (
-        <Main>
+        <Main>  
           <Routes>
             <Route path={ROUTES.PATIENT_HOME} element={<PatientHome />} />
             <Route path={ROUTES.ADMIN_HOME} element={<AdminHome />} />
@@ -117,6 +121,20 @@ const Router = () => {
               element={<CoordinatorList />}
             />
             <Route path={ROUTES.ADMIN_PATIENT_LIST} element={<PatientList />} />
+
+            <Route
+              path="/doctor/appointments"
+              element={<DoctorAppointments />}
+            />
+            <Route
+              path={ROUTES.DOCTOR_PRESCRIPTION}
+              element={<PrescribeForm />}
+            />
+            <Route path="/patient/records" element={<PatientRecords />} />
+            <Route
+              path="/care-coordinator/test-results"
+              element={<TestResults />}
+            />
           </Routes>
         </Main>
       )}

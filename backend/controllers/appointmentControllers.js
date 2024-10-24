@@ -3,6 +3,7 @@ const PatientModel = require("../models/patientModel");
 const DoctorModel = require("../models/doctorModel");
 const DoctorLeave = require("../models/doctorLeaveModel");
 const { sendEmail } = require("../services/emailservice");
+const { TIME_SLOTS } = require('../utils/constant')
 
 const createAppointment = async (req, res) => {
   const { patientId, doctorId, appointmentDate, timeSlot } = req.body;
@@ -83,7 +84,7 @@ const getUnavailableTimeSlots = async (req, res) => {
     // Check if the doctor is on leave during the given date
     const leaveOnDate = await DoctorLeave.findOne({
       doctorId,
-      startDate: { $lte: new Date(date) }, // Corrected field names
+      startDate: { $lte: new Date(date) },
       endDate: { $gte: new Date(date) },
       status: "approved",
     });
@@ -92,7 +93,7 @@ const getUnavailableTimeSlots = async (req, res) => {
       return res.status(201).json({
         message: "Doctor is on approved leave on this date.",
         unavailable: true,
-        unavailableSlots: [], // No time slots available on leave days
+        unavailableSlots: TIME_SLOTS, // All time slots are unavailable when the doctor is on leave
       });
     }
 
@@ -154,19 +155,20 @@ const cancelAppointment = async (req, res) => {
   console.log(req.params);
 
   try {
-    const appointment = await AppointmentModel.findById(appointmentId);
+    const appointment = await AppointmentModel.findByIdAndUpdate(
+      appointmentId,
+      {status: 'canceled'},
+      { new: true});
     if (!appointment) {
       return res.status(404).json({ message: "Appointment not found" });
     }
-    // Delete the appointment instead of marking it as "canceled"
-    await appointment.deleteOne();
 
     const patient = await PatientModel.findById(appointment.patientId);
     const doctor = await DoctorModel.findById(appointment.doctorId);
     const message = `Dear ${patient.name}, your appointment scheduled to the Dr. ${doctor.firstName} ${doctor.lastName} for ${appointment.appointmentDate} at ${appointment.timeSlot} has been canceled`;
     sendEmail(patient.email, "Appointment Canceled", message);
 
-    res.status(201).json({ message: "Appointment canceled successfully" });
+    res.status(201).json({ message: "Appointment canceled successfully" ,appointment});
   } catch (error) {
     console.error("Error canceling appointment:", error);
     res.status(500).json({ message: "Server error" });
@@ -240,6 +242,127 @@ const getAllAppointments = async (req, res) => {
   }
 };
 
+const markPatientAbsent = async(req,res) =>{
+  const { appointmentId } =req.params;
+  try {
+    const appointment = await AppointmentModel.findByIdAndUpdate(
+      appointmentId,
+      { status: 'absent' },
+      { new: true }
+    );
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+    res.status(201).json({ message: "Patient marked as absent", appointment });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const startConsultation = async (req, res) => {
+  const { appointmentId } = req.params;
+  try {
+    const appointment = await AppointmentModel.findByIdAndUpdate(
+      appointmentId,
+      { status: 'in_consultation' },
+      { new: true }
+    );
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+    res.status(201).json({ message: "Consultation started", appointment });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const submitPrescription = async (req, res) => {
+  const { appointmentId } = req.params;
+  const { medicines, tests, notes } = req.body;
+  console.log("testidddd",appointmentId);
+  console.log("resultrt",req.body);
+  try {
+    const appointment = await AppointmentModel.findByIdAndUpdate(
+      appointmentId,
+      {
+        status: 'completed',
+        prescription: { medicines, tests, notes }
+      },
+      { new: true }
+    );
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+    res.status(201).json({ message: "Prescription submitted", appointment });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getPatientRecords = async (req, res) => {
+  const { patientId } = req.params;
+  try {
+    const records = await AppointmentModel.find({ patientId, status: 'completed' })
+      .populate('doctorId', 'firstName lastName')
+      .select('appointmentDate prescription doctorId');
+    res.status(201).json(records);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getPendingTests = async (req, res) => {
+  try {
+    const pendingTests = await AppointmentModel.find({
+      'prescription.tests': { $elemMatch: { result: { $exists: false } } }
+    })
+    .populate('patientId', 'name')
+    .populate('doctorId', 'firstName lastName')
+    .select('patientId doctorId appointmentDate prescription.tests');
+    res.status(201).json(pendingTests);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const submitTestResults = async (req, res) => {
+  const { testId } = req.params;
+  const { result } = req.body;
+  try {
+    const appointment = await AppointmentModel.findOneAndUpdate(
+      { 'prescription.tests._id': testId },
+      { $set: { 'prescription.tests.$.result': result } },
+      { new: true }
+    );
+    if (!appointment) {
+      return res.status(404).json({ message: "Test not found" });
+    }
+    res.status(201).json({ message: "Test result submitted", appointment });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getAppointmentDetails = async (req, res) => {
+  const { appointmentId } = req.params;
+  
+
+  try {
+    const appointment = await AppointmentModel.findById(appointmentId)
+      .populate("patientId", "name")
+      .populate("doctorId", "firstName lastName");
+    
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    res.status(201).json(appointment);
+  } catch (error) {
+    console.error("Error fetching appointment details:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   createAppointment,
   getUnavailableTimeSlots,
@@ -247,4 +370,11 @@ module.exports = {
   cancelAppointment,
   rescheduleAppointment,
   getAllAppointments,
+  markPatientAbsent,
+  startConsultation,
+  submitPrescription,
+  getPatientRecords,
+  getPendingTests,
+  submitTestResults,
+  getAppointmentDetails,
 };
