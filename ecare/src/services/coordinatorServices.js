@@ -50,3 +50,23 @@ export const postSigninCoordinator = async (payload) => {
       throw error;
     }
   };
+
+  export const getPendingTests = async () => {
+    try {
+      const response = await apiClient.get('/care-coordinator/pending-tests');
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching pending tests", error);
+      throw error;
+    }
+  };
+  
+  export const submitTestResults = async (testId, result) => {
+    try {
+      const response = await apiClient.put(`/care-coordinator/test-results/${testId}`, { result });
+      return response.data;
+    } catch (error) {
+      console.error("Error submitting test results", error);
+      throw error;
+    }
+  };

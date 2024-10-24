@@ -99,7 +99,7 @@ const DoctorList = ({ doctorsList, handleSelectDoctor, selectedDoctor }) => {
                 <span
                   className={styles.docName}
                 >{`${doc.firstName} ${doc.lastName}`}</span>
-                <span className={styles.docCaption}>MBBS MD, cardiologyst</span>
+                <span className={styles.docCaption}>{doc.specialization}</span>
               </div>
             </div>
           );

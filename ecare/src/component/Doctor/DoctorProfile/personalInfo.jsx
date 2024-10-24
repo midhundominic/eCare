@@ -4,21 +4,16 @@ import styles from "./personalInfo.module.css";
 import EditBox from "../../Common/EditButton/editButton";
 import TextInfo from "../../Common/TextInfo";
 import TextInput from "../../Common/TextInput";
-import UpdateButtons from "./UpdateButtons/updateButtons";
+import UpdateButtons from "./updateButtons/updateButtons";
 import RadioButton from "../../Common/RadioButton";
-import DatePicker from "../../Common/DatePicker";
-import dayjs from "dayjs";
+
 
 const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
   const [formData, setFormData] = useState({
     name: profileData.name || "",
     email: "", // Email will be fetched from localStorage
-    dateOfBirth: profileData.dateOfBirth
-      ? dayjs(profileData.dateOfBirth)
-      : null,
+    phone: profileData.phone,
     gender: profileData.gender || "male", // Provide a default value for gender
-    weight: profileData.weight || "",
-    height: profileData.height || "",
   });
 
   useEffect(() => {
@@ -33,13 +28,9 @@ const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
 
     setFormData((prevState) => ({
       ...prevState,
-      name: profileData.name || "",
-      dateOfBirth: profileData.dateOfBirth
-        ? dayjs(profileData.dateOfBirth)
-        : null,
+      name: profileData.firstName || "",
       gender: profileData.gender || "", // Set default value if empty
-      weight: profileData.weight || "",
-      height: profileData.height || "",
+      phone: profileData.phone || "",
     }));
   }, [profileData]);
 
@@ -84,15 +75,14 @@ const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
               value={formData.email} 
               disabled
             />
-
-            {/* Date of Birth Field */}
-            <DatePicker
-              name="dateOfBirth"
-              title="Date of birth"
-              value={formData.dateOfBirth}
+            <TextInput
+              type="phone"
+              title="Phone"
+              name="phone"
+              value={formData.phone} 
               onChange={handleChange}
-              isRequired
             />
+            
 
             {/* Gender Field */}
             <RadioButton
@@ -107,25 +97,6 @@ const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
               ]}
               onChange={handleChange}
             />
-
-            <TextInput
-              type="text"
-              title="Weight"
-              name="weight"
-              value={formData.weight?.toString() || ""}
-              onChange={handleChange}
-              placeholder="Enter your weight"
-              isRequired={true}
-            />
-            <TextInput
-              type="text"
-              title="Height"
-              name="height"
-              value={formData.height?.toString() || ""}
-              onChange={handleChange}
-              placeholder="Enter your height"
-              isRequired={true}
-            />
           </div>
           <UpdateButtons
             handleClickCancel={handleCancel}
@@ -137,17 +108,9 @@ const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
           {/* Display text info when not editing */}
           <TextInfo title="Name" info={formData.name || "N/A"} />
           <TextInfo title="Email" info={formData.email || "N/A"} />
-          <TextInfo
-            title="Date of Birth"
-            info={
-              formData.dateOfBirth
-                ? dayjs(formData.dateOfBirth).format("DD-MM-YYYY")
-                : "N/A"
-            }
-          />
+          <TextInfo title="phone" info={formData.phone || "N/A"} />
+          
           <TextInfo title="Gender" info={formData.gender || "N/A"} />
-          <TextInfo title="Weight" info={`${formData.weight || "N/A"} kg`} />
-          <TextInfo title="Height" info={`${formData.height || "N/A"} cm`} />
         </div>
       )}
     </div>

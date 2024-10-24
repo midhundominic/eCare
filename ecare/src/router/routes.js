@@ -32,6 +32,7 @@ export const ROUTES = {
   DOCTOR_PATIENTLIST:"/doctor/patientlist",
   COORDINATOR_PROFILE: "/coordinatorprofile",
   HEALTH_RECORDS: "/coordinator/records",
+  DOCTOR_PRESCRIPTION: "/doctor/prescription",
 };
 
 export const NON_AUTH_ROUTES = [
@@ -59,4 +60,5 @@ export const NON_AUTH_ROUTES = [
   ROUTES.COORDINATOR_HOME,
   ROUTES.ADMIN_COORDINATOR_LIST,
   ROUTES.ADMIN_PATIENT_LIST,
+  ROUTES.DOCTOR_PRESCRIPTION,
 ];

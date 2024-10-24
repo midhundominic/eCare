@@ -94,8 +94,18 @@ router.post("/leaves/apply/:doctorId",doctorControllers.applyForLeave);
 router.get("/leaves/:doctorId",doctorControllers.getLeaveRequests);
 router.delete("/leaves/cancel/:leaveId", doctorControllers.cancelLeave);
 
-
+//leave
 router.get("/leaves/:doctorId",doctorControllers.getLeaveRequests);
 router.delete("/leaves/cancel/:leaveId", doctorControllers.cancelLeave);
+
+
+//appointments
+router.get('/appointments/:appointmentId', appointmentControllers.getAppointmentDetails);
+router.put('/appointments/:appointmentId/absent', appointmentControllers.markPatientAbsent);
+router.put('/appointments/:appointmentId/start-consultation', appointmentControllers.startConsultation);
+router.post('/appointments/:appointmentId/prescription', appointmentControllers.submitPrescription);
+router.get('/patients/:patientId/records', appointmentControllers.getPatientRecords);
+router.get('/care-coordinator/pending-tests', appointmentControllers.getPendingTests);
+router.put('/care-coordinator/test-results/:testId', appointmentControllers.submitTestResults);
 
 module.exports = router;

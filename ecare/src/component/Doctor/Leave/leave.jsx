@@ -30,12 +30,19 @@ const ApplyLeave = () => {
 
   const handleSubmit = async () => {
     const today = new Date();
-
+  
     if (!startDate || !endDate || startDate < today || endDate < today) {
       toast.error("You cannot apply for leave in the past or without selecting dates.");
       return;
     }
-
+  
+    // Adjust dates to start and end at midnight local time to avoid time zone issues
+    const adjustedStartDate = new Date(startDate);
+    adjustedStartDate.setHours(0, 0, 0, 0); // Start at midnight local time
+  
+    const adjustedEndDate = new Date(endDate);
+    adjustedEndDate.setHours(23, 59, 59, 999); // End at 23:59:59 local time
+  
     try {
       const userData = JSON.parse(localStorage.getItem("userData"));
       const doctorId = userData.doctorId;
@@ -43,16 +50,22 @@ const ApplyLeave = () => {
         toast.error("Doctor ID not found");
         return;
       }
-
-      await applyForLeave({ doctorId, startDate, endDate, reason });
+  
+      await applyForLeave({ doctorId, startDate: adjustedStartDate, endDate: adjustedEndDate, reason });
       toast.success("Leave request submitted");
+  
+      // Clear fields and update the state with the new request
       setLeaveDates([null, null]); // Clear the date fields
       setReason(""); // Clear the reason field
-      setLeaveRequests([...leaveRequests, { startDate, endDate, reason, status: "pending" }]); // Add new request to the state
+      setLeaveRequests([
+        ...leaveRequests, 
+        { startDate: adjustedStartDate, endDate: adjustedEndDate, reason, status: "pending" }
+      ]); // Add new request to the state
     } catch (error) {
       toast.error("Error submitting leave request");
     }
   };
+  
 
   const handleCancelLeave = async (leaveId) => {
     try {

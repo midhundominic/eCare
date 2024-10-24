@@ -44,22 +44,28 @@ const SlotBooking = ({ selectedDoctor }) => {
     setSelectedTimeSlot("");
     if (selectedDoctor && date) {
       try {
-        const unavailableSlots = await getUnavailableTimeSlots(
-          selectedDoctor._id,
-          date
-        );
+        const unavailableSlotsRes = await getUnavailableTimeSlots(selectedDoctor._id, date);
+        const { unavailableSlots, unavailable } = unavailableSlotsRes.data;
+        
         const now = dayjs();
         const selectedDate = dayjs(date);
 
-        const filteredSlots = TIME_SLOTS.filter((slot) => {
-          const slotTime = dayjs(`${date} ${slot}`, "YYYY-MM-DD hh:mm A");
+        let filteredSlots = TIME_SLOTS;
 
-          // Filter out slots that are either unavailable or in the past
-          return (
-            !unavailableSlots.includes(slot) &&
-            (selectedDate.isAfter(now, "day") || slotTime.isAfter(now))
-          );
-        });
+        // If the doctor is on leave, all slots are unavailable
+        if (unavailable) {
+          filteredSlots = []; // No slots available if doctor is on leave
+        } else {
+          filteredSlots = TIME_SLOTS.filter((slot) => {
+            const slotTime = dayjs(`${date} ${slot}`, "YYYY-MM-DD hh:mm A");
+
+            // Filter out slots that are either unavailable or in the past
+            return (
+              !unavailableSlots.includes(slot) &&
+              (selectedDate.isAfter(now, "day") || slotTime.isAfter(now))
+            );
+          });
+        }
 
         setAvailableTimeSlots(filteredSlots);
         setIsLoading(false);
@@ -82,7 +88,7 @@ const SlotBooking = ({ selectedDoctor }) => {
       toast.success("Appointment scheduled successfully");
       setAvailableTimeSlots(TIME_SLOTS);
       const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
-      handleDateSelect(tomorrow)
+      handleDateSelect(tomorrow);
       setSelectedTimeSlot("");
     } catch (error) {
       toast.error("Error scheduling appointment");

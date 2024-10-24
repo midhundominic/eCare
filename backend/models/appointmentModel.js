@@ -33,8 +33,16 @@ const AppointmentSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["scheduled", "rescheduled", "canceled"],
+    enum: ["scheduled", "rescheduled", "canceled", "completed", "absent", "in_consultation"],
     default: "scheduled",
+  },
+  prescription: {
+    medicines: [{
+      name: String,
+      dosage: String,
+    }],
+    tests: [String],
+    notes: String,
   },
   createdAt: { type: Date, default: () => dayjs().toDate() },
 });

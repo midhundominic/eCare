@@ -15,6 +15,7 @@ const getDoctorProfile = async (req, res) => {
       lastName: doctor.lastName,
       email: doctor.email,
       phone: doctor.phone,
+      gender: doctor.gender,
       profilePhoto: doctor.profilePhoto || "", // Return profile photo path
     });
   } catch (error) {

@@ -65,3 +65,13 @@ export const deletePatient = async (id) => {
     throw error;
   }
 };
+
+export const getPatientRecords = async (patientId) => {
+  try {
+    const response = await apiClient.get(`/patients/${patientId}/records`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching patient records", error);
+    throw error;
+  }
+};
