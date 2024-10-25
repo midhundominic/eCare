@@ -15,6 +15,7 @@ const DoctorSchema = new mongoose.Schema({
   profilePhoto: { type: String, default: "" },
   date_created: { type: Date, required: true, default: () => dayjs().toDate() },
   aboutDoctor: { type: String, required:true},
+  rating: { type: Number, default: 0 },
 });
 
 const Doctor = mongoose.model("doctor", DoctorSchema);

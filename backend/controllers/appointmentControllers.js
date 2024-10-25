@@ -8,6 +8,8 @@ const { TIME_SLOTS } = require('../utils/constant')
 const createAppointment = async (req, res) => {
   const { patientId, doctorId, appointmentDate, timeSlot } = req.body;
 
+  console.log("From fronend",req.body);
+
   if (!patientId || !doctorId || !appointmentDate || !timeSlot) {
     return res.status(400).json({ message: "All fields are required" });
   }
@@ -363,6 +365,37 @@ const getAppointmentDetails = async (req, res) => {
   }
 };
 
+const getCompletedAppointments = async(req,res)=>{
+  try {
+    const { patientId } = req.params;
+    const appointments = await AppointmentModel.find({ patientId, status: "completed" }).populate("doctorId"); 
+    res.status(201).json({ appointments });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching completed appointments" });
+  }
+};
+
+const submitReview = async(req,res) =>{
+  try {
+    const { appointmentId, doctorId } = req.params;
+    const { rating, review } = req.body;
+
+    const appointment = await AppointmentModel.findByIdAndUpdate(appointmentId, { rating, review }, { new: true });
+
+    // Update doctor's rating
+    const doctor = await DoctorModel.findById(doctorId);
+    const appointmentsWithRating = await AppointmentModel.find({ doctorId, rating: { $exists: true } });
+    const averageRating = appointmentsWithRating.reduce((acc, curr) => acc + curr.rating, 0) / appointmentsWithRating.length;
+
+    doctor.rating = averageRating;
+    await doctor.save();
+
+    res.status(201).json({ message: "Review submitted successfully", appointment });
+  } catch (error) {
+    res.status(500).json({ message: "Error submitting review" });
+  }
+};
+
 module.exports = {
   createAppointment,
   getUnavailableTimeSlots,
@@ -377,4 +410,6 @@ module.exports = {
   getPendingTests,
   submitTestResults,
   getAppointmentDetails,
+  getCompletedAppointments,
+  submitReview,
 };

@@ -31,37 +31,28 @@ const RescheduleAppointment = ({
 
   const handleDateSelect = async (date) => {
     setRescheduleDate(date);
-
-    // If the selected date is today, filter out past time slots
     const isToday = dayjs().format("YYYY-MM-DD") === date;
     let filteredTimeSlots = timeSlots;
-
+  
     if (isToday) {
       const currentTime = dayjs();
       filteredTimeSlots = timeSlots.filter((slot) => {
         const [startTime] = slot.split(" - ");
         const slotTime = dayjs(`${date} ${startTime}`, "YYYY-MM-DD h:mm A");
-
         return slotTime.isAfter(currentTime);
       });
     }
-
-    setAvailableTimeSlots(filteredTimeSlots);
-
-    if (appointment && date) {
-      try {
-        const unavailable = await getUnavailableTimeSlots(
-          appointment.doctorId._id,
-          date
-        );
-        setUnavailableSlots(unavailable); // Set unavailable time slots
-        setAvailableTimeSlots(filteredTimeSlots);
-      } catch (error) {
-        console.error("Error fetching unavailable time slots:", error);
-        toast.error("Error fetching time slots. Please try again later.");
-      }
+  
+    try {
+      const unavailable = await getUnavailableTimeSlots(appointment.doctorId._id, date);
+      const unavailableArray = Array.isArray(unavailable.data.unavailableSlots) ? unavailable.data.unavailableSlots : [];
+      setUnavailableSlots(unavailableArray);
+      setAvailableTimeSlots(filteredTimeSlots);
+    } catch (error) {
+      console.error("Error fetching unavailable time slots:", error);
+      toast.error("Error fetching time slots. Please try again later.");
     }
-  };
+  };  
 
   const handleReschedule = async () => {
     try {

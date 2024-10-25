@@ -1,10 +1,11 @@
-
 import apiClient from "../api";
-
 
 export const createAppointment = async (appointmentData) => {
   try {
-    const response = await apiClient.post("/create-appointment", appointmentData);
+    const response = await apiClient.post(
+      "/create-appointment",
+      appointmentData
+    );
     return response.data;
   } catch (error) {
     console.error("Error creating appointment", error);
@@ -37,7 +38,9 @@ export const getAppointments = async (patientId) => {
 // Cancel an appointment
 export const cancelAppointment = async (appointmentId) => {
   try {
-    const response = await apiClient.put(`/cancel-appointment/${appointmentId}`);
+    const response = await apiClient.put(
+      `/cancel-appointment/${appointmentId}`
+    );
     return response;
   } catch (error) {
     console.error("Error canceling appointment", error);
@@ -48,7 +51,10 @@ export const cancelAppointment = async (appointmentId) => {
 // Reschedule an appointment
 export const rescheduleAppointment = async (appointmentId, rescheduleData) => {
   try {
-    const response = await apiClient.put(`/reschedule-appointment/${appointmentId}`, rescheduleData);
+    const response = await apiClient.put(
+      `/reschedule-appointment/${appointmentId}`,
+      rescheduleData
+    );
     return response.data;
   } catch (error) {
     console.error("Error rescheduling appointment", error);
@@ -56,12 +62,41 @@ export const rescheduleAppointment = async (appointmentId, rescheduleData) => {
   }
 };
 
-export const leaveCheck = async () =>{
-  try{
+export const leaveCheck = async () => {
+  try {
     const response = await apiClient.get(`/appointments/patient/${patientId}`);
     return response.data;
   } catch (error) {
     console.error("Error rescheduling appointment", error);
+    throw error;
+  }
+};
+
+export const getCompletedAppointments = async (patientId) => {
+  try {
+    const response = await apiClient.get(`/completed/${patientId}`);
+    return response;
+  } catch (error) {
+    console.error("Error Fetching Completed Appointments");
+    throw error;
+  }
+};
+
+export const submitReview = async (
+  appointmentId,
+  doctorId,
+  patientId,
+  rating,
+  review
+) => {
+  try {
+    const response = await apiClient.post(
+      `/review/${appointmentId}/${doctorId}`,
+      { patientId, rating, review }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error Fetching Completed Appointments");
     throw error;
   }
 };
