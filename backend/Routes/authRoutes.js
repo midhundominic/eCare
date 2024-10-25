@@ -14,6 +14,8 @@ const profilePatient = require("../controllers/profileControllers/patientControl
 const profileDoctor = require ("../controllers/profileControllers/doctorControllers");
 const appointmentControllers = require("../controllers/appointmentControllers");
 const coordinatorHealthControllers = require("../controllers/coordinatorHealthControllers");
+const reviewControllers = require('../controllers/reviewControllers');
+const paymentControllers = require('../controllers/paymentControllers');
 
 //patient
 
@@ -107,5 +109,15 @@ router.post('/appointments/:appointmentId/prescription', appointmentControllers.
 router.get('/patients/:patientId/records', appointmentControllers.getPatientRecords);
 router.get('/care-coordinator/pending-tests', appointmentControllers.getPendingTests);
 router.put('/care-coordinator/test-results/:testId', appointmentControllers.submitTestResults);
+router.get('/completed/:patientId',appointmentControllers.getCompletedAppointments);
+
+//review
+router.post('/review/:appointmentId/:doctorId',authMiddleware,reviewControllers.submitReview);
+
+//payment
+router.post('/payment/order', paymentControllers.createOrder);
+router.post('/payment/verify', paymentControllers.verifyPayment);
+router.post('/payment/save', paymentControllers.savePaymentDetails);
+router.get('/payment/user/:userId',paymentControllers.getPaymentsByUser);
 
 module.exports = router;

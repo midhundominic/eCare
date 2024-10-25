@@ -37,8 +37,8 @@ export const NAV_CONTENT_PATIENT = [
   },
   {
     id: 5,
-    title: "Payments",
-    link: ROUTES.PATIENT_PAYMENTS,
+    title: "Completed Appointments",
+    link: ROUTES.COMPLETED_APPOINTMENT,
     icon: PaymentIcon,
   },
   {
@@ -46,6 +46,12 @@ export const NAV_CONTENT_PATIENT = [
     title: "Records",
     link: ROUTES.PATIENT_RECORDS,
     icon: LibraryBooksIcon,
+  },
+  {
+    id: 7,
+    title: "Payments",
+    link: ROUTES.PATIENT_PAYMENTS,
+    icon: PaymentIcon,
   },
 ];
 

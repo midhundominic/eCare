@@ -10,6 +10,7 @@ import PatientProfile from "../component/Patient/PatientProfile";
 import PatientRecords from "../component/Patient/PatientRecords";
 import PatientPayments from "../component/Patient/Payments";
 import PatientConsultation from "../component/Patient/Consultation";
+import PatientCompletedAppointment from '../component/Patient/CompletedAppointments';
 import Admin from "../component/Admin/Login";
 import AdminHome from "../component/Admin/Home";
 import AdminProile from "../component/Admin/AdminProile";
@@ -130,6 +131,10 @@ const Router = () => {
               path={ROUTES.DOCTOR_PRESCRIPTION}
               element={<PrescribeForm />}
             />
+
+            <Route path={ROUTES.COMPLETED_APPOINTMENT} element={<PatientCompletedAppointment/>}/>
+  
+
             <Route path="/patient/records" element={<PatientRecords />} />
             <Route
               path="/care-coordinator/test-results"

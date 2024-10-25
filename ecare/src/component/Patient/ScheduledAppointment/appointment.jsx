@@ -12,18 +12,11 @@ import PageTitle from "../../Common/PageTitle";
 
 const PatientAppointments = () => {
   const [appointments, setAppointments] = useState([]);
-
   const navigate = useNavigate();
 
   const timeSlots = [
-    "9:30 AM",
-    "10:00 AM",
-    "10:30 AM",
-    "11:00 AM",
-    "11:30 AM",
-    "12:00 PM",
-    "1:30 PM",
-    "2:00 PM",
+    "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM",
+    "11:30 AM", "12:00 PM", "1:30 PM", "2:00 PM",
   ];
 
   useEffect(() => {
@@ -59,10 +52,31 @@ const PatientAppointments = () => {
     );
   };
 
+  // Sort appointments by date, time slot, and canceled status
+  const sortedAppointments = appointments.slice().sort((a, b) => {
+    const dateA = dayjs(a.appointmentDate);
+    const dateB = dayjs(b.appointmentDate);
+
+    // Sort by date
+    if (dateA.isBefore(dateB)) return -1;
+    if (dateA.isAfter(dateB)) return 1;
+
+    // Sort by time slot if dates are equal
+    const timeIndexA = timeSlots.indexOf(a.timeSlot);
+    const timeIndexB = timeSlots.indexOf(b.timeSlot);
+    if (timeIndexA < timeIndexB) return -1;
+    if (timeIndexA > timeIndexB) return 1;
+
+    // Place canceled appointments at the end
+    if (a.status === "canceled" && b.status !== "canceled") return 1;
+    if (b.status === "canceled" && a.status !== "canceled") return -1;
+
+    return 0;
+  });
+
   const getNextSevenDays = () => {
     const days = [];
     let i = 0;
-
     while (days.length < 7) {
       const day = dayjs().add(i, "day");
       if (day.day() !== 0) days.push(day);
@@ -75,34 +89,32 @@ const PatientAppointments = () => {
 
   return (
     <div className="appointments-list">
-      {appointments.length ? (
+      {sortedAppointments.length ? (
         <>
           <PageTitle>My Appointments</PageTitle>
-          {appointments.map((appointment) => (
+          {sortedAppointments.map((appointment) => (
             <div key={appointment._id} className="appointment-card">
               <div className="appointment-card-content">
-                <p>
-                  Doctor: Dr. {appointment.doctorId.firstName}{" "}
-                  {appointment.doctorId.lastName}
-                </p>
+                <p>Doctor: Dr. {appointment.doctorId.firstName} {appointment.doctorId.lastName}</p>
                 <p>Specialization: {appointment.doctorId.specialization}</p>
-                <p>
-                  Date:{" "}
-                  {dayjs(appointment.appointmentDate).format("YYYY-MM-DD")}
-                </p>
+                <p>Date: {dayjs(appointment.appointmentDate).format("YYYY-MM-DD")}</p>
                 <p>Time Slot: {appointment.timeSlot}</p>
                 <p>Status: {appointment.status}</p>
               </div>
-              <CancelAppointment
-                appointmentId={appointment._id}
-                onCancel={handleCancelUpdate}
-              />
-              <RescheduleAppointment
-                appointment={appointment}
-                timeSlots={timeSlots}
-                availableDates={availableDates}
-                onReschedule={handleRescheduleUpdate}
-              />
+              {appointment.status !== "canceled" && (
+                <>
+                  <CancelAppointment
+                    appointmentId={appointment._id}
+                    onCancel={handleCancelUpdate}
+                  />
+                  <RescheduleAppointment
+                    appointment={appointment}
+                    timeSlots={timeSlots}
+                    availableDates={availableDates}
+                    onReschedule={handleRescheduleUpdate}
+                  />
+                </>
+              )}
             </div>
           ))}
         </>
