@@ -38,7 +38,7 @@ const PatientRecords = () => {
           <ul>
             {record.prescription.tests.map((test, idx) => (
               <li key={idx}>
-                {test.name}: {test.result ? test.name : 'Pending'}
+                {test.name}: {test.result ? test.result : 'Pending'}
               </li>
             ))}
           </ul>

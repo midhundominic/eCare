@@ -41,7 +41,10 @@ const AppointmentSchema = new mongoose.Schema({
       name: String,
       dosage: String,
     }],
-    tests: [String],
+    tests: [{
+      name: String,
+      result: String,
+    }],
     notes: String,
   },
   createdAt: { type: Date, default: () => dayjs().toDate() },

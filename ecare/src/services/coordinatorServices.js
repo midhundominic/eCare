@@ -60,13 +60,34 @@ export const postSigninCoordinator = async (payload) => {
       throw error;
     }
   };
-  
-  export const submitTestResults = async (testId, result) => {
+
+  export const getCompletedTests = async () => {
     try {
-      const response = await apiClient.put(`/care-coordinator/test-results/${testId}`, { result });
+      const response = await apiClient.get('/care-coordinator/completed-tests');
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching completed tests", error);
+      throw error;
+    }
+  };
+  
+  export const submitTestResults = async (appointmentId,testId, result) => {
+    try {
+      const response = await apiClient.put(`/care-coordinator/test-results/${appointmentId}/${testId}`, { result });
       return response.data;
     } catch (error) {
       console.error("Error submitting test results", error);
+      throw error;
+    }
+  };
+
+
+  export const updateTestResult = async (appointmentId, testId, result) => {
+    try {
+      const response = await apiClient.put(`/update-test-result/${appointmentId}/${testId}`, { result });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating test result", error);
       throw error;
     }
   };

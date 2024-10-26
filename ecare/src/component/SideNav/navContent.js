@@ -135,4 +135,18 @@ export const NAV_CONTENT_COORDINATOR = [
     link: ROUTES.HEALTH_RECORDS,
     icon: AutoStoriesIcon,
   },
+
+  {
+    id: 3,
+    title: "Test Results",
+    link: ROUTES.TEST_RESULTS,
+    icon: AutoStoriesIcon,
+  },
+
+  {
+    id: 4,
+    title: "Completed Results",
+    link: ROUTES.COMPLETED_RESULT,
+    icon: AutoStoriesIcon,
+  },
 ];
