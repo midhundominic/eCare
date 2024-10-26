@@ -37,6 +37,7 @@ import DoctorPatientList from "../component/Doctor/PatientsList";
 
 import PrescribeForm from "../component/Doctor/PrescribeForm";
 import TestResults from "../component/Coordinator/TestResult";
+import CompletedTests from "../component/Coordinator/CompletedTest";
 import DoctorAppointments from "../component/Doctor/ScheduledAppointments";
 
 const Router = () => {
@@ -137,9 +138,11 @@ const Router = () => {
 
             <Route path="/patient/records" element={<PatientRecords />} />
             <Route
-              path="/care-coordinator/test-results"
+              path={ROUTES.TEST_RESULTS}
               element={<TestResults />}
             />
+
+            <Route path={ROUTES.COMPLETED_RESULT} element={<CompletedTests/>}/>
           </Routes>
         </Main>
       )}

@@ -108,7 +108,9 @@ router.put('/appointments/:appointmentId/start-consultation', appointmentControl
 router.post('/appointments/:appointmentId/prescription', appointmentControllers.submitPrescription);
 router.get('/patients/:patientId/records', appointmentControllers.getPatientRecords);
 router.get('/care-coordinator/pending-tests', appointmentControllers.getPendingTests);
-router.put('/care-coordinator/test-results/:testId', appointmentControllers.submitTestResults);
+router.get('/care-coordinator/completed-tests', appointmentControllers.getCompletedTests);
+router.put('/update-test-result/:appointmentId/:testId',appointmentControllers.updateTestResult)
+router.put('/care-coordinator/test-results/:appointmentId/:testId', appointmentControllers.submitTestResults);
 router.get('/completed/:patientId',appointmentControllers.getCompletedAppointments);
 
 //review

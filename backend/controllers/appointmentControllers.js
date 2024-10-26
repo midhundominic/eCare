@@ -281,23 +281,29 @@ const startConsultation = async (req, res) => {
 const submitPrescription = async (req, res) => {
   const { appointmentId } = req.params;
   const { medicines, tests, notes } = req.body;
-  console.log("testidddd",appointmentId);
-  console.log("resultrt",req.body);
+
   try {
     const appointment = await AppointmentModel.findByIdAndUpdate(
       appointmentId,
       {
-        status: 'completed',
-        prescription: { medicines, tests, notes }
+        prescription: {
+          medicines,
+          tests: tests.map(test => ({ name: test, result: '' })),
+          notes
+        },
+        status: "completed"
       },
       { new: true }
     );
+
     if (!appointment) {
       return res.status(404).json({ message: "Appointment not found" });
     }
-    res.status(201).json({ message: "Prescription submitted", appointment });
+
+    res.status(201).json(appointment);
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    console.error("Error submitting prescription:", error);
+    res.status(500).json({ message: "Error submitting prescription" });
   }
 };
 
@@ -316,7 +322,7 @@ const getPatientRecords = async (req, res) => {
 const getPendingTests = async (req, res) => {
   try {
     const pendingTests = await AppointmentModel.find({
-      'prescription.tests': { $elemMatch: { result: { $exists: false } } }
+      'prescription.tests': { $elemMatch: { result: '' } }
     })
     .populate('patientId', 'name')
     .populate('doctorId', 'firstName lastName')
@@ -327,12 +333,27 @@ const getPendingTests = async (req, res) => {
   }
 };
 
+const getCompletedTests = async (req, res) => {
+  try {
+    const completedTests = await AppointmentModel.find({
+      'prescription.tests': { $not: { $elemMatch: { result: '' } } }
+    })
+    .populate('patientId', 'name')
+    .populate('doctorId', 'firstName lastName')
+    .select('patientId doctorId appointmentDate prescription.tests');
+    res.status(201).json(completedTests);
+  } catch (error) {
+    console.error("Error fetching completed tests:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 const submitTestResults = async (req, res) => {
-  const { testId } = req.params;
-  const { result } = req.body;
+  const { appointmentId, testId } = req.params;
+
   try {
     const appointment = await AppointmentModel.findOneAndUpdate(
-      { 'prescription.tests._id': testId },
+      { _id: appointmentId, 'prescription.tests._id': testId },
       { $set: { 'prescription.tests.$.result': result } },
       { new: true }
     );
@@ -341,9 +362,34 @@ const submitTestResults = async (req, res) => {
     }
     res.status(201).json({ message: "Test result submitted", appointment });
   } catch (error) {
+    console.error("Error submitting test result:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+const updateTestResult = async (req, res) => {
+  const { appointmentId, testId } = req.params;
+  const { result } = req.body;
+
+  try {
+    const appointment = await AppointmentModel.findOneAndUpdate(
+      { _id: appointmentId, 'prescription.tests._id': testId },
+      { $set: { 'prescription.tests.$.result': result } },
+      { new: true }
+    );
+
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment or test not found" });
+    }
+
+    res.status(201).json({ message: "Test result updated successfully", appointment });
+  } catch (error) {
+    console.error("Error updating test result:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 
 const getAppointmentDetails = async (req, res) => {
   const { appointmentId } = req.params;
@@ -408,7 +454,9 @@ module.exports = {
   submitPrescription,
   getPatientRecords,
   getPendingTests,
+  getCompletedTests,
   submitTestResults,
+  updateTestResult,
   getAppointmentDetails,
   getCompletedAppointments,
   submitReview,
