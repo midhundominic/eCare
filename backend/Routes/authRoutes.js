@@ -16,6 +16,9 @@ const appointmentControllers = require("../controllers/appointmentControllers");
 const coordinatorHealthControllers = require("../controllers/coordinatorHealthControllers");
 const reviewControllers = require('../controllers/reviewControllers');
 const paymentControllers = require('../controllers/paymentControllers');
+const medicineControllers = require('../controllers/medicineControllers');
+const prescriptionControllers = require('../controllers/prescriptionController');
+const medicineController = require('../controllers/medicineController');
 
 //patient
 
@@ -38,6 +41,10 @@ router.get("/doctor-appointments/:doctorId",authMiddleware,doctorControllers.get
 //doctorid
 router.get("/doctor/:id", doctorControllers.getDoctorById);
 
+
+//admin
+router.patch('/admin/toggle-status/:userType/:id', adminControllers.toggleUserStatus);
+router.patch('/admin/edit-user/:userType/:id', adminControllers.editUserDetails);
 
 
 router.post("/admin-signin", adminControllers.adminSignin);
@@ -121,5 +128,19 @@ router.post('/payment/order', paymentControllers.createOrder);
 router.post('/payment/verify', paymentControllers.verifyPayment);
 router.post('/payment/save', paymentControllers.savePaymentDetails);
 router.get('/payment/user/:userId',paymentControllers.getPaymentsByUser);
+
+
+//Precription
+
+router.post('/prescriptions/create',authMiddleware,prescriptionControllers.createPrescription);
+router.post('/prescriptions/test/result',prescriptionControllers.uploadTestResult);
+router.get('/prescriptions/test-results/:id',prescriptionControllers.getPrescription);
+router.get('/prescriptions/patient/:patientId',prescriptionControllers.getPatientPrescriptions);
+
+//medicine
+
+router.post('/medicines/add',medicineController.addMedicine);
+router.get('/medicines/list', medicineController.getMedicinesList);
+router.patch('/medicines/stock', medicineController.updateMedicineStock);
 
 module.exports = router;

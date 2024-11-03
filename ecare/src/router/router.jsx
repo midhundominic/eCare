@@ -39,6 +39,7 @@ import PrescribeForm from "../component/Doctor/PrescribeForm";
 import TestResults from "../component/Coordinator/TestResult";
 import CompletedTests from "../component/Coordinator/CompletedTest";
 import DoctorAppointments from "../component/Doctor/ScheduledAppointments";
+import CoordinatorMedicine from "../component/Coordinator/Medicine";
 
 const Router = () => {
   const location = useLocation();
@@ -143,6 +144,7 @@ const Router = () => {
             />
 
             <Route path={ROUTES.COMPLETED_RESULT} element={<CompletedTests/>}/>
+            <Route path={ROUTES.MEDICINE_LIST} element={<CoordinatorMedicine/>}/>
           </Routes>
         </Main>
       )}

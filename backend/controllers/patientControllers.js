@@ -121,6 +121,7 @@ const getAllPatient = async (req, res) => {
         weight: 1,
         height: 1,
         admissionNumber: 1,
+        isDisabled:1,
       }
     );
 

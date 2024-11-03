@@ -149,4 +149,10 @@ export const NAV_CONTENT_COORDINATOR = [
     link: ROUTES.COMPLETED_RESULT,
     icon: AutoStoriesIcon,
   },
+  {
+    id: 5,
+    title: "Medicine",
+    link: ROUTES.MEDICINE_LIST,
+    icon: AutoStoriesIcon,
+  },
 ];

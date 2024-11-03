@@ -1,0 +1,19 @@
+.doctorUserListContainer {
+    padding: 20px;
+  }
+  
+  .searchContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .searchField {
+    width: 60%;
+  }
+  
+  .registerButton {
+    margin-left: auto;
+  }
+  

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getPatientRecords } from '../../../services/patientServices';
+import { getPrescriptionHistory } from '../../../services/prescriptionServices';
 import { toast } from 'react-toastify';
 
 const PatientRecords = () => {
@@ -12,7 +12,7 @@ const PatientRecords = () => {
         const patientId = userData?.userId;
         if (!patientId) return;
 
-        const patientRecords = await getPatientRecords(patientId);
+        const patientRecords = await getPrescriptionHistory(patientId);
         setRecords(patientRecords);
       } catch (error) {
         toast.error('Error fetching patient records');

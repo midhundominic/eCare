@@ -9,6 +9,10 @@ const CoordinatorSchema = new mongoose.Schema({
   phone: { type: String, required: true },
   password: { type: String, required: true },
   role: { type: Number, required: true },
+  isDisabled: {
+    type: Boolean,
+    default: false,
+  },
   date_created: { type: Date, required: true, default: () => dayjs().toDate() },
 });
 
