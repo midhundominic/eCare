@@ -54,6 +54,7 @@ export const deleteDoctor = async (id) => {
 export const getDoctorAppointments = async (doctorId) => {
   try {
     const response = await apiClient.get(`/doctor-appointments/${doctorId}`);
+    console.log("doctorappointments",response);
     return response;
   } catch (error) {
     console.error("Error fetching doctor appointments", error);

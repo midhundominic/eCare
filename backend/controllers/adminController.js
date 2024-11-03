@@ -1,5 +1,7 @@
 const DoctorLeave = require('../models/doctorLeaveModel');
-const Doctor = require('../models/doctorLeaveModel');
+const DoctorModel = require('../models/doctorModel');
+const CoordinatorModel = require('../models/coordinatorModel');
+const PatientModel = require('../models/patientModel');
 
 const adminSignin = async (req, res) => {
   const { email, password } = req.body;
@@ -28,6 +30,74 @@ const adminSignin = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+
+const toggleUserStatus = async (req, res) => {
+  const { id, userType } = req.params;
+  const { isDisabled } = req.body;
+
+  console.log("id,userType",req.params);
+  console.log("Disable",req.body);
+
+  let Model;
+  switch (userType) {
+    case 'patient':
+      Model = PatientModel;
+      break;
+    case 'doctor':
+      Model = DoctorModel;
+      break;
+    case 'coordinator':
+      Model = CoordinatorModel;
+      break;
+    default:
+      return res.status(400).json({ message: 'Invalid user type' });
+  }
+
+  try {
+    const user = await Model.findByIdAndUpdate(id, { isDisabled }, { new: true });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(201).json({ message: 'User status updated successfully', user });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+const editUserDetails = async (req, res) => {
+  const { id, userType } = req.params;
+  const updateData = req.body;
+
+  let Model;
+  switch (userType) {
+    case 'patient':
+      Model = PatientModel;
+      break;
+    case 'doctor':
+      Model = DoctorModel;
+      break;
+    case 'coordinator':
+      Model = CoordinatorModel;
+      break;
+    default:
+      return res.status(400).json({ message: 'Invalid user type' });
+  }
+
+  try {
+    const user = await Model.findByIdAndUpdate(id, updateData, { new: true });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(201).json({ message: 'User details updated successfully', user });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+
+
 
 const getLeaveRequests = async (req, res) => {
   try {
@@ -59,6 +129,8 @@ const updateLeaveStatus = async (req, res) => {
 
 module.exports = {
   adminSignin,
+  toggleUserStatus,
+  editUserDetails,
   getLeaveRequests,
   updateLeaveStatus,
 };

@@ -3,6 +3,7 @@ const Appointment = require("../models/appointmentModel");
 const DoctorLeave = require("../models/doctorLeaveModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { mergeDateAndTime } = require("../utils/helper");
 
 const registerDoctor = async (req, res) => {
   const {
@@ -83,7 +84,6 @@ const getDoctorById = async (req, res) => {
 };
 
 const deleteDoctor = async (req, res) => {
-  
   try {
     const doctor = await DoctorModel.findByIdAndDelete(req.params.id);
     if (!doctor) {
@@ -101,8 +101,8 @@ const getDoctorAppointments = async (req, res) => {
 
     // Fetch appointments based on doctorId
     const appointments = await Appointment.find({ doctor: doctorId })
-      .populate('patient')  // Optional: Populate patient details
-      .populate('doctor');  // Optional: Populate doctor details
+      .populate("patient") // Optional: Populate patient details
+      .populate("doctor"); // Optional: Populate doctor details
 
     res.status(201).json({
       success: true,
@@ -122,16 +122,27 @@ const getAppointmentsByDoctorId = async (req, res) => {
   try {
     const appointments = await Appointment.find({ doctorId }).populate(
       "patientId",
-      "name"
+      ""  // An empty string means all fields in the `Patient` schema will be included
     );
-    res.status(201).json({ appointments });
+
+    const modifiedList = appointments.map((data) => {
+      const mergedDate = mergeDateAndTime(data.appointmentDate, data.timeSlot);
+      return {
+        ...data._doc,
+        appointmentDate: mergedDate,
+        patientDetails: data.patientId, // Include populated patient details
+      };
+    });
+
+    res.status(201).json({ appointments: modifiedList });
   } catch (error) {
     console.error("Error fetching doctor appointments:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-//Leave 
+
+//Leave
 const applyForLeave = async (req, res) => {
   try {
     const { startDate, endDate, reason } = req.body;
@@ -140,13 +151,13 @@ const applyForLeave = async (req, res) => {
     // Check if leave already exists in the given date range
     const leaveExists = await DoctorLeave.findOne({
       doctorId,
-      $or: [
-        { startDate: { $lte: endDate }, endDate: { $gte: startDate } }
-      ]
+      $or: [{ startDate: { $lte: endDate }, endDate: { $gte: startDate } }],
     });
 
     if (leaveExists) {
-      return res.status(400).json({ message: "Leave already applied for these dates" });
+      return res
+        .status(400)
+        .json({ message: "Leave already applied for these dates" });
     }
 
     const newLeave = new DoctorLeave({ doctorId, startDate, endDate, reason });

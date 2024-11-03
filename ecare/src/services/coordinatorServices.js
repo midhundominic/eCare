@@ -24,7 +24,7 @@ export const postSigninCoordinator = async (payload) => {
   export const getCoordinator = async () => {
     try {
       const response = await coordinatorView();
-      return response;
+      return response.data;
     } catch (error) {
       console.error("Error fetching coordinator list", error);
       throw error;

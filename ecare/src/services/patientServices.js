@@ -49,7 +49,7 @@ export const authWithGoogleService = async (fields) => {
 export const getPatients = async (payload) => {
   try {
     const response = await patientView();
-    return response;
+    return response.data;
   } catch (error) {
     console.error("Error Fetching Patient", error);
     throw error;

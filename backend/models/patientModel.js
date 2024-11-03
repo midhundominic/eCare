@@ -11,17 +11,25 @@ const PatientSchema = new mongoose.Schema({
   date_created: { type: Date, required: true, default: () => dayjs().toDate() },
   resetCode: { type: String, default: "" },
   resetCodeExpiration: { type: Date, default: Date.now },
+  isDisabled: {
+    type: Boolean,
+    default: false,
+  },
 
-
-  dateOfBirth: { type: Date, required: false ,default: ""},
+  dateOfBirth: { type: Date, required: false, default: "" },
   gender: { type: String, required: false, default: "" },
   weight: { type: String, required: false, default: "" },
-  height: { type: String, required: false, default: ""},
-  profilePhoto: { type: String ,required: false}, // URL to the profile photo
-  admissionNumber: { type: String, unique: true, sparse: true,required: false }, // Unique admission number
+  height: { type: String, required: false, default: "" },
+  profilePhoto: { type: String, required: false }, // URL to the profile photo
+  admissionNumber: {
+    type: String,
+    unique: true,
+    sparse: true,
+    required: false,
+  }, // Unique admission number
   isProfileComplete: { type: Boolean, default: false },
   lastUpdated: { type: Date, default: Date.now },
-  address: { type: String, required: false ,default: ""},
+  address: { type: String, required: false, default: "" },
 });
 
 // Pre-save hook to hash password before saving

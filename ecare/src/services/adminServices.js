@@ -1,4 +1,5 @@
 import { adminSignin } from "../api/admin";
+import { doctorView } from "../api/doctor";
 import apiClient from "../api/index";
 
 export const postSignin = async (payload) => {
@@ -7,6 +8,37 @@ export const postSignin = async (payload) => {
       return response;
     } catch (error) {
       console.error("Error on signin Admin", error);
+      throw error;
+    }
+  };
+
+  export const getDoctors = async (payload) => {
+    try {
+      const response = await doctorView();
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching doctors list", error);
+      throw error;
+    }
+  };
+
+
+  export const toggleUserStatus = async (userType, id, isDisabled) => {
+    try {
+      const response = await apiClient.patch(`admin/toggle-status/${userType}/${id}`, { isDisabled });
+      return response.data;
+    } catch (error) {
+      console.error('Error toggling user status:', error);
+      throw error;
+    }
+  };
+  
+  export const editUserDetails = async (userType, id, updateData) => {
+    try {
+      const response = await apiClient.patch(`/admin/edit-user/${userType}/${id}`, updateData);
+      return response.data;
+    } catch (error) {
+      console.error('Error editing user details:', error);
       throw error;
     }
   };

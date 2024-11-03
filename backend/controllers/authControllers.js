@@ -22,6 +22,9 @@ const signin = async (req, res) => {
       if (!isMatch) {
         return res.status(401).json({ message: "Invalid password" });
       }
+      if (patient.isDisabled) {
+        return res.status(403).json({ message: "Your account is blocked. Please contact the administrator." });
+      }
 
       const token = jwt.sign(
         { userId: patient._id, email: patient.email, role: patient.role },
@@ -46,6 +49,9 @@ const signin = async (req, res) => {
     if (doctor) {
       if (doctor.password !== password) {
         return res.status(401).json({ message: "Invalid password" });
+      }
+      if (doctor.isDisabled) {
+        return res.status(403).json({ message: "Your account is blocked. Please contact the administrator." });
       }
 
       const token = jwt.sign(
@@ -72,6 +78,9 @@ const signin = async (req, res) => {
     if (coordinator) {
       if (coordinator.password !== password) {
         return res.status(401).json({ message: "Invalid password" });
+      }
+      if (coordinator.isDisabled) {
+        return res.status(403).json({ message: "Your account is blocked. Please contact the administrator." });
       }
 
       const token = jwt.sign(

@@ -15,6 +15,7 @@ import Checkbox from "../Common/Checkbox";
 import { ROUTES } from "../../router/routes";
 import LoginButton from "../LoginButton";
 import { usePatient } from "../../context/patientContext";
+import { useDoctor } from "../../context/doctorContext";
 
 const auth = getAuth(firebaseApp);
 const googleProvider = new GoogleAuthProvider();
@@ -22,6 +23,7 @@ const googleProvider = new GoogleAuthProvider();
 const Login = () => {
   const navigate = useNavigate();
   const { setPatient } = usePatient();
+  const { setDoctor } = useDoctor();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -98,9 +100,11 @@ const Login = () => {
           // Navigate based on user role
           switch (role) {
             case 1:
+              setPatient(response.data);
               navigate(ROUTES.PATIENT_HOME);
               break;
             case 2:
+              setDoctor(response.data);
               navigate(ROUTES.DOCTOR_HOME);
               break;
             case 3:

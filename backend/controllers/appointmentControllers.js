@@ -393,11 +393,10 @@ const updateTestResult = async (req, res) => {
 
 const getAppointmentDetails = async (req, res) => {
   const { appointmentId } = req.params;
-  
 
   try {
     const appointment = await AppointmentModel.findById(appointmentId)
-      .populate("patientId", "name")
+      .populate("patientId", "") 
       .populate("doctorId", "firstName lastName");
     
     if (!appointment) {
