@@ -98,7 +98,7 @@ export const NAV_CONTENT_DOCTOR = [
   {
     id: 1,
     title: "Dashboard",
-    link: ROUTES.DEFAULT_HOME,
+    link: ROUTES.DOCTOR_HOME,
     icon: DashboardCustomizeRoundedIcon,
   },
   {

@@ -108,3 +108,14 @@ export const postSignin = async (payload) => {
       throw error;
     }
   };
+
+  export const getDashboardStats = async () => {
+    try {
+      const response = await apiClient.get('/admin/dashboardstats');
+      console.log("dashboard",response);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
+      throw error;
+    }
+  };

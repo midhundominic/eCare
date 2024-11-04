@@ -82,6 +82,7 @@ const Login = () => {
             name="email"
             placeholder="Enter your Email"
             value={formData.email}
+            id="email"
             onChange={handleChange}
             error={error.email}
           />
@@ -89,12 +90,13 @@ const Login = () => {
             type="password"
             title="Password"
             name="password"
+            id= "password"
             placeholder="Enter your Password"
             value={formData.password}
             onChange={handleChange}
             error={error.password}
           />
-          <button type="submit" className={styles.submitButton}>
+          <button type="submit" id="submitbutton" className={styles.submitButton}>
             Login
           </button>
         </form>

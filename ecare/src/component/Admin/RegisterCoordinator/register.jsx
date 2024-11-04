@@ -146,7 +146,7 @@ const CoordinatorRegistration = () => {
             />
           </div>
           <div className={styles.buttonContainer}>
-            <Button type="submit" styles={{ btnPrimary: styles.newButton }}>
+            <Button type="submit" name="createcoordinator" styles={{ btnPrimary: styles.newButton }}>
               Create Coordinator
             </Button>
           </div>

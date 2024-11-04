@@ -39,3 +39,13 @@ export const getMedicineDetails = async (medicineId) => {
     throw error;
   }
 };
+
+export const deleteMedicine = async (medicineId) => {
+  try {
+    const response = await apiClient.delete(`/medicines/${medicineId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting medicine", error);
+    throw error;
+  }
+};

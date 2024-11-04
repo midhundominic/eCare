@@ -262,7 +262,7 @@ const DoctorRegistration = () => {
             error={formError.aboutDoctor}
           />
 
-          <Button type="submit">Create Doctor</Button>
+          <Button id="createDoctorButton" name="createdoctor" type="submit">Create Doctor</Button>
         </form>
       </div>
     </div>

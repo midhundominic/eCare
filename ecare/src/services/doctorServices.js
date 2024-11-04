@@ -141,3 +141,44 @@ export const submitPrescription = async (appointmentId, prescriptionData) => {
     throw error;
   }
 };
+
+export const getDoctorDashboardStats = async (doctorId) => {
+  try {
+    const response = await apiClient.get(`/doctors/${doctorId}/dashboard-stats`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching doctor dashboard stats:', error);
+    throw error;
+  }
+};
+
+export const getPrescriptionHistory = async (patientId) => {
+  try {
+    const response = await apiClient.get(`/prescriptions/patient/${patientId}`);
+    console.log('Prescription response:', response.data); // For debugging
+    return {
+      data: {
+        appointments: response.data.map(prescription => ({
+          _id: prescription._id,
+          appointmentDate: prescription.createdAt,
+          prescription: {
+            medicines: prescription.medicines.map(med => ({
+              medicine: {
+                name: med.medicine?.name || 'Unknown Medicine'
+              },
+              frequency: med.frequency,
+              days: med.days,
+              beforeFood: med.beforeFood,
+              isSOS: med.isSOS
+            })),
+            tests: prescription.tests,
+            notes: prescription.notes
+          }
+        }))
+      }
+    };
+  } catch (error) {
+    console.error("Error fetching prescription history", error);
+    throw error;
+  }
+};

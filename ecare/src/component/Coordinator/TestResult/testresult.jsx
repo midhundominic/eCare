@@ -1,11 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { getPendingTests, submitTestResults } from '../../../services/coordinatorServices';
+import { 
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  CircularProgress,
+  Typography
+} from '@mui/material';
 import { toast } from 'react-toastify';
-import styles from './testresult.module.css';
+import { getPrescriptionDetails, uploadTestResult } from '../../../services/prescriptionServices';
+import styles from './testResult.module.css';
 
-const PendingTests = () => {
+const TestResultUpload = () => {
   const [pendingTests, setPendingTests] = useState([]);
-  const [results, setResults] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedTest, setSelectedTest] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [remarks, setRemarks] = useState('');
 
   useEffect(() => {
     fetchPendingTests();
@@ -13,79 +34,149 @@ const PendingTests = () => {
 
   const fetchPendingTests = async () => {
     try {
-      const tests = await getPendingTests();
-      setPendingTests(tests);
-      const initialResults = {};
-      tests.forEach(appointment => {
-        appointment.prescription.tests.forEach(test => {
-          if (!test.result) {
-            initialResults[`${appointment._id}-${test._id}`] = '';
-          }
-        });
-      });
-      setResults(initialResults);
+      setLoading(true);
+      const response = await getPrescriptionDetails();
+      
+      if (response.success) {
+        setPendingTests(response.data);
+      } else {
+        toast.error('Failed to fetch pending tests');
+      }
     } catch (error) {
-      console.error("Error fetching pending tests:", error);
-      toast.error("Failed to fetch pending tests");
+      toast.error(error.message || 'Error fetching pending tests');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleResultChange = (appointmentId, testId, value) => {
-    setResults(prev => ({
-      ...prev,
-      [`${appointmentId}-${testId}`]: value
-    }));
+  const handleUploadClick = (test) => {
+    setSelectedTest(test);
+    setOpenDialog(true);
   };
 
-  const handleSubmitResult = async (appointmentId, testId) => {
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedTest(null);
+    setSelectedFile(null);
+    setRemarks('');
+  };
+
+  const handleFileChange = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      toast.error('Please select a file');
+      return;
+    }
+
     try {
-      const result = results[`${appointmentId}-${testId}`];
-      await submitTestResults(appointmentId, testId, result);
-      toast.success("Test result submitted successfully");
-      fetchPendingTests(); // Refresh the list after submitting
+      setLoading(true);
+      const formData = new FormData();
+      formData.append('resultPDF', selectedFile);
+      formData.append('testName', selectedTest.testName);
+      formData.append('prescriptionId', selectedTest.prescriptionId);
+      formData.append('remarks', remarks);
+
+      await uploadTestResult(formData);
+      toast.success('Test result uploaded successfully');
+      handleCloseDialog();
+      fetchPendingTests(); // Refresh the list
     } catch (error) {
-      console.error("Error submitting test result:", error);
-      toast.error("Failed to submit test result");
+      toast.error(error.message || 'Error uploading test result');
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading && pendingTests.length === 0) {
+    return <CircularProgress />;
+  }
 
   return (
-    <div className={styles.pendingTestsContainer}>
-      <h2 className={styles.title}>Pending Tests</h2>
-      {pendingTests.map((appointment) => (
-        <div key={appointment._id} className={styles.appointmentCard}>
-          <h3 className={styles.patientName}>Patient: {appointment.patientId.name}</h3>
-          <p className={styles.doctorName}>Doctor: Dr. {appointment.doctorId.firstName} {appointment.doctorId.lastName}</p>
-          <p className={styles.appointmentDate}>Date: {new Date(appointment.appointmentDate).toLocaleDateString()}</p>
-          {appointment.prescription.tests.map((test) => (
-            <div key={test._id} className={styles.testItem}>
-              <p className={styles.testName}>Test: {test.name}</p>
-              {test.result ? (
-                <p className={styles.testResult}>Result: {test.result}</p>
-              ) : (
-                <div className={styles.resultInputContainer}>
-                  <input
-                    type="text"
-                    className={styles.resultInput}
-                    placeholder="Enter test result"
-                    value={results[`${appointment._id}-${test._id}`] || ''}
-                    onChange={(e) => handleResultChange(appointment._id, test._id, e.target.value)}
-                  />
-                  <button
-                    className={styles.submitButton}
-                    onClick={() => handleSubmitResult(appointment._id, test._id)}
-                    disabled={!results[`${appointment._id}-${test._id}`]}
+    <div className={styles.container}>
+      <Typography variant="h5" gutterBottom>Pending Test Results</Typography>
+      
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Patient Name</TableCell>
+              <TableCell>Doctor Name</TableCell>
+              <TableCell>Test Name</TableCell>
+              <TableCell>Prescribed Date</TableCell>
+              <TableCell>Action</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {pendingTests.map((test, index) => (
+              <TableRow key={index}>
+                <TableCell>{test.patientName}</TableCell>
+                <TableCell>{test.doctorName}</TableCell>
+                <TableCell>{test.testName}</TableCell>
+                <TableCell>{new Date(test.createdDate).toLocaleDateString()}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleUploadClick(test)}
+                    disabled={test.isCompleted}
                   >
-                    Submit Result
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      ))}
+                    {test.isCompleted ? 'Completed' : 'Upload Result'}
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Upload Test Result</DialogTitle>
+        <DialogContent>
+          <div className={styles.dialogContent}>
+            {selectedTest && (
+              <>
+                <Typography variant="subtitle1">
+                  Patient: {selectedTest.patientName}
+                </Typography>
+                <Typography variant="subtitle2" gutterBottom>
+                  Test: {selectedTest.testName}
+                </Typography>
+              </>
+            )}
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={handleFileChange}
+              className={styles.fileInput}
+            />
+            <TextField
+              multiline
+              rows={3}
+              variant="outlined"
+              label="Remarks"
+              value={remarks}
+              onChange={(e) => setRemarks(e.target.value)}
+              fullWidth
+              margin="normal"
+            />
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Cancel</Button>
+          <Button 
+            onClick={handleUpload}
+            variant="contained"
+            color="primary"
+            disabled={!selectedFile || loading}
+          >
+            {loading ? <CircularProgress size={24} /> : 'Upload'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
 
-export default PendingTests;
+export default TestResultUpload;

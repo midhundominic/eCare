@@ -1,0 +1,24 @@
+.dashboardContainer {
+    padding: 24px;
+  }
+  
+  .statCard {
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .iconWrapper {
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+  
+  .chartCard {
+    padding: 20px;
+    height: 100%;
+  }

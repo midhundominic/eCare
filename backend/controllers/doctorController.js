@@ -1,6 +1,8 @@
 const DoctorModel = require("../models/doctorModel");
 const Appointment = require("../models/appointmentModel");
 const DoctorLeave = require("../models/doctorLeaveModel");
+const PrescriptionModel = require("../models/prescriptionModel");
+const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { mergeDateAndTime } = require("../utils/helper");
@@ -195,6 +197,46 @@ const cancelLeave = async (req, res) => {
   }
 };
 
+const getDoctorDashboardStats = async (req, res) => {
+  try {
+    const doctorId = new mongoose.Types.ObjectId(req.params.doctorId);
+
+    // Get total counts
+    const totalPatients = await Appointment.distinct('patientId', { doctorId }).length;
+    const totalAppointments = await Appointment.countDocuments({ doctorId });
+    const totalPrescriptions = await PrescriptionModel.countDocuments({ doctorId });
+
+    // Get appointments by status
+    const appointmentsByStatus = await Appointment.aggregate([
+      { $match: { doctorId: doctorId } },
+      { $group: { _id: "$status", count: { $sum: 1 } } },
+      { $project: { name: "$_id", value: "$count", _id: 0 } }
+    ]);
+
+    // Get upcoming appointments
+    const upcomingAppointments = await Appointment.find({
+      doctorId,
+      appointmentDate: { $gte: new Date() },
+      status: 'scheduled'
+    })
+    .populate('patientId', 'name')
+    .sort({ appointmentDate: 1 })
+    .limit(5);
+
+    res.status(201).json({
+      totalPatients,
+      totalAppointments,
+      totalPrescriptions,
+      appointmentsByStatus,
+      upcomingAppointments
+    });
+
+  } catch (error) {
+    console.error('Error getting doctor dashboard stats:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   registerDoctor,
   getAllDoctors,
@@ -205,4 +247,5 @@ module.exports = {
   applyForLeave,
   getLeaveRequests,
   cancelLeave,
+  getDoctorDashboardStats,
 };
