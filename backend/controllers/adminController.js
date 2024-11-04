@@ -2,6 +2,8 @@ const DoctorLeave = require('../models/doctorLeaveModel');
 const DoctorModel = require('../models/doctorModel');
 const CoordinatorModel = require('../models/coordinatorModel');
 const PatientModel = require('../models/patientModel');
+const AppointmentModel = require('../models/appointmentModel');
+const PrescriptionModel = require('../models/prescriptionModel');
 
 const adminSignin = async (req, res) => {
   const { email, password } = req.body;
@@ -127,10 +129,56 @@ const updateLeaveStatus = async (req, res) => {
 };
 
 
+const getDashboardStats = async (req, res) => {
+  try {
+    const totalPatients = await PatientModel.countDocuments();
+    const totalDoctors = await DoctorModel.countDocuments();
+    const totalAppointments = await AppointmentModel.countDocuments();
+    const totalPrescriptions = await PrescriptionModel.countDocuments();
+
+    // Get appointments by status
+    const appointmentsByStatus = await AppointmentModel.aggregate([
+      { $group: { _id: "$status", count: { $sum: 1 } } }
+    ]);
+
+    // Get appointments by department
+    const appointmentsByDepartment = await AppointmentModel.aggregate([
+      {
+        $lookup: {
+          from: "doctors",
+          localField: "doctorId",
+          foreignField: "_id",
+          as: "doctor"
+        }
+      },
+      { $unwind: "$doctor" },
+      { $group: { _id: "$doctor.specialization", count: { $sum: 1 } } }
+    ]);
+
+    res.status(201).json({
+      totalPatients,
+      totalDoctors,
+      totalAppointments,
+      totalPrescriptions,
+      appointmentsByStatus: appointmentsByStatus.map(item => ({
+        name: item._id,
+        value: item.count
+      })),
+      appointmentsByDepartment: appointmentsByDepartment.map(item => ({
+        name: item._id,
+        value: item.count
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   adminSignin,
   toggleUserStatus,
   editUserDetails,
   getLeaveRequests,
   updateLeaveStatus,
+  getDashboardStats,
 };

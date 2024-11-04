@@ -1,3 +1,39 @@
 .recordRoot {
   display: grid;
 }
+.recordRoot {
+  padding: 20px;
+}
+
+.prescriptionDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sectionTitle {
+  font-weight: 600 !important;
+  margin-bottom: 10px !important;
+}
+
+.medicineSection, .testSection, .notesSection {
+  padding: 10px;
+}
+
+.medicineItem, .testItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.divider {
+  margin: 10px 0 !important;
+}
+
+.testItem > div {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}

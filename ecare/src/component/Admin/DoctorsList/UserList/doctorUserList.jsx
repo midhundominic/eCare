@@ -60,12 +60,13 @@ const DoctorUserList = ({ fetchDoctors, toggleDoctorStatus, editDoctorDetails, r
       <div className={styles.searchContainer}>
         <TextField
           label="Search"
+          name="search"
           variant="outlined"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className={styles.searchField}
         />
-        <Button variant="contained" color="primary" onClick={registerDoctor} className={styles.registerButton}>
+        <Button variant="contained" color="primary" onClick={registerDoctor} id="registerButton" className={styles.registerButton}>
           Register Doctor
         </Button>
       </div>

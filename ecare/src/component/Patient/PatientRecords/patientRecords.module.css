@@ -1,0 +1,53 @@
+.recordsContainer {
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  
+  .recordAccordion {
+    margin-bottom: 16px !important;
+  }
+  
+  .summaryContent {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 20px;
+  }
+  
+  .prescriptionDetails {
+    padding: 0 20px;
+  }
+  
+  .section {
+    margin-bottom: 24px;
+  }
+  
+  .section h3 {
+    color: #2c3e50;
+    margin-bottom: 12px;
+  }
+  
+  .section ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .section li {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 8px;
+    align-items: center;
+  }
+  
+  .testItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+  }
+  
+  .pendingResult {
+    color: #e74c3c;
+    font-style: italic;
+  }

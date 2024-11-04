@@ -70,7 +70,7 @@ const DoctorReview = () => {
   
     const prescription = {
       appointmentId: searchParams.get("appointmentId"),
-      doctorId: searchParams.get("doctorId"),
+      doctorId: searchParams.get("appointmentId"),
       medicines: medicines
         .filter((med) => med.name?.value)
         .map((med) => ({

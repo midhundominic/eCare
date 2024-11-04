@@ -21,14 +21,37 @@ exports.getMedicinesList = async (req, res) => {
 
 exports.updateMedicineStock = async (req, res) => {
   try {
-    const { id, stockQuantity } = req.body;
+    const { medicineId } = req.params;  // Changed from const id = req.params
+    const { stockQuantity } = req.body;
+    
     const medicine = await Medicine.findByIdAndUpdate(
-      id,
+      medicineId,  // Use medicineId directly
       { stockQuantity },
       { new: true }
     );
+
+    if (!medicine) {
+      return res.status(404).json({ message: 'Medicine not found' });
+    }
+
     res.status(201).json(medicine);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+exports.deleteMedicine = async (req, res) => {
+  try {
+    const { medicineId } = req.params;
+    
+    const medicine = await Medicine.findByIdAndDelete(medicineId);
+    
+    if (!medicine) {
+      return res.status(404).json({ message: 'Medicine not found' });
+    }
+
+    res.status(201).json({ message: 'Medicine deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

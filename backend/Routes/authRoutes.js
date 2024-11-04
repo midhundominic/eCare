@@ -9,6 +9,7 @@ const forgotPassword = require("../controllers/authforgotPassword");
 const resetPassword = require("../controllers/resetPassword");
 const profileCoordinator = require("../controllers/profileControllers/coordinatorControllers");
 const authMiddleware = require("../middleware/auth");
+const pdfUpload = require("../middleware/pdf-upload");
 const uploadMiddleware = require("../middleware/upload");
 const profilePatient = require("../controllers/profileControllers/patientControllers");
 const profileDoctor = require ("../controllers/profileControllers/doctorControllers");
@@ -37,6 +38,7 @@ router.post("/doctor-signin", authControllers.signin);
 router.get("/doctors-view",doctorControllers.getAllDoctors);
 router.get("/:doctorId/appointments",doctorControllers.getDoctorAppointments);
 router.get("/doctor-appointments/:doctorId",authMiddleware,doctorControllers.getAppointmentsByDoctorId);
+router.get('/doctors/:doctorId/dashboard-stats',doctorControllers.getDoctorDashboardStats);
 
 //doctorid
 router.get("/doctor/:id", doctorControllers.getDoctorById);
@@ -45,6 +47,7 @@ router.get("/doctor/:id", doctorControllers.getDoctorById);
 //admin
 router.patch('/admin/toggle-status/:userType/:id', adminControllers.toggleUserStatus);
 router.patch('/admin/edit-user/:userType/:id', adminControllers.editUserDetails);
+router.get('/admin/dashboardstats', adminControllers.getDashboardStats);
 
 
 router.post("/admin-signin", adminControllers.adminSignin);
@@ -54,6 +57,7 @@ router.post("/admin-signin", adminControllers.adminSignin);
 router.post("/coordinator-registration", coordinatoControllers.registerCoordinator);
 router.post("/coordinator-signin", authControllers.signin);
 router.get("/coordinator-view",coordinatoControllers.getAllCoordinator);
+router.get("/prescriptions/:prescriptionId",prescriptionControllers.getAppointmentDetails);
 
 
 //profile Photo
@@ -133,14 +137,22 @@ router.get('/payment/user/:userId',paymentControllers.getPaymentsByUser);
 //Precription
 
 router.post('/prescriptions/create',authMiddleware,prescriptionControllers.createPrescription);
-router.post('/prescriptions/test/result',prescriptionControllers.uploadTestResult);
+router.post(
+    '/prescriptions/upload-test-result', 
+    authMiddleware,
+    pdfUpload.single('resultPDF'),
+    prescriptionControllers.uploadTestResult
+  );
 router.get('/prescriptions/test-results/:id',prescriptionControllers.getPrescription);
 router.get('/prescriptions/patient/:patientId',prescriptionControllers.getPatientPrescriptions);
+router.get('/prescriptions/pendingtests',authMiddleware,prescriptionControllers.getPrescriptionsWithPendingTests);
+router.put('/prescriptions/update/:appointmentId',authMiddleware,prescriptionControllers.updatePrescription);
 
 //medicine
 
 router.post('/medicines/add',medicineController.addMedicine);
 router.get('/medicines/list', medicineController.getMedicinesList);
-router.patch('/medicines/stock', medicineController.updateMedicineStock);
+router.patch('/medicines/stock/:medicineId', medicineController.updateMedicineStock);
+router.delete('/medicines/:medicineId', medicineController.deleteMedicine);
 
 module.exports = router;
