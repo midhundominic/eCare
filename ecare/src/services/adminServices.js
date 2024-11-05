@@ -46,6 +46,7 @@ export const postSignin = async (payload) => {
   export const getAllAppointments = async () => {
     try {
       const response = await apiClient.get("/appointments");
+      console.log('Appointments response:', response.data);
       return response.data.appointments;
     } catch (error) {
       console.error("Error fetching appointments", error);
