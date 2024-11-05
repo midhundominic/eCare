@@ -17,30 +17,33 @@ import styles from "./patientRecords.module.css";
 
 const PatientRecords = () => {
   const [records, setRecords] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchRecords = async () => {
       try {
         const userData = JSON.parse(localStorage.getItem("userData"));
         const patientId = userData?.userId;
-        if (!patientId) return;
+        if (!patientId) {
+          toast.error("User ID not found");
+          return;
+        }
 
         const response = await getPrescriptionHistory(patientId);
-        setRecords(response.data);
+        console.log('Prescription records:', response.data); // For debugging
+        setRecords(response.data || []);
       } catch (error) {
+        console.error('Error:', error);
         toast.error("Error fetching patient records");
+      } finally {
+        setLoading(false);
       }
     };
     fetchRecords();
   }, []);
 
-  const handleDownloadResult = async (testResultId) => {
-    try {
-      await downloadTestResult(testResultId);
-    } catch (error) {
-      toast.error("Error downloading test result");
-    }
-  };
+  if (loading) return <div>Loading...</div>;
+  if (!records.length) return <div>No medical records found.</div>;
 
   return (
     <div className={styles.recordsContainer}>
@@ -50,30 +53,37 @@ const PatientRecords = () => {
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <div className={styles.summaryContent}>
               <span>{dayjs(record.createdAt).format("DD MMM YYYY")}</span>
-              <span>Dr. {record.doctorId.firstName} {record.doctorId.lastName} - {record.doctorId.specialization}</span>
+              <span>
+                {record.doctorId ? 
+                  `Dr. ${record.doctorId.firstName || ''} ${record.doctorId.lastName || ''} - ${record.doctorId.specialization || ''}` : 
+                  'Doctor information unavailable'
+                }
+              </span>
             </div>
           </AccordionSummary>
           <AccordionDetails>
             <div className={styles.prescriptionDetails}>
-              <div className={styles.section}>
-                <h3>Medicines</h3>
-                <ul>
-                  {record.medicines.map((medicine, idx) => (
-                    <li key={idx}>
-                      <span>{medicine.medicine?.name}</span>
-                      <span>
-                        {medicine.frequency} for {medicine.days} days
-                      </span>
-                      <span>
-                        {medicine.beforeFood ? "Before food" : "After food"}
-                      </span>
-                      {medicine.isSOS && <span>(SOS)</span>}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {record.medicines?.length > 0 && (
+                <div className={styles.section}>
+                  <h3>Medicines</h3>
+                  <ul>
+                    {record.medicines.map((medicine, idx) => (
+                      <li key={idx}>
+                        <span>{medicine.medicine?.name || 'Unknown Medicine'}</span>
+                        <span>
+                          {medicine.frequency || 'N/A'} for {medicine.days || 0} days
+                        </span>
+                        <span>
+                          {medicine.beforeFood ? "Before food" : "After food"}
+                        </span>
+                        {medicine.isSOS && <span>(SOS)</span>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
-              {record.tests.length > 0 && (
+              {record.tests?.length > 0 && (
                 <div className={styles.section}>
                   <h3>Tests</h3>
                   <ul>
@@ -113,5 +123,4 @@ const PatientRecords = () => {
     </div>
   );
 };
-
 export default PatientRecords;

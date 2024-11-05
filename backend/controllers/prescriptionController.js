@@ -188,17 +188,84 @@ exports.getPrescription = async (req, res) => {
   
   exports.getPatientPrescriptions = async (req, res) => {
     try {
-      const prescriptions = await Prescription.find({ patientId: req.params.patientId })
-        .populate('medicines.medicine')
-        .populate('doctorId', 'firstName lastName specialization')
+      const { patientId } = req.params;
+      
+      if (!patientId) {
+        return res.status(400).json({ 
+          success: false,
+          message: 'Patient ID is required' 
+        });
+      }
+  
+      const prescriptions = await Prescription.find({ patientId })
+        .populate({
+          path: 'medicines.medicine',
+          select: 'name'
+        })
+        .populate({
+          path: 'doctorId',
+          select: 'firstName lastName specialization',
+        })
         .populate('tests.resultId')
         .sort({ createdAt: -1 });
-      
-      res.status(201).json(prescriptions);
+  
+      if (!prescriptions) {
+        return res.status(404).json({
+          success: false,
+          message: 'No prescriptions found'
+        });
+      }
+  
+      res.status(201).json({
+        success: true,
+        data: prescriptions
+      });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      console.error('Error fetching prescriptions:', error);
+      res.status(500).json({ 
+        success: false,
+        message: error.message || 'Error fetching prescriptions'
+      });
     }
   };
+
+
+  // Assuming Prescription is a Mongoose model
+exports.getPatientRecords = async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    const prescriptions = await Prescription.find({ patientId: req.params.patientId })
+      .populate('medicines.medicine')
+      .populate('doctorId', 'firstName lastName specialization')
+      .populate('tests.resultId')
+      .sort({ createdAt: -1 });
+
+    // Format the prescriptions as appointments
+    const formattedAppointments = prescriptions.map(prescription => ({
+      _id: prescription._id,
+      appointmentDate: prescription.createdAt,
+      prescription: {
+        medicines: prescription.medicines.map(med => ({
+          medicine: {
+            name: med.medicine?.name || 'Unknown Medicine',
+          },
+          frequency: med.frequency,
+          days: med.days,
+          beforeFood: med.beforeFood,
+          isSOS: med.isSOS,
+        })),
+        tests: prescription.tests,
+        notes: prescription.notes,
+      },
+    }));
+
+    res.status(201).json({ appointments: formattedAppointments });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+  
   
   exports.getDoctorPrescriptions = async (req, res) => {
     try {

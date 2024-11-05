@@ -145,6 +145,7 @@ router.post(
   );
 router.get('/prescriptions/test-results/:id',prescriptionControllers.getPrescription);
 router.get('/prescriptions/patient/:patientId',prescriptionControllers.getPatientPrescriptions);
+router.get('/prescriptions/doctor/:patientId',prescriptionControllers.getPatientRecords);
 router.get('/prescriptions/pendingtests',authMiddleware,prescriptionControllers.getPrescriptionsWithPendingTests);
 router.put('/prescriptions/update/:appointmentId',authMiddleware,prescriptionControllers.updatePrescription);
 

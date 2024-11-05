@@ -48,7 +48,8 @@ const Payments = () => {
             <p><strong>Date:</strong> {new Date(payment.createdAt).toLocaleDateString()}</p>
             <p><strong>Time:</strong> {new Date(payment.createdAt).toLocaleTimeString()}</p>
             <Button 
-              variant="contained" 
+              variant="contained"
+              name="download" 
               color="primary" 
               onClick={() => downloadPDF(payment)}
             >

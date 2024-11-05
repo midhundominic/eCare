@@ -131,18 +131,20 @@ const AdminAppointments = () => {
 
   return (
     <div className="appointments-list">
-      <h2>All Appointments</h2>
-      {appointments && appointments.length > 0 ? (
-        appointments.map((appointment) => (
-          <div key={appointment._id} className="appointment-card">
-            <p>Patient: {appointment.patientId.name}</p>
-            <p>
-              Doctor: Dr. {appointment.doctorId.firstName}{" "}
-              {appointment.doctorId.lastName}
-            </p>
-            <p>Date: {dayjs(appointment.appointmentDate).format("YYYY-MM-DD")}</p>
-            <p>Time Slot: {appointment.timeSlot}</p>
-            <p>Status: {appointment.status}</p>
+  <h2>All Appointments</h2>
+  {appointments && appointments.length > 0 ? (
+    appointments.map((appointment) => (
+      <div key={appointment._id} className="appointment-card">
+        <p>Patient: {appointment.patientId.name}</p>
+        <p>
+          Doctor: Dr. {appointment.doctorId.firstName}{" "}
+          {appointment.doctorId.lastName}
+        </p>
+        <p>Date: {dayjs(appointment.appointmentDate).format("YYYY-MM-DD")}</p>
+        <p>Time Slot: {appointment.timeSlot}</p>
+        <p>Status: {appointment.status}</p>
+        {appointment.status !== 'completed' && appointment.status !== 'canceled' && (
+          <div className="appointment-actions">
             <button
               onClick={() => handleCancel(appointment._id)}
               className="cancel-btn"
@@ -156,10 +158,12 @@ const AdminAppointments = () => {
               Reschedule
             </button>
           </div>
-        ))
-      ) : (
-        <p>No appointments available.</p>
-      )}
+        )}
+      </div>
+    ))
+  ) : (
+    <p>No appointments available.</p>
+  )}
 
       <Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)} className="reschedule-modal" overlayClassName="reschedule-modal-overlay">
         <h2>Reschedule Appointment</h2>

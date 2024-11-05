@@ -154,28 +154,13 @@ export const getDoctorDashboardStats = async (doctorId) => {
 
 export const getPrescriptionHistory = async (patientId) => {
   try {
-    const response = await apiClient.get(`/prescriptions/patient/${patientId}`);
-    console.log('Prescription response:', response.data); // For debugging
+    const response = await apiClient.get(`/prescriptions/doctor/${patientId}`);
+    console.log('record response:', response); // For debugging
+
     return {
       data: {
-        appointments: response.data.map(prescription => ({
-          _id: prescription._id,
-          appointmentDate: prescription.createdAt,
-          prescription: {
-            medicines: prescription.medicines.map(med => ({
-              medicine: {
-                name: med.medicine?.name || 'Unknown Medicine'
-              },
-              frequency: med.frequency,
-              days: med.days,
-              beforeFood: med.beforeFood,
-              isSOS: med.isSOS
-            })),
-            tests: prescription.tests,
-            notes: prescription.notes
-          }
-        }))
-      }
+        appointments: response.data.appointments || [],
+      },
     };
   } catch (error) {
     console.error("Error fetching prescription history", error);

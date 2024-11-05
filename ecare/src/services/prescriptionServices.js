@@ -29,7 +29,7 @@ export const updatePrescription = async (appointmentId, prescriptionData) => {
 export const getPrescriptionHistory = async (patientId) => {
   try {
     const response = await apiClient.get(`/prescriptions/patient/${patientId}`);
-    return response;
+    return response.data;
   } catch (error) {
     console.error("Error fetching prescription history", error);
     throw error;
