@@ -19,7 +19,6 @@ import { useDoctor } from "../../../context/doctorContext";
 const DoctorAppointments = () => {
   const { doctor } = useDoctor();
   const [appointments, setAppointments] = useState([]);
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,6 +43,7 @@ const DoctorAppointments = () => {
             title: data.patientId.name,
             start: data.appointmentDate,
             end: endTime,
+            status: data.status,
             ...data,
           };
         });
@@ -89,6 +89,12 @@ const DoctorAppointments = () => {
     }
   };
 
+  const handleUpdatePrescription = (appointmentId) => {
+    navigate(
+      `${ROUTES.DOCTOR_PRESCRIPTION}?appointmentId=${appointmentId}&doctorId=${doctor?.doctorId}&mode=update`
+    );
+  };
+
   return (
     <div className={styles.docAppointmentRoot}>
       <PageTitle>Appointments</PageTitle>
@@ -99,6 +105,7 @@ const DoctorAppointments = () => {
             appointment={appointment}
             handleMarkAbsent={(id) => handleMarkAbsent(id, callBack)}
             handleStartConsultation={handleStartConsultation}
+            handleUpdatePrescription={handleUpdatePrescription}
           />
         )}
       />

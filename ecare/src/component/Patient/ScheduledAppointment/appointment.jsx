@@ -101,7 +101,7 @@ const PatientAppointments = () => {
                 <p>Time Slot: {appointment.timeSlot}</p>
                 <p>Status: {appointment.status}</p>
               </div>
-              {appointment.status !== "canceled" || "canceled" && (
+              {appointment.status !== "canceled" && appointment.status !== "completed" && appointment.status !== "absent" && (
                 <>
                   <CancelAppointment
                     name="cancel"

@@ -78,13 +78,17 @@ exports.createPrescription = async (req, res) => {
         return res.status(404).json({ message: "Prescription not found" });
       }
   
-      // Update prescription
-      prescription.medicines = medicines;
-      prescription.notes = notes;
+      prescription.medicines = medicines.map(med => ({
+        medicine: med.medicine,
+        frequency: med.frequency,
+        days: parseInt(med.days),
+        isSOS: med.isSOS || false,
+        beforeFood: med.beforeFood || false
+      }));
   
-      // Handle tests updates
-      const existingTests = prescription.tests;
-      const newTests = tests.map(test => {
+      // Handle tests updates while preserving completion status
+      const existingTests = prescription.tests || [];
+      prescription.tests = tests.map(test => {
         const existingTest = existingTests.find(et => et.testName === test.testName);
         return {
           testName: test.testName,
@@ -92,40 +96,36 @@ exports.createPrescription = async (req, res) => {
           resultId: existingTest ? existingTest.resultId : null
         };
       });
-      prescription.tests = newTests;
   
+      prescription.notes = notes;
       await prescription.save();
   
       // Update appointment prescription details
-      await Appointment.findByIdAndUpdate(appointmentId, {
-        prescription: {
-          medicines: medicines.map(med => ({
-            name: med.medicine,
-            dosage: `${med.frequency} for ${med.days} days`
-          })),
-          tests: newTests.map(test => ({
-            name: test.testName,
-            result: ""
-          })),
-          notes: notes
-        }
-      });
-  
-      res.status(201).json({
-        success: true,
-        message: "Prescription updated successfully",
-        data: prescription
-      });
-    } catch (error) {
-      console.error("Prescription update error:", error);
-      res.status(400).json({ 
-        success: false,
-        message: error.message || "Error updating prescription",
-        error: error
-      });
-    }
-  };
+    await Appointment.findByIdAndUpdate(appointmentId, {
+      prescription: {
+        medicines: medicines.map(med => ({
+          name: med.medicine,
+          dosage: `${med.frequency} for ${med.days} days`
+        })),
+        tests: prescription.tests,
+        notes: notes
+      }
+    });
 
+    res.status(201).json({
+      success: true,
+      message: "Prescription updated successfully",
+      data: prescription
+    });
+  } catch (error) {
+    console.error("Prescription update error:", error);
+    res.status(400).json({ 
+      success: false,
+      message: error.message || "Error updating prescription",
+      error: error
+    });
+  }
+};
 
   exports.uploadTestResult = async (req, res) => {
     try {
@@ -346,6 +346,33 @@ exports.getPatientRecords = async (req, res) => {
         success: false,
         message: 'Error fetching pending tests',
         error: error.message 
+      });
+    }
+  };
+
+  exports.getPrescriptionByAppointment = async (req, res) => {
+    try {
+      const { appointmentId } = req.params;
+      const prescription = await Prescription.findOne({ appointmentId })
+        .populate('medicines.medicine')
+        .populate('doctorId', 'firstName lastName specialization')
+        .populate('tests.resultId');
+  
+      if (!prescription) {
+        return res.status(404).json({ 
+          success: false,
+          message: 'Prescription not found' 
+        });
+      }
+  
+      res.status(201).json({
+        success: true,
+        data: prescription
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false,
+        message: error.message || 'Error fetching prescription'
       });
     }
   };
