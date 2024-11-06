@@ -148,6 +148,7 @@ router.get('/prescriptions/patient/:patientId',prescriptionControllers.getPatien
 router.get('/prescriptions/doctor/:patientId',prescriptionControllers.getPatientRecords);
 router.get('/prescriptions/pendingtests',authMiddleware,prescriptionControllers.getPrescriptionsWithPendingTests);
 router.put('/prescriptions/update/:appointmentId',authMiddleware,prescriptionControllers.updatePrescription);
+router.get('/prescriptions/appointment/:appointmentId', prescriptionControllers.getPrescriptionByAppointment);
 
 //medicine
 

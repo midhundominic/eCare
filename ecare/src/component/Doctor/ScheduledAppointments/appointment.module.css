@@ -23,3 +23,8 @@
   composes: customButton;
   background-color: #3b9cfa !important;
 }
+
+.updateBtn {
+  composes: customButton;
+  background-color: #4caf50 !important;
+}

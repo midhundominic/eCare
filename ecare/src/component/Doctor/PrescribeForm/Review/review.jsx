@@ -13,20 +13,25 @@ import Checkbox from "../../../Common/Checkbox";
 import Button from "../../../Common/Button";
 import { ROUTES } from "../../../../router/routes";
 import { getMedicinesList } from "../../../../services/medicineservices";
-import { submitPrescription } from "../../../../services/prescriptionServices";
+import { submitPrescription,updatePrescription,getPrescriptionByAppointment } from "../../../../services/prescriptionServices";
+
 
 const DoctorReview = () => {
   const [comment, setComment] = useState("");
   const [tests, setTests] = useState([]);
   const [medicines, setMedicines] = useState(INITIAL_MEDICINE_ARR);
   const [medicineOptions, setMedicineOptions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const isUpdateMode = searchParams.get("mode") === "update";
+  const appointmentId = searchParams.get("appointmentId");
 
   useEffect(() => {
-    const fetchMedicinesList = async () => {
+    const fetchInitialData = async () => {
       try {
+        // Fetch medicines list
         const medicinesList = await getMedicinesList();
         setMedicineOptions(
           medicinesList.map((med) => ({
@@ -35,12 +40,39 @@ const DoctorReview = () => {
             stock: med.stockQuantity,
           }))
         );
+
+        // If update mode, fetch existing prescription
+        if (isUpdateMode && appointmentId) {
+          const response = await getPrescriptionByAppointment(appointmentId);
+          const prescriptionData = response.data;
+
+          if (prescriptionData) {
+            setComment(prescriptionData.notes || '');
+            setTests(prescriptionData.tests.map(test => test.testName));
+            
+            const formattedMedicines = prescriptionData.medicines.map(med => ({
+              name: {
+                label: med.medicine.name,
+                value: med.medicine._id
+              },
+              frequency: med.frequency,
+              days: med.days.toString(),
+              isSOS: med.isSOS || false,
+              bf: med.beforeFood || false
+            }));
+            
+            setMedicines([...formattedMedicines, ...INITIAL_MEDICINE_ARR]);
+          }
+        }
       } catch (error) {
-        toast.error("Error fetching medicines list");
+        toast.error("Error fetching prescription data");
+      } finally {
+        setIsLoading(false);
       }
     };
-    fetchMedicinesList();
-  }, []);
+
+    fetchInitialData();
+  }, [isUpdateMode, appointmentId]);
 
   const removeMedicine = (index) => {
     const updatedMedicines = medicines.filter((_, idx) => idx !== index);
@@ -58,23 +90,11 @@ const DoctorReview = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validate required fields
-    const hasEmptyMedicine = medicines.some(med => 
-      !med.name?.value || !med.frequency || !med.days
-    );
-  
-    // if (hasEmptyMedicine) {
-    //   toast.error("Please fill all medicine details");
-    //   return;
-    // }
-  
-    const prescription = {
-      appointmentId: searchParams.get("appointmentId"),
-      doctorId: searchParams.get("appointmentId"),
+    const prescriptionData = {
       medicines: medicines
         .filter((med) => med.name?.value)
         .map((med) => ({
-          medicine: med.name.value, // Changed from medicineId to medicine to match model
+          medicine: med.name.value,
           frequency: med.frequency,
           days: parseInt(med.days),
           isSOS: med.isSOS || false,
@@ -86,13 +106,22 @@ const DoctorReview = () => {
       })),
       notes: comment,
     };
-  
+
     try {
-      await submitPrescription(prescription);
-      toast.success("Prescription submitted successfully");
+      if (isUpdateMode) {
+        await updatePrescription(appointmentId, prescriptionData);
+        toast.success("Prescription updated successfully");
+      } else {
+        await submitPrescription({
+          ...prescriptionData,
+          appointmentId: appointmentId,
+          doctorId: searchParams.get("doctorId"),
+        });
+        toast.success("Prescription submitted successfully");
+      }
       navigate(ROUTES.SCHEDULED_APPOINTMENTS);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Error submitting prescription");
+      toast.error(error.response?.data?.message || `Error ${isUpdateMode ? 'updating' : 'submitting'} prescription`);
     }
   };
 
@@ -122,6 +151,10 @@ const DoctorReview = () => {
   
     setMedicines(updatedItems);
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className={styles.reviewRoot}>

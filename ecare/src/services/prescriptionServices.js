@@ -79,3 +79,14 @@ export const downloadTestResult = async (testResultId) => {
     throw error;
   }
 };
+
+export const getPrescriptionByAppointment = async (appointmentId) => {
+  try {
+    const response = await apiClient.get(`/prescriptions/appointment/${appointmentId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching prescription", error);
+    throw error;
+  }
+};
+
