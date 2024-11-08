@@ -127,6 +127,7 @@ router.get('/completed/:patientId',appointmentControllers.getCompletedAppointmen
 //review
 router.post('/review/:appointmentId/:doctorId',authMiddleware,reviewControllers.submitReview);
 router.get('/reviews/patient/:patientId',authMiddleware,reviewControllers.getSubmittedReviews);
+router.get('/reviews/all',reviewControllers.getAllReviews);
 
 //payment
 router.post('/payment/order', paymentControllers.createOrder);

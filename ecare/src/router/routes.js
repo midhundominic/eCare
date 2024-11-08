@@ -37,6 +37,7 @@ export const ROUTES = {
   TEST_RESULTS: "/coordinator/test",
   COMPLETED_RESULT: "/coordinator/completed-test",
   MEDICINE_LIST: "/coordinator/medicineList",
+  ADMIN_REVIEW: "/admin/review",
 };
 
 export const NON_AUTH_ROUTES = [
@@ -69,4 +70,5 @@ export const NON_AUTH_ROUTES = [
   ROUTES.TEST_RESULTS,
   ROUTES.COMPLETED_RESULT,
   ROUTES.MEDICINE_LIST,
+  ROUTES.ADMIN_REVIEW,
 ];

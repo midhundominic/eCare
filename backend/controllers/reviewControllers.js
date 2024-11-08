@@ -52,5 +52,28 @@ const getSubmittedReviews = async (req, res) => {
   }
 };
 
-module.exports = { submitReview, getSubmittedReviews }
+const getAllReviews = async (req, res) => {
+  try {
+    const reviews = await ReviewModel.find()
+      .populate('appointmentId')
+      .populate('doctorId', 'firstName lastName specialization')
+      .populate('patientId', 'name email phone')
+      .sort({ createdAt: -1 });
+    
+    res.status(201).json({
+      success: true,
+      data: reviews
+    });
+  } catch (error) {
+    console.error("Error fetching all reviews:", error);
+    res.status(500).json({ 
+      success: false,
+      message: "Error fetching reviews" 
+    });
+  }
+};
+
+module.exports = { submitReview, getSubmittedReviews, getAllReviews };
+
+
 
