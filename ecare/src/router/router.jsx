@@ -15,6 +15,7 @@ import Admin from "../component/Admin/Login";
 import AdminHome from "../component/Admin/Home";
 import AdminProile from "../component/Admin/AdminProile";
 import AdminLeave from "../component/Admin/Leave";
+import AdminReview from "../component/Admin/Review";
 import DoctorProfile from "../component/Doctor/DoctorProfile";
 import CoordinatorProfile from "../component/Coordinator/CoordinatorProfile";
 import DoctorRegister from "../component/Admin/RegisterDoctor";
@@ -124,6 +125,7 @@ const Router = () => {
               element={<CoordinatorList />}
             />
             <Route path={ROUTES.ADMIN_PATIENT_LIST} element={<PatientList />} />
+            <Route path={ROUTES.ADMIN_REVIEW} element={<AdminReview />} />
 
             <Route
               path="/doctor/appointments"

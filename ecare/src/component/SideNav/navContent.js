@@ -7,6 +7,7 @@ import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
 import BadgeRoundedIcon from "@mui/icons-material/BadgeRounded";
 import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
+import ReviewsIcon from '@mui/icons-material/Reviews';
 
 import { ROUTES } from "../../router/routes";
 
@@ -91,6 +92,12 @@ export const NAV_CONTENT_ADMIN = [
     title: "Leave",
     link: ROUTES.ADMIN_LEAVE,
     icon: EditCalendarIcon,
+  },
+  {
+    id: 7,
+    title: "Reviews",
+    link: ROUTES.ADMIN_REVIEW,
+    icon: ReviewsIcon,
   },
 ];
 

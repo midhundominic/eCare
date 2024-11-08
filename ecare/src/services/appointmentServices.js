@@ -111,3 +111,14 @@ export const getSubmittedReviews = async (patientId) => {
     throw error;
   }
 };
+
+export const getAllReviews = async () => {
+  try {
+    const response = await apiClient.get('/reviews/all');
+    console.log("adminreview",response);
+    return response;
+  } catch (error) {
+    console.error("Error fetching all reviews");
+    throw error;
+  }
+};
