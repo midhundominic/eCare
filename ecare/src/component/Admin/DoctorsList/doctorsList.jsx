@@ -20,7 +20,10 @@ const DoctorList = () => {
       phone: doctor.phone,
       email: doctor.email,
       date_created: doctor.date_created,
-      isDisabled: doctor.isDisabled
+      isDisabled: doctor.isDisabled,
+      aboutDoctor: doctor.aboutDoctor,
+      password: doctor.password,
+      profilePhoto: doctor.profilePhoto,
     }));
   };
 

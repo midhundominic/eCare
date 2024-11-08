@@ -206,6 +206,10 @@ exports.getPrescription = async (req, res) => {
           path: 'doctorId',
           select: 'firstName lastName specialization',
         })
+        .populate({
+          path: 'patientId',
+          select: 'name dateOfBirth gender'
+        })
         .populate('tests.resultId')
         .sort({ createdAt: -1 });
   

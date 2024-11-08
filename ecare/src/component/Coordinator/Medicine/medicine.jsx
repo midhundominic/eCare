@@ -1,21 +1,42 @@
 import React, { useEffect, useState } from "react";
-import { TextField, IconButton } from "@mui/material";
+import {
+  TextField,
+  IconButton,
+  Card,
+  Grid,
+  Typography,
+  Paper,
+  Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Fab,
+  InputAdornment,
+  CircularProgress,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import SearchIcon from "@mui/icons-material/Search";
 import { toast } from "react-toastify";
 
 import styles from "./medicineList.module.css";
 import Button from "../../Common/Button";
+import PageTitle from "../../Common/PageTitle";
 import {
   getMedicinesList,
   addMedicine,
   updateMedicineStock,
   deleteMedicine,
 } from "../../../services/medicineservices";
-import PageTitle from "../../Common/PageTitle";
 
 const MedicineList = () => {
   const [medicines, setMedicines] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [openDialog, setOpenDialog] = useState(false);
   const [newMedicine, setNewMedicine] = useState({
     name: "",
     stockQuantity: 0,
@@ -30,35 +51,19 @@ const MedicineList = () => {
 
   const fetchMedicines = async () => {
     try {
+      setLoading(true);
       const medicinesList = await getMedicinesList();
       setMedicines(medicinesList);
     } catch (error) {
       toast.error("Error fetching medicines");
-    }
-  };
-
-  const handleAddMedicine = async (e) => {
-    e.preventDefault();
-    try {
-      await addMedicine(newMedicine);
-      toast.success("Medicine added successfully");
-      setNewMedicine({
-        name: "",
-        stockQuantity: 0,
-        price: 0,
-        manufacturer: "",
-        description: "",
-      });
-      fetchMedicines();
-    } catch (error) {
-      toast.error("Error adding medicine");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleUpdateStock = async (medicineId, newStock) => {
     try {
       await updateMedicineStock(medicineId, { stockQuantity: newStock });
-      toast.success("Stock updated successfully");
       fetchMedicines();
     } catch (error) {
       toast.error("Error updating stock");
@@ -75,123 +80,226 @@ const MedicineList = () => {
     }
   };
 
+  const handleAddMedicine = async (e) => {
+    e.preventDefault();
+    try {
+      await addMedicine(newMedicine);
+      toast.success("Medicine added successfully");
+      setNewMedicine({
+        name: "",
+        stockQuantity: 0,
+        price: 0,
+        manufacturer: "",
+        description: "",
+      });
+      setOpenDialog(false);
+      fetchMedicines();
+    } catch (error) {
+      toast.error("Error adding medicine");
+    }
+  };
+
+  const filteredMedicines = medicines.filter(medicine => 
+    (medicine?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     medicine?.manufacturer?.toLowerCase().includes(searchTerm.toLowerCase())) ?? false
+  );
+
   return (
     <div className={styles.medicineRoot}>
       <PageTitle>Medicine Management</PageTitle>
 
-      <form onSubmit={handleAddMedicine} className={styles.addMedicineForm}>
+      <div className={styles.toolbarSection}>
         <TextField
-          label="Medicine Name"
-          value={newMedicine.name}
-          onChange={(e) =>
-            setNewMedicine({ ...newMedicine, name: e.target.value })
-          }
-          required
+          placeholder="Search medicines..."
+          variant="outlined"
+          size="small"
+          className={styles.searchField}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
         />
-        <TextField
-          label="Stock Quantity"
-          type="number"
-          value={newMedicine.stockQuantity}
-          onChange={(e) =>
-            setNewMedicine({
-              ...newMedicine,
-              stockQuantity: parseInt(e.target.value),
-            })
-          }
-          required
-        />
-        <TextField
-          label="Price"
-          type="number"
-          value={newMedicine.price}
-          onChange={(e) =>
-            setNewMedicine({
-              ...newMedicine,
-              price: parseFloat(e.target.value),
-            })
-          }
-          required
-        />
-        <TextField
-          label="Manufacturer"
-          value={newMedicine.manufacturer}
-          onChange={(e) =>
-            setNewMedicine({ ...newMedicine, manufacturer: e.target.value })
-          }
-        />
-        <TextField
-          label="Description"
-          multiline
-          rows={3}
-          value={newMedicine.description}
-          onChange={(e) =>
-            setNewMedicine({ ...newMedicine, description: e.target.value })
-          }
-        />
-        <Button type="submit">Add Medicine</Button>
-      </form>
+        <Fab
+          color="primary"
+          className={styles.addButton}
+          onClick={() => setOpenDialog(true)}
+        >
+          <AddIcon />
+        </Fab>
+      </div>
 
-      <div className={styles.medicineList}>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Stock</th>
-              <th>Price</th>
-              <th>Manufacturer</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          
-          <tbody>
-            {medicines.map((medicine) => (
-              <tr key={medicine._id}>
-                <td>{medicine.name}</td>
-                <td>
-                  <TextField
-                    type="number"
-                    value={medicine.stockQuantity}
-                    onChange={(e) =>
-                      handleUpdateStock(medicine._id, parseInt(e.target.value))
-                    }
-                    size="small"
-                  />
-                </td>
-                <td>₹{medicine.price}</td>
-                <td>{medicine.manufacturer}</td>
-                <td>
-                  <IconButton
-                    onClick={() =>
-                      handleUpdateStock(
-                        medicine._id,
-                        medicine.stockQuantity + 1
-                      )
-                    }
+      {loading ? (
+        <div className={styles.loadingContainer}>
+          <CircularProgress />
+        </div>
+      ) : (
+        <Grid container spacing={3} className={styles.medicineGrid}>
+          {filteredMedicines.map((medicine) => (
+            <Grid item xs={12} sm={6} md={4} key={medicine._id}>
+              <Card className={styles.medicineCard}>
+                <div className={styles.cardHeader}>
+                  <Typography variant="h6">{medicine.name}</Typography>
+                  <div
+                    className={styles.stockIndicator}
+                    style={{
+                      backgroundColor:
+                        medicine.stockQuantity > 10 ? "#4caf50" : "#ff9800",
+                    }}
                   >
-                    +
-                  </IconButton>
+                    {medicine.stockQuantity} in stock
+                  </div>
+                </div>
+
+                <div className={styles.cardContent}>
+                  <Typography variant="body2" color="textSecondary">
+                    Manufacturer: {medicine.manufacturer}
+                  </Typography>
+                  <Typography variant="h6" className={styles.price}>
+                    ₹{medicine.price}
+                  </Typography>
+                  <Typography variant="body2" className={styles.description}>
+                    {medicine.description}
+                  </Typography>
+                </div>
+
+                <div className={styles.cardActions}>
+                  <div className={styles.stockControls}>
+                    <IconButton
+                      size="small"
+                      onClick={() =>
+                        handleUpdateStock(
+                          medicine._id,
+                          Math.max(0, medicine.stockQuantity - 1)
+                        )
+                      }
+                    >
+                      -
+                    </IconButton>
+                    <TextField
+                      type="number"
+                      value={medicine.stockQuantity}
+                      onChange={(e) =>
+                        handleUpdateStock(
+                          medicine._id,
+                          parseInt(e.target.value)
+                        )
+                      }
+                      size="small"
+                      className={styles.stockInput}
+                    />
+                    <IconButton
+                      size="small"
+                      onClick={() =>
+                        handleUpdateStock(
+                          medicine._id,
+                          medicine.stockQuantity + 1
+                        )
+                      }
+                    >
+                      +
+                    </IconButton>
+                  </div>
                   <IconButton
-                    onClick={() =>
-                      handleUpdateStock(
-                        medicine._id,
-                        Math.max(0, medicine.stockQuantity - 1)
-                      )
-                    }
-                  >
-                    -
-                  </IconButton>
-                  <IconButton
-                    onClick={() => handleDeleteMedicine(medicine._id)}
                     color="error"
+                    onClick={() => handleDeleteMedicine(medicine._id)}
                   >
                     <DeleteIcon />
                   </IconButton>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                </div>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      )}
+
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Add New Medicine</DialogTitle>
+        <form onSubmit={handleAddMedicine}>
+          <DialogContent dividers>
+            <TextField
+              label="Medicine Name"
+              value={newMedicine.name}
+              onChange={(e) =>
+                setNewMedicine({ ...newMedicine, name: e.target.value })
+              }
+              fullWidth
+              required
+              margin="dense"
+            />
+            <TextField
+              label="Stock Quantity"
+              type="number"
+              value={newMedicine.stockQuantity}
+              onChange={(e) =>
+                setNewMedicine({
+                  ...newMedicine,
+                  stockQuantity: parseInt(e.target.value),
+                })
+              }
+              fullWidth
+              required
+              margin="dense"
+            />
+            <TextField
+              label="Price"
+              type="number"
+              value={newMedicine.price}
+              onChange={(e) =>
+                setNewMedicine({
+                  ...newMedicine,
+                  price: parseFloat(e.target.value),
+                })
+              }
+              fullWidth
+              required
+              margin="dense"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">₹</InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              label="Manufacturer"
+              value={newMedicine.manufacturer}
+              onChange={(e) =>
+                setNewMedicine({ ...newMedicine, manufacturer: e.target.value })
+              }
+              fullWidth
+              margin="dense"
+            />
+            <TextField
+              label="Description"
+              multiline
+              rows={3}
+              value={newMedicine.description}
+              onChange={(e) =>
+                setNewMedicine({ ...newMedicine, description: e.target.value })
+              }
+              fullWidth
+              margin="dense"
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenDialog(false)} color="inherit">
+              Cancel
+            </Button>
+            <Button type="submit" color="primary">
+              Add Medicine
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
     </div>
   );
 };

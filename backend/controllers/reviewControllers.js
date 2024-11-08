@@ -11,7 +11,8 @@ const submitReview = async (req, res) => {
       doctorId,
       patientId,
       rating,
-      review
+      review,
+      isSubmitted:true,
     });
 
     await newReview.save();
@@ -29,4 +30,27 @@ const submitReview = async (req, res) => {
   }
 };
 
-module.exports = {submitReview}
+const getSubmittedReviews = async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    
+    const reviews = await ReviewModel.find({ patientId })
+      .populate('appointmentId')
+      .populate('doctorId', 'firstName lastName')
+      .select('rating review isSubmitted createdAt'); 
+    
+    res.status(201).json({
+      success: true,
+      data: reviews
+    });
+  } catch (error) {
+    console.error("Error fetching submitted reviews:", error);
+    res.status(500).json({ 
+      success: false,
+      message: "Error fetching submitted reviews" 
+    });
+  }
+};
+
+module.exports = { submitReview, getSubmittedReviews }
+

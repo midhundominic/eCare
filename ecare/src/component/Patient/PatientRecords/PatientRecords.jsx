@@ -14,6 +14,9 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import DownloadIcon from "@mui/icons-material/Download";
 import styles from "./patientRecords.module.css";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import PrescriptionTemplate from "./prescriptionTemplate";
+import { calculateAge } from "../../../utils/helper";
 
 const PatientRecords = () => {
   const [records, setRecords] = useState([]);
@@ -30,10 +33,10 @@ const PatientRecords = () => {
         }
 
         const response = await getPrescriptionHistory(patientId);
-        console.log('Prescription records:', response.data); // For debugging
+        console.log("Prescription records:", response.data); // For debugging
         setRecords(response.data || []);
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
         toast.error("Error fetching patient records");
       } finally {
         setLoading(false);
@@ -41,6 +44,31 @@ const PatientRecords = () => {
     };
     fetchRecords();
   }, []);
+
+  const PrescriptionDownloadButton = ({ prescription, doctor, patient }) => (
+    <PDFDownloadLink
+      document={
+        <PrescriptionTemplate 
+          prescription={prescription}
+          doctor={doctor}
+          patient={patient}
+        />
+      }
+      fileName={`prescription_${dayjs().format('DDMMYYYY')}.pdf`}
+    >
+      {({ loading }) => (
+        <Button
+          startIcon={<DownloadIcon />}
+          variant="contained"
+          size="small"
+          disabled={loading}
+          className={styles.downloadBtn}
+        >
+          {loading ? 'Generating...' : 'Download Prescription'}
+        </Button>
+      )}
+    </PDFDownloadLink>
+  );
 
   if (loading) return <div>Loading...</div>;
   if (!records.length) return <div>No medical records found.</div>;
@@ -54,10 +82,11 @@ const PatientRecords = () => {
             <div className={styles.summaryContent}>
               <span>{dayjs(record.createdAt).format("DD MMM YYYY")}</span>
               <span>
-                {record.doctorId ? 
-                  `Dr. ${record.doctorId.firstName || ''} ${record.doctorId.lastName || ''} - ${record.doctorId.specialization || ''}` : 
-                  'Doctor information unavailable'
-                }
+                {record.doctorId
+                  ? `Dr. ${record.doctorId.firstName || ""} ${
+                      record.doctorId.lastName || ""
+                    } - ${record.doctorId.specialization || ""}`
+                  : "Doctor information unavailable"}
               </span>
             </div>
           </AccordionSummary>
@@ -69,9 +98,12 @@ const PatientRecords = () => {
                   <ul>
                     {record.medicines.map((medicine, idx) => (
                       <li key={idx}>
-                        <span>{medicine.medicine?.name || 'Unknown Medicine'}</span>
                         <span>
-                          {medicine.frequency || 'N/A'} for {medicine.days || 0} days
+                          {medicine.medicine?.name || "Unknown Medicine"}
+                        </span>
+                        <span>
+                          {medicine.frequency || "N/A"} for {medicine.days || 0}{" "}
+                          days
                         </span>
                         <span>
                           {medicine.beforeFood ? "Before food" : "After food"}
@@ -116,6 +148,17 @@ const PatientRecords = () => {
                   <p>{record.notes}</p>
                 </div>
               )}
+            </div>
+            <div className={styles.actionButtons}>
+              <PrescriptionDownloadButton
+                prescription={record}
+                doctor={record.doctorId}
+                patient={{
+                  name: record.patientId.name,
+                  age: calculateAge(record.patientId.dateOfBirth),
+                  gender: record.patientId.gender,
+                }}
+              />
             </div>
           </AccordionDetails>
         </Accordion>

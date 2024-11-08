@@ -100,3 +100,14 @@ export const submitReview = async (
     throw error;
   }
 };
+
+export const getSubmittedReviews = async (patientId) => {
+  try {
+    const response = await apiClient.get(`/reviews/patient/${patientId}`);
+    console.log("review",response);
+    return response;
+  } catch (error) {
+    console.error("Error fetching submitted reviews");
+    throw error;
+  }
+};
