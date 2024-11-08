@@ -121,10 +121,10 @@ const getAppointmentsByPatientId = async (req, res) => {
   const { patientId } = req.params;
 
   try {
-    const appointments = await AppointmentModel.find({ patientId }).populate(
-      "doctorId",
-      "firstName lastName specialization"
-    );
+    const appointments = await AppointmentModel.find({
+      patientId,
+      status: { $ne: "completed" }, // Exclude appointments with status "completed"
+    }).populate("doctorId", "firstName lastName specialization");
 
     // Get approved leave dates for doctors with the patient's appointments
     const leaveDates = await DoctorLeave.find({
