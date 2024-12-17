@@ -20,6 +20,7 @@ const paymentControllers = require('../controllers/paymentControllers');
 const medicineControllers = require('../controllers/medicineControllers');
 const prescriptionControllers = require('../controllers/prescriptionController');
 const medicineController = require('../controllers/medicineController');
+const consultationControllers = require('../controllers/consultationControllers');
 
 //patient
 
@@ -158,5 +159,10 @@ router.post('/medicines/add',medicineController.addMedicine);
 router.get('/medicines/list', medicineController.getMedicinesList);
 router.patch('/medicines/stock/:medicineId', medicineController.updateMedicineStock);
 router.delete('/medicines/:medicineId', medicineController.deleteMedicine);
+
+
+
+router.get('/doctor/patients/:doctorId', consultationControllers.getConsultedPatients);
+router.get('/doctor/prescriptions/:patientId', consultationControllers.getPatientPrescriptions);
 
 module.exports = router;

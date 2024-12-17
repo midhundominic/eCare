@@ -167,3 +167,24 @@ export const getPrescriptionHistory = async (patientId) => {
     throw error;
   }
 };
+
+export const getConsultedPatients = async (doctorId) => {
+  try {
+    const response = await apiClient.get(`/doctor/patients/${doctorId}`);
+    return response;
+  } catch (error) {
+    console.error('Error fetching consulted patients:', error);
+    throw error;
+  }
+};
+
+export const getPatientPrescriptions = async (patientId) => {
+  try {
+    const response = await apiClient.get(`/doctor/prescriptions/${patientId}`);
+    console.log("doctorpatientPrescription",response);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching patient prescriptions:', error);
+    throw error;
+  }
+};

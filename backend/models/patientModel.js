@@ -27,6 +27,14 @@ const PatientSchema = new mongoose.Schema({
     sparse: true,
     required: false,
   }, // Unique admission number
+
+  consultations: [{
+    doctorId: { type: mongoose.Schema.Types.ObjectId, ref: 'doctor' },
+    firstVisit: { type: Date, default: Date.now },
+    lastVisit: { type: Date, default: Date.now },
+    totalVisits: { type: Number, default: 1 }
+  }],
+
   isProfileComplete: { type: Boolean, default: false },
   lastUpdated: { type: Date, default: Date.now },
   address: { type: String, required: false, default: "" },
