@@ -57,7 +57,7 @@ const PrescribeForm = () => {
           <img
             src={
               patientInfo?.profilePhoto
-                ? `http://localhost:5000/src/assets/doctorProfile/${selectedDoctor.profilePhoto}`
+                ? `http://localhost:5001/src/assets/doctorProfile/${selectedDoctor.profilePhoto}`
                 : PatientIcon
             }
             className={styles.patientImage}

@@ -108,7 +108,7 @@ const DoctorProfiles = () => {
             <img
               src={
                 selectedDoctor.profilePhoto
-                  ? `http://localhost:5000/src/assets/doctorProfile/${selectedDoctor.profilePhoto}`
+                  ? `http://localhost:5001/src/assets/doctorProfile/${selectedDoctor.profilePhoto}`
                   : DoctorIcon
               }
               alt="doctor profile"

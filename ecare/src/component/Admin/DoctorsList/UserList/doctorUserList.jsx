@@ -139,7 +139,7 @@ const DoctorUserList = ({
                   {doctor.profilePhoto ? (
                     <Avatar
                       className={styles.avatar}
-                      src={`http://localhost:5000/src/assets/doctorProfile/${doctor.profilePhoto}`}
+                      src={`http://localhost:5001/src/assets/doctorProfile/${doctor.profilePhoto}`}
                       alt={`${doctor.firstName} ${doctor.lastName}`}
                     />
                   ) : (

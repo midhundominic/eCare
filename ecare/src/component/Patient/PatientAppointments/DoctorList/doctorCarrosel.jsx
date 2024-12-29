@@ -89,7 +89,7 @@ const DoctorList = ({ doctorsList, handleSelectDoctor, selectedDoctor }) => {
               <img
                 src={
                   doc.profilePhoto
-                    ? `http://localhost:5000/src/assets/doctorProfile/${doc.profilePhoto}`
+                    ? `http://localhost:5001/src/assets/doctorProfile/${doc.profilePhoto}`
                     : DoctorIcon
                 }
                 alt="doctor profile"
