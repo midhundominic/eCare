@@ -118,7 +118,7 @@ const SideNav = () => {
             {/* Conditional rendering for profile image */}
             {profileImage ? (
               <img
-                src={`http://localhost:5000/src/assets/doctorProfile/${profileImage}`} // Adjust the image path according to your setup
+                src={`http://localhost:5001/src/assets/doctorProfile/${profileImage}`} // Adjust the image path according to your setup
                 alt="Profile"
                 className={styles.profileImage}
                 style={{ width: "36px", height: "36px", borderRadius: "50%" }} // Styling for profile image

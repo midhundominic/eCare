@@ -90,7 +90,7 @@ const Profile = () => {
               <img
                 src={
                   previewImage ||
-                  `http://localhost:5000/src/assets/doctorProfile/${profileImage}`
+                  `http://localhost:5001/src/assets/doctorProfile/${profileImage}`
                 }
                 alt="Profile"
                 className={styles.profileImage}

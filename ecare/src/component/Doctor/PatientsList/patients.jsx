@@ -83,7 +83,7 @@ const PatientsList = () => {
               <CardContent>
                 <div className={styles.cardHeader}>
                   <Avatar 
-                    src={patient.profilePhoto ? `http://localhost:5000/assets/patientProfile/${patient.profilePhoto}` : null}
+                    src={patient.profilePhoto ? `http://localhost:5001/assets/patientProfile/${patient.profilePhoto}` : null}
                     className={styles.avatar}
                   >
                     {patient.name.charAt(0)}
