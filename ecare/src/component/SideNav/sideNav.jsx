@@ -21,22 +21,44 @@ const SideNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  useEffect(() => {
+    const handleProfilePhotoUpdate = (event) => {
+      setProfileImage(event.detail.profilePhoto);
+    };
+
+    window.addEventListener('profilePhotoUpdated', handleProfilePhotoUpdate);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('profilePhotoUpdated', handleProfilePhotoUpdate);
+    };
+  }, []);
+
   // Fetch user data and profile image based on role
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const user = JSON.parse(localStorage.getItem("userData")); // Get from local storage
         setUserData(user);
-
+         
+        const storedProfilePhoto = localStorage.getItem('profilePhoto');
+        if (storedProfilePhoto) {
+          setProfileImage(storedProfilePhoto);
+        }
         // Fetch specific profile data based on role
-        if (user?.role === 2) { // Assuming role 2 is for doctors
+        if (user?.role === 2) {
           const doctorProfile = await getProfileDoctor();
-          setProfileImage(doctorProfile.profilePhoto); // Set profile image path
-        } else if (user?.role === 1) { // Assuming role 1 is for patients
+          if (doctorProfile.profilePhoto) {
+            setProfileImage(doctorProfile.profilePhoto);
+            localStorage.setItem('profilePhoto', doctorProfile.profilePhoto);
+          }
+        } else if (user?.role === 1) {
           const patientProfile = await getProfilePatient();
-          setProfileImage(patientProfile.profilePhoto); // Set profile image path
-        } 
-        // You can also fetch for coordinators or admin if needed
+          if (patientProfile.profilePhoto) {
+            setProfileImage(patientProfile.profilePhoto);
+            localStorage.setItem('profilePhoto', patientProfile.profilePhoto);
+          }
+        }
       } catch (error) {
         console.error("Error fetching profile data", error);
       }
@@ -118,10 +140,14 @@ const SideNav = () => {
             {/* Conditional rendering for profile image */}
             {profileImage ? (
               <img
-                src={`http://localhost:5001/src/assets/doctorProfile/${profileImage}`} // Adjust the image path according to your setup
+                src={profileImage} // Adjust the image path according to your setup
                 alt="Profile"
                 className={styles.profileImage}
-                style={{ width: "36px", height: "36px", borderRadius: "50%" }} // Styling for profile image
+                style={{ width: "46px", height: "46px", borderRadius: "50%" }} // Styling for profile image
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = AccountCircleIcon; // Fallback to default icon
+                }}
               />
             ) : (
               <AccountCircleIcon style={{ color: "white", fontSize: "36px" }} />

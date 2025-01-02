@@ -3,7 +3,7 @@ import { toast, Slide } from "react-toastify";
 
 const apiClient = axios.create({
   baseURL: "http://localhost:5001/api",
-  timeout: 10000, // Optional: Set timeout
+  timeout: 30000, // Optional: Set timeout
   headers: {
     "Content-Type": "application/json", // Default headers
   },
