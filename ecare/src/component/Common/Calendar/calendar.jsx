@@ -94,6 +94,7 @@ const CalendarComponent = (props) => {
           const isActive = currentView === view.name;
           return (
             <IconButton
+              key={view.name}
               className={isActive ? styles.iconActiveButton : styles.iconButton}
               onClick={() => handleViewButton(view.name)}
             >

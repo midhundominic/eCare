@@ -10,7 +10,7 @@ const resetPassword = require("../controllers/resetPassword");
 const profileCoordinator = require("../controllers/profileControllers/coordinatorControllers");
 const authMiddleware = require("../middleware/auth");
 const pdfUpload = require("../middleware/pdf-upload");
-const uploadMiddleware = require("../middleware/upload");
+const upload = require("../middleware/upload");
 const profilePatient = require("../controllers/profileControllers/patientControllers");
 const profileDoctor = require ("../controllers/profileControllers/doctorControllers");
 const appointmentControllers = require("../controllers/appointmentControllers");
@@ -63,7 +63,7 @@ router.get("/prescriptions/:prescriptionId",prescriptionControllers.getAppointme
 
 //profile Photo
 
-router.post("/doctor-profile-photo",profileDoctor.uploadDoctorProfilePhoto);
+router.post("/doctor-profile-photo",authMiddleware,upload,profileDoctor.uploadDoctorProfilePhoto);
 
 
 //profile

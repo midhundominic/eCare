@@ -11,7 +11,8 @@ const app = express();
 app.use(cors());
 
 // Middleware
-app.use(express.json()); // Parse JSON bodies
+app.use(express.json( { limit: "50mb" } )); // Parse JSON bodies
+app.use(express.urlencoded( { extended :true ,limit:"50mb"} ));
 
 // Routes
 app.use("/api", authRoutes); // Use the routes

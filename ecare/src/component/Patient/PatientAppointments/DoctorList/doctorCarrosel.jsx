@@ -89,11 +89,15 @@ const DoctorList = ({ doctorsList, handleSelectDoctor, selectedDoctor }) => {
               <img
                 src={
                   doc.profilePhoto
-                    ? `http://localhost:5001/src/assets/doctorProfile/${doc.profilePhoto}`
+                    ? doc.profilePhoto
                     : DoctorIcon
                 }
                 alt="doctor profile"
-                className={styles.docProfile}
+                className={styles.docProfile} 
+                onError={(e)=>{
+                  e.target.onerror = null;
+                  e.target.src = DoctorIcon;
+                }}
               />
               <div className={styles.docInfo}>
                 <span

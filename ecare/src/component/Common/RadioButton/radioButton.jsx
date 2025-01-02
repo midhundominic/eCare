@@ -10,6 +10,7 @@ const RadioButton = (props) => {
     title,
     labels = [],
     error,
+    value,
     onChange = () => {},
   } = props;
 
@@ -26,8 +27,9 @@ const RadioButton = (props) => {
             <label key={item.value}>
               <input
                 type="radio"
-                name="gender"
+                name={name}
                 value={item.value}
+                checked= {value === item.value}
                 onChange={onChange}
               />
               {item.label}
@@ -47,6 +49,7 @@ RadioButton.propTypes = {
   title: PropTypes.string,
   error: PropTypes.string,
   isRequired: PropTypes.bool,
+  value: PropTypes.string,
   onChange: PropTypes.func,
   onFocus: PropTypes.func,
 };

@@ -5,6 +5,7 @@ import {
   updatePatientProfile,
   uploadDoctorProfileImage,
 } from "../api/profile";
+import apiClient from "../api";
 
 export const getProfileCoordinator = async () => {
   try {
@@ -45,16 +46,16 @@ export const getProfileDoctor = async () => {
   }
 };
 
-export const uploadDoctorProfilePic = async (formData) => {
-  try {
-    const response = await uploadDoctorProfileImage(formData);
-    console.log("API Response:", response);
-    return response;
-  } catch (error) {
-    console.error("Error uploading doctor profile image", error);
-    throw error;
-  }
-}
+// export const uploadDoctorProfilePic = async (formData) => {
+//   try {
+//     const response = await uploadDoctorProfileImage(formData);
+//     console.log("API Response:", response);
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error uploading doctor profile image", error);
+//     throw error;
+//   }
+// }
 
 // export const getDoctorProfilePhoto = async () => {
 //   try {
@@ -64,3 +65,23 @@ export const uploadDoctorProfilePic = async (formData) => {
 //     console.error("Error Fetching Patient", error);
 //   }
 // };
+export const uploadDoctorProfilePic = async (formData) => {
+  try {
+    // Debug logging
+    for (let pair of formData.entries()) {
+      console.log('FormData:', pair[0], pair[1]);
+    }
+
+    const response = await apiClient.post("/doctor-profile-photo", formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+        // Authorization header is added by the interceptor
+      }
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Error uploading profile pic:', error);
+    throw error;
+  }
+};

@@ -10,10 +10,10 @@ import RadioButton from "../../Common/RadioButton";
 
 const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
   const [formData, setFormData] = useState({
-    name: profileData.name || "",
+    name: "",
     email: "", // Email will be fetched from localStorage
-    phone: profileData.phone,
-    gender: profileData.gender || "male", // Provide a default value for gender
+    phone: "",
+    gender: "", // Provide a default value for gender
   });
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
     setFormData((prevState) => ({
       ...prevState,
       name: profileData.firstName || "",
-      gender: profileData.gender || "", // Set default value if empty
+      gender: profileData.gender || "male", // Set default value if empty
       phone: profileData.phone || "",
     }));
   }, [profileData]);
@@ -76,7 +76,7 @@ const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
               disabled
             />
             <TextInput
-              type="phone"
+              type="text"
               title="Phone"
               name="phone"
               value={formData.phone} 
