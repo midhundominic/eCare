@@ -10,7 +10,8 @@ import RadioButton from "../../Common/RadioButton";
 
 const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "", // Email will be fetched from localStorage
     phone: "",
     gender: "", // Provide a default value for gender
@@ -28,7 +29,8 @@ const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
 
     setFormData((prevState) => ({
       ...prevState,
-      name: profileData.firstName || "",
+      firstName: profileData.firstName || "",
+      lastName: profileData.lastName || "",
       gender: profileData.gender || "male", // Set default value if empty
       phone: profileData.phone || "",
     }));
@@ -60,8 +62,18 @@ const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
             <TextInput
               type="text"
               title="Name"
-              name="name"
-              value={formData.name}
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              placeholder="Enter your name"
+              isRequired={true}
+            />
+
+            <TextInput
+              type="text"
+              title="Last Name"
+              name="lastName"
+              value={formData.lastName}
               onChange={handleChange}
               placeholder="Enter your name"
               isRequired={true}
@@ -106,7 +118,8 @@ const PersonalInfo = ({ profileData, isEditing, handleSave, setIsEditing }) => {
       ) : (
         <div className={styles.personalInfoRoot}>
           {/* Display text info when not editing */}
-          <TextInfo title="Name" info={formData.name || "N/A"} />
+          <TextInfo title="First Name" info={formData.firstName || "N/A"} />
+          <TextInfo title="Last Name" info={formData.lastName || "N/A"} />
           <TextInfo title="Email" info={formData.email || "N/A"} />
           <TextInfo title="phone" info={formData.phone || "N/A"} />
           
