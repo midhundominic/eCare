@@ -3,7 +3,7 @@ import {
   fetchDoctorProfile,
   fetchPatientProfile,
   updatePatientProfile,
-  uploadDoctorProfileImage,
+  updateDoctorProfile,
 } from "../api/profile";
 import apiClient from "../api";
 
@@ -82,6 +82,36 @@ export const uploadDoctorProfilePic = async (formData) => {
     return response;
   } catch (error) {
     console.error('Error uploading profile pic:', error);
+    throw error;
+  }
+};
+
+export const uploadPatientProfilePic = async (formData) => {
+  try {
+    // Debug logging
+    for (let pair of formData.entries()) {
+      console.log('FormData:', pair[0], pair[1]);
+    }
+
+    const response = await apiClient.post("/patient-profile-photo", formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Error uploading profile pic:', error);
+    throw error;
+  }
+};
+
+export const updateProfileDoctor = async (payload) => {
+  try {
+    const response = await updateDoctorProfile(payload);  
+    return response.data;
+  } catch (error) {
+    console.error("Error updating Patient profile", error);
     throw error;
   }
 };

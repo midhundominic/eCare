@@ -58,3 +58,11 @@ export const uploadDoctorProfileImage = async (formData) => {
   }
 };
 
+export const updateDoctorProfile = async (payload) => {
+  try {
+    const response = await apiClient.put("/doctor-profile", payload);  // PUT method to update profile
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};

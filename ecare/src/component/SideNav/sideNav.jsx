@@ -54,8 +54,8 @@ const SideNav = () => {
           }
         } else if (user?.role === 1) {
           const patientProfile = await getProfilePatient();
-          if (patientProfile.profilePhoto) {
-            setProfileImage(patientProfile.profilePhoto);
+          if (patientProfile.data.profilePhoto) {
+            setProfileImage(patientProfile.data.profilePhoto);
             localStorage.setItem('profilePhoto', patientProfile.profilePhoto);
           }
         }

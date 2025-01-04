@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   getProfileDoctor,
   uploadDoctorProfilePic,
+  updateProfileDoctor,
 } from "../../../services/profileServices";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import EditButton from "../../Common/EditButton/editButton";
@@ -61,7 +62,28 @@ const Profile = () => {
     }
   };
   
-  const handleSave = async () => {
+  const handleSaveProfile = async(updatedData) =>{
+    try{
+      await updateProfileDoctor(updatedData);
+
+      setProfileData(prevData => ({
+        ...prevData,
+        ...updatedData,
+      }));
+
+      setIsEditing(false);
+      toast.success("Profile Updated Successfully");
+
+      const updatedProfile = await getProfileDoctor();
+      setProfileData(updatedProfile);
+    }catch(error){
+      console.error("Error updating profile",error);
+      toast.error("Error updating profile")
+    }
+  };
+
+
+  const handleSavePhoto = async () => {
     if (previewImage) {
       const file = document.querySelector('input[type="file"]').files[0];
       
@@ -186,7 +208,7 @@ const Profile = () => {
           />
           <UpdateButtons
             handleClickCancel={handleCancel}
-            handleClickSave={handleSave}
+            handleClickSave={handleSavePhoto}
           />
         </>
       )}
@@ -196,7 +218,7 @@ const Profile = () => {
         profileData={profileData} // Pass the correct profile data
         isEditing={isEditing}
         setIsEditing={setIsEditing}
-        handleSave={handleSave}
+        handleSave={handleSaveProfile}
       />
     </div>
   );
