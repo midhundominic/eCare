@@ -9,10 +9,11 @@ cloudinary.config({
   timeout: 120000 // 2 minutes timeout for Cloudinary
 });
 
-const storage = new CloudinaryStorage({
+const createStorage = (folderName)=>{
+  return new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'doctor-profiles',
+    folder: folderName,
     allowed_formats: ['jpg', 'jpeg', 'png', 'avif'],
     transformation: [
       { width: 800, height: 800, crop: "limit" }, // Reduce image size
@@ -20,6 +21,7 @@ const storage = new CloudinaryStorage({
     ]
   }
 });
+};
 
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image/')) {
@@ -29,13 +31,21 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const uploadMiddleware = multer({
-  storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
-    fieldSize: 10 * 1024 * 1024 // 10MB field size limit
-  },
-  fileFilter: fileFilter
-}).single('profilePhoto');
+const createUploadMiddleware = (folderName)=>{
+  const storage = createStorage(folderName);
+  
+  return multer({
+    storage: storage,
+    limits: {
+      fileSize: 5 * 1024 * 1024, 
+      fieldSize: 10 * 1024 * 1024 
+    },
+    fileFilter: fileFilter
+  }).single('profilePhoto');
+};
+  
 
-module.exports = uploadMiddleware;
+module.exports = {
+  doctorProfileUpload: createUploadMiddleware('doctor-profiles'),
+  patientProfileUpload: createUploadMiddleware('patient-profiles')
+};

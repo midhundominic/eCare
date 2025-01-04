@@ -23,7 +23,7 @@ const getDoctorProfile = async (req, res) => {
 
 const uploadDoctorProfilePhoto = async (req, res) => {
   try {
-    console.log("Hit in controllers for profile picture");
+    console.log("Hit in controllers for doctor profile picture");
     console.log('Request received in controller');
     console.log('Files:', req.file);
     console.log('Body:', req.body);
@@ -86,4 +86,33 @@ const uploadDoctorProfilePhoto = async (req, res) => {
   }
 };
 
-module.exports = { getDoctorProfile, uploadDoctorProfilePhoto };
+const updateDoctorProfile = async (req, res) => {
+  const {firstName,lastName, email, phone, gender} = req.body;
+
+  try {
+    const doctor = await DoctorModel.findOne({ email });
+
+    if (!doctor) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
+
+    // Update personal info fields
+    doctor.firstName = firstName ||doctor.firstName;
+    doctor.lastName = lastName ||doctor.lastName;
+    doctor.gender = gender || doctor.gender;
+    doctor.phone = phone || doctor.phone;
+    
+
+    await doctor.save();
+
+    res.status(201).json({
+      message: "Profile updated successfully",
+      profile: doctor,
+    });
+  } catch (error) {
+    console.error("Error updating  Profile:", error);
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
+module.exports = { getDoctorProfile, uploadDoctorProfilePhoto ,updateDoctorProfile};
