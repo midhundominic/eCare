@@ -63,7 +63,8 @@ router.get("/prescriptions/:prescriptionId",prescriptionControllers.getAppointme
 
 //profile Photo
 
-router.post("/doctor-profile-photo",authMiddleware,upload,profileDoctor.uploadDoctorProfilePhoto);
+router.post("/doctor-profile-photo",authMiddleware,upload.doctorProfileUpload,profileDoctor.uploadDoctorProfilePhoto);
+router.post("/patient-profile-photo",authMiddleware,upload.patientProfileUpload,profilePatient.uploadPatientProfilePhoto);
 
 
 //profile
@@ -71,6 +72,7 @@ router.get("/coordinator-profile",authMiddleware,profileCoordinator.getCoordinat
 router.get("/patient-profile", authMiddleware, profilePatient.getPatientProfile);
 router.put("/patient-profile", authMiddleware, profilePatient.updatePatientProfile);
 router.get("/doctor-profile",authMiddleware,profileDoctor.getDoctorProfile);
+router.put("/doctor-profile",authMiddleware,profileDoctor.updateDoctorProfile);
 router.put("/coordinator-update",profileCoordinator.updateCoordinatorProfile);
 
 //delete

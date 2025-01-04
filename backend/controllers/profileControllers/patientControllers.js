@@ -1,6 +1,7 @@
 const PatientModel = require("../../models/patientModel");
 const generateAdmissionNumber = require("../../utils/admissionNumberGenerator");
 const dayjs = require("dayjs");
+const { cloudinary } = require("../../middleware/upload");
 
 const getPatientProfile = async (req, res) => {
   const { email } = req.user;
@@ -21,9 +22,21 @@ const getPatientProfile = async (req, res) => {
       weight: patient.weight || 0,
       height: patient.height || 0,
       isProfileComplete: patient.isProfileComplete || false,
+      profilePhoto: patient.profilePhoto || "",
     };
 
     res.status(201).json({ data: profile });
+    // res.status(201).json({
+    //   patientId: patient._id,
+    //   email: patient.email,
+    //   name: patient.name || "",
+    //   dateOfBirth: patient.dateOfBirth || null,
+    //   gender: patient.gender || "",
+    //   weight: patient.weight || 0,
+    //   height: patient.height || 0,
+    //   isProfileComplete: patient.isProfileComplete || false,
+    //   profilePhoto: patient.profilePhoto || "",
+    // });
     // res.status(201).json({ patient });
   } catch (error) {
     console.error("Error fetching patient profile:", error);
@@ -87,4 +100,60 @@ const updatePatientProfile = async (req, res) => {
   }
 };
 
-module.exports = { getPatientProfile, updatePatientProfile };
+const uploadPatientProfilePhoto = async (req,res) =>{
+   try{
+    if(!req.file){
+      return res.status(400).json({ message: 'No file uploaded'});
+    }
+   
+    const { email } = req.body;
+    if(!email){
+      return res.status(400).json( { message: 'Email is Rewuired'});
+    }
+    
+    const patient = await PatientModel.findOne({ email });
+ 
+    if(!patient){
+      if(req.file.path){
+        await cloudinary.uploader.destroy(req.file.filename);
+      }
+      return res.status(404).json({ message: "Patient not Found" });
+    }
+    
+    if(patient.profilePhoto){
+      try{
+      const publicId = patientProfileUpload.profilePhoto.split('/').pop().split('.')[0];
+      await cloudinary.uploader.destroy(publicId);
+    } catch(deleteError){
+      console.error('Error deleting old images', deleteError);
+    }
+    }
+   
+   patient.profilePhoto = req.file.path;
+   await patient.save();
+   console.log("Patient Profile Photo Uploaded successfully");
+  
+   res.status(201).json({
+    success: true,
+    message: "Profile Photo Uploaded Successfully",
+    profilePhoto: patient.profilePhoto,
+   });
+  
+  } catch(error){
+    if(req.file && req.file.path){
+      try{
+        await cloudinary.uploader.destroy(req.file.filename);
+
+      }catch(cleanupError){
+        console.error('Error upload Photo', cleanupError);
+      }
+    }
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message
+    });
+  }
+};
+
+module.exports = { getPatientProfile, updatePatientProfile, uploadPatientProfilePhoto};
