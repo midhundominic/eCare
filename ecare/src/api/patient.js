@@ -2,10 +2,15 @@ import apiClient from "./index";
 
 export const patientSignup = async (payload) => {
   try {
-    const response = await apiClient.post("/patient-signup", payload);
+    const response = await apiClient.post("/patient-signup", payload, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
     return response.data;
   } catch (error) {
-    throw error;
+    throw error.response?.data || error;
   }
 };
 

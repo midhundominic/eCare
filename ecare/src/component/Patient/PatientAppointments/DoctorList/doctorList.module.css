@@ -76,3 +76,71 @@
   font-size: 12px;
 }
 
+
+.docInfo {
+  display: grid;
+  height: fit-content;
+  gap: 4px;
+}
+
+.docName {
+  font-weight: 600;
+  color: #333;
+}
+
+.docCaption {
+  font-size: 12px;
+  color: #666;
+}
+
+.ratingContainer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.stars {
+  display: flex;
+  align-items: center;
+}
+
+.starIcon {
+  font-size: 16px !important;
+}
+
+.ratingText {
+  font-size: 12px;
+  color: #666;
+  margin-left: 4px;
+}
+
+.experience {
+  font-size: 12px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.doctorCard, .selectedDocCard {
+  display: flex;
+  gap: 16px;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.doctorCard {
+  border: 2px solid #f6f6f6;
+  background-color: #fff;
+}
+
+.selectedDocCard {
+  background-color: #eef5ff;
+  border: 2px solid #579bfe;
+}
+
+.doctorCard:hover {
+  border-color: #e0e0e0;
+  background-color: #fafafa;
+}

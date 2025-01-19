@@ -81,11 +81,11 @@ router.delete("/patient/:id",patientControllers.deletePatientById);
 router.delete("/coordinator/:id",coordinatoControllers.deleteCoordinator);
 
 //appointments
-router.post("/create-appointment",appointmentControllers.createAppointment);
-router.get("/availability",appointmentControllers.getUnavailableTimeSlots);
+router.post("/create-appointment",authMiddleware,appointmentControllers.createAppointment);
+router.get("/availability",authMiddleware,appointmentControllers.getUnavailableTimeSlots);
 router.get("/patient-appointments/:patientId",authMiddleware,appointmentControllers.getAppointmentsByPatientId);
-router.put("/cancel-appointment/:appointmentId",appointmentControllers.cancelAppointment);
-router.put("/reschedule-appointment/:appointmentId",appointmentControllers.rescheduleAppointment);
+router.put("/cancel-appointment/:appointmentId",authMiddleware,appointmentControllers.cancelAppointment);
+router.put("/reschedule-appointment/:appointmentId",authMiddleware,appointmentControllers.rescheduleAppointment);
 
 //Heath Data
 // router.post("healthdata/add",coordinatoControllers.addHealthData);

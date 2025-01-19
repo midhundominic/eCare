@@ -82,18 +82,30 @@ const Signup = () => {
       try {
         const { name, email, password } = formData;
         const response = await postSignup({ name, email, password });
-        setFormError({});
-        toast.success("Account created successfully.");
-        setformData({
-          name: "",
-          email: "",
-          password: "",
-          confirmPassword: "",
-        });
-        navigate(ROUTES.LOGIN);
+        
+        if (response.success) {
+          // Store token and user data
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('userData', JSON.stringify(response.data));
+          
+          setFormError({});
+          toast.success("Account created successfully!");
+          
+          // Clear form data
+          setformData({
+            name: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+          });
+          
+          navigate(ROUTES.LOGIN);
+        } else {
+          toast.error(response.message || "Signup failed");
+        }
       } catch (error) {
-        console.error("Error response:", error.response);
-        alert(error.response?.data.message || "Error Occurred");
+        console.error("Error during signup:", error);
+        toast.error(error.response?.data?.message || "Error occurred during signup");
       }
     } else {
       setFormError(validationErrors);
