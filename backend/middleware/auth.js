@@ -12,26 +12,41 @@ const authMiddleware = (req, res, next) => {
     if (!token) {
       return res.status(401).json({ 
         success: false, 
-        message: "Access denied. No token provided." 
+        message: "Access denied. No token provided.",
+        isSessionExpired: true
       });
     }
 
     // Verify token
     const decoded = jwt.verify(token, JWT_SECRET);
 
+    //check if token expired
+    if(decoded.exp < Date.now() / 1000){
+      return res.status(401).json({
+        success: false,
+        message: 'Token has expired',
+        isSessionExpired: true
+      })
+    }
+
     // Add user info to request
-    req.user = {
-      _id: decoded._id,
-      role: decoded.role,
-      email: decoded.email
-    };
+    req.user = decoded;
+
+    //add session check
+    if(!req.session?.userId || req.session.userId !=decoded.userId){
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid session',
+        isSessionExpired: true
+      });
+    }
 
     next();
   } catch (error) {
     console.error('Auth Middleware Error:', error);
     return res.status(403).json({
       success: false,
-      message: error.message === 'jwt expired' 
+      message: error.message === 'jwt expired'
         ? 'Token has expired' 
         : 'Invalid token'
     });

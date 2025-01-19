@@ -44,67 +44,124 @@ const signup = async (req, res) => {
     const token = jwt.sign(
       { userId: newUser._id, email: newUser.email, role: newUser.role },
       JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "24h" } // Changed to 24h to match session duration
     );
 
-    res.status(201).json({
-      message: "User created successfully",
-      data: { name: newUser.name, email: newUser.email, role: newUser.role },
-      token,
+    // Set up session
+    req.session.userId = newUser._id;
+    req.session.role = newUser.role;
+    req.session.email = newUser.email;
+
+    // Save session before sending response
+    return req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        return res.status(500).json({ 
+          success: false, 
+          message: 'Session initialization failed' 
+        });
+      }
+
+      // Set HTTP-only cookie
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: "User created successfully",
+        data: {
+          name: newUser.name,
+          email: newUser.email,
+          role: newUser.role,
+          userId: newUser._id
+        },
+        token: token,
+      });
     });
+
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ 
+      success: false, 
+      message: "Server error" 
+    });
   }
 };
 
+// Also update authWithGoogle function to include session management
 const authWithGoogle = async (req, res) => {
-  const { tokenId } = req.body; // Expect the Firebase ID token from the frontend
+  const { tokenId } = req.body;
 
   try {
-    // Verify the Firebase ID token
     const decodedToken = await admin.auth().verifyIdToken(tokenId);
-    const { name, email } = decodedToken; // Extract user info from the decoded token
+    const { name, email } = decodedToken;
 
-    // Check if the user exists in the database
     let user = await PatientModel.findOne({ email });
 
     if (!user) {
-      // If the user doesn't exist, create a new one
       user = new PatientModel({
         name,
         email,
-        password: "", // No password for Google users
-        role: 1, // Assuming Google users are patients (role = 1)
+        password: "",
+        role: 1,
       });
 
       await user.save();
     }
 
-    // Generate JWT token for your app
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
       JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "24h" }
     );
 
-    res.status(201).json({
-      message: "User login successful!",
-      data: {
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        userId: user._id,
-      },
-      token,
+    // Set up session
+    req.session.userId = user._id;
+    req.session.role = user.role;
+    req.session.email = user.email;
+
+    return req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        return res.status(500).json({ 
+          success: false, 
+          message: 'Session initialization failed' 
+        });
+      }
+
+      // Set HTTP-only cookie
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: "User login successful!",
+        data: {
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          userId: user._id,
+        },
+        token: token,
+      });
     });
+
   } catch (error) {
     console.error("Error during Google Sign-In:", error);
-    return res
-      .status(500)
-      .json({ message: "Invalid or expired Firebase token" });
+    return res.status(500).json({ 
+      success: false,
+      message: "Invalid or expired Firebase token" 
+    });
   }
 };
+
+
 
 const getAllPatient = async (req, res) => {
   try {

@@ -1,49 +1,183 @@
-import React, { useEffect, useState } from "react";
-import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { IconButton, Button, Paper, CircularProgress } from "@mui/material";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
+import MedicalInformationIcon from "@mui/icons-material/MedicalInformation";
+import HealthAndSafetyIcon from "@mui/icons-material/HealthAndSafety";
+import Carousel from "./carousel";
+import hospitalImages from "./hospitalImages";
 import styles from "./patientHome.module.css";
-import PageTitle from "../../Common/PageTitle";
-import Carousel from "./carousel"; // New carousel component
-import hospitalImages from "./hospitalImages" // Import images for the carousel
+import { ROUTES } from "../../../router/routes";
+import { getAppointments } from "../../../services/appointmentServices";
 
-const Home = () => {
+const PatientHome = () => {
+  const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const totalImages = hospitalImages.length;
+  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const userData = JSON.parse(localStorage.getItem("userData"));
 
-  // Function to change the image every 5 seconds
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % totalImages);
-    }, 5000); // Change image every 5 seconds
+    // Carousel Auto-play
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => 
+        prevIndex === hospitalImages.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 5000);
 
-    return () => clearInterval(intervalId);
-  }, [totalImages]);
+    // Fetch upcoming appointments
+    fetchUpcomingAppointments();
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchUpcomingAppointments = async () => {
+    try {
+      setLoading(true);
+      const userData = JSON.parse(localStorage.getItem("userData"));
+      const patientId = userData?.userId;
+      const response = await getAppointments(patientId);
+      
+      // Filter for upcoming appointments only
+      const upcomingAppts = response.data(appointment => {
+        const appointmentDate = new Date(appointment.appointmentDate);
+        return appointmentDate >= new Date();
+      });
+
+      // Sort by date (nearest first)
+      upcomingAppts.sort((a, b) => 
+        new Date(a.appointmentDate) - new Date(b.appointmentDate)
+      );
+
+      // Take only the next 3 appointments
+      setUpcomingAppointments(upcomingAppts.slice(0, 3));
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+      toast.error("Failed to fetch appointments");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const quickActions = [
+    {
+      title: "Book Appointment",
+      icon: <CalendarMonthIcon />,
+      route: ROUTES.PATIENT_APPOINTMENT,
+      color: "#4CAF50"
+    },
+    {
+      title: "My Records",
+      icon: <MedicalInformationIcon />,
+      route: ROUTES.PATIENT_RECORDS,
+      color: "#2196F3"
+    },
+    {
+      title: "Find Doctor",
+      icon: <LocalHospitalIcon />,
+      route: ROUTES.PATIENT_DOCTORS,
+      color: "#9C27B0"
+    },
+    {
+      title: "Health Tips",
+      icon: <HealthAndSafetyIcon />,
+      route: ROUTES.PATIENT_HEALTH_TIPS,
+      color: "#FF9800"
+    }
+  ];
 
   return (
     <div className={styles.homeContainer}>
-      <div className={styles.titleContainer}>
-        <PageTitle>Dashboard</PageTitle>
-        <div className={styles.notificationWrapper}>
-          <NotificationsNoneRoundedIcon
-            style={{ color: "white", fontSize: "20px" }}
-          />
-          <div className={styles.notificationStatus} />
+      {/* Header Section */}
+      <div className={styles.header}>
+        <div className={styles.welcomeSection}>
+          <h1 className={styles.greeting}>
+            Welcome back, {userData?.name || "Patient"}!
+          </h1>
+          <p className={styles.subtitle}>How are you feeling today?</p>
         </div>
+        <IconButton className={styles.notificationBtn}>
+          <NotificationsIcon />
+          <span className={styles.notificationBadge}></span>
+        </IconButton>
       </div>
-      <h1 className={styles.dashboardTitle}>Patient Portal</h1>
 
       {/* Carousel Section */}
-      <Carousel images={hospitalImages} currentIndex={currentIndex} />
+      <Paper elevation={3} className={styles.carouselWrapper}>
+        <Carousel images={hospitalImages} currentIndex={currentIndex} />
+      </Paper>
 
-      {/* Additional content can go here */}
-      <div className={styles.content}>
-        <h2>Welcome to the Patient Portal</h2>
-        <p>
-          Here, you can access your medical records, schedule appointments,
-          and connect with healthcare professionals.
-        </p>
+      {/* Quick Actions */}
+      <div className={styles.quickActionsContainer}>
+        <h2 className={styles.sectionTitle}>Quick Actions</h2>
+        <div className={styles.quickActionsGrid}>
+          {quickActions.map((action, index) => (
+            <Paper 
+              key={index}
+              className={styles.actionCard}
+              onClick={() => navigate(action.route)}
+              style={{ borderTop: `4px solid ${action.color}` }}
+            >
+              <div className={styles.actionIcon} style={{ color: action.color }}>
+                {action.icon}
+              </div>
+              <h3 className={styles.actionTitle}>{action.title}</h3>
+            </Paper>
+          ))}
+        </div>
+      </div>
+
+      {/* Upcoming Appointments */}
+      <div className={styles.appointmentsSection}>
+        <h2 className={styles.sectionTitle}>Upcoming Appointments</h2>
+        {loading ? (
+          <div className={styles.loadingContainer}>
+            <CircularProgress />
+          </div>
+        ) : upcomingAppointments.length > 0 ? (
+          <div className={styles.appointmentsGrid}>
+            {upcomingAppointments.map((appointment, index) => (
+              <Paper key={index} className={styles.appointmentCard}>
+                <div className={styles.appointmentInfo}>
+                  <h4>{appointment.doctorName}</h4>
+                  <p>{appointment.specialization}</p>
+                  <p>{appointment.dateTime}</p>
+                </div>
+                <Button 
+                  variant="outlined" 
+                  color="primary"
+                  onClick={() => navigate(`/appointments/${appointment.id}`)}
+                >
+                  View Details
+                </Button>
+              </Paper>
+            ))}
+          </div>
+        ) : (
+          <Paper className={styles.noAppointments}>
+            <p>No upcoming appointments</p>
+            <Button 
+              variant="contained" 
+              color="primary"
+              onClick={() => navigate(ROUTES.PATIENT_APPOINTMENTS)}
+            >
+              Book Now
+            </Button>
+          </Paper>
+        )}
+      </div>
+
+      {/* Health Stats Section */}
+      <div className={styles.healthStatsSection}>
+        <h2 className={styles.sectionTitle}>Your Health Overview</h2>
+        <div className={styles.statsGrid}>
+          {/* Add health statistics cards here */}
+        </div>
       </div>
     </div>
   );
 };
 
-export default Home;
+export default PatientHome;

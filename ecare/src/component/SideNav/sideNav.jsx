@@ -2,7 +2,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import EastRoundedIcon from "@mui/icons-material/EastRounded";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { getProfileDoctor, getProfilePatient } from "../../services/profileServices"; // Ensure these functions are correctly implemented
+import {
+  getProfileDoctor,
+  getProfilePatient,
+} from "../../services/profileServices"; // Ensure these functions are correctly implemented
 
 import {
   NAV_CONTENT_ADMIN,
@@ -12,6 +15,7 @@ import {
 } from "./navContent";
 import styles from "./sideNav.module.css";
 import { ROUTES } from "../../router/routes";
+import logo from "../../assets/images/logo.png"
 
 const SideNav = () => {
   const [activeNav, setActiveNav] = useState(1);
@@ -26,11 +30,14 @@ const SideNav = () => {
       setProfileImage(event.detail.profilePhoto);
     };
 
-    window.addEventListener('profilePhotoUpdated', handleProfilePhotoUpdate);
+    window.addEventListener("profilePhotoUpdated", handleProfilePhotoUpdate);
 
     // Cleanup
     return () => {
-      window.removeEventListener('profilePhotoUpdated', handleProfilePhotoUpdate);
+      window.removeEventListener(
+        "profilePhotoUpdated",
+        handleProfilePhotoUpdate
+      );
     };
   }, []);
 
@@ -40,8 +47,8 @@ const SideNav = () => {
       try {
         const user = JSON.parse(localStorage.getItem("userData")); // Get from local storage
         setUserData(user);
-         
-        const storedProfilePhoto = localStorage.getItem('profilePhoto');
+
+        const storedProfilePhoto = localStorage.getItem("profilePhoto");
         if (storedProfilePhoto) {
           setProfileImage(storedProfilePhoto);
         }
@@ -50,13 +57,13 @@ const SideNav = () => {
           const doctorProfile = await getProfileDoctor();
           if (doctorProfile.profilePhoto) {
             setProfileImage(doctorProfile.profilePhoto);
-            localStorage.setItem('profilePhoto', doctorProfile.profilePhoto);
+            localStorage.setItem("profilePhoto", doctorProfile.profilePhoto);
           }
         } else if (user?.role === 1) {
           const patientProfile = await getProfilePatient();
           if (patientProfile.data.profilePhoto) {
             setProfileImage(patientProfile.data.profilePhoto);
-            localStorage.setItem('profilePhoto', patientProfile.profilePhoto);
+            localStorage.setItem("profilePhoto", patientProfile.profilePhoto);
           }
         }
       } catch (error) {
@@ -119,7 +126,10 @@ const SideNav = () => {
 
   return (
     <div className={styles.sideNavRoot}>
-      <div className={styles.logo}>eCare</div>
+      <div className={styles.logo}>
+        <img src={logo}  className={styles.logoImage} />
+        medicloud
+      </div>
       <div className={styles.navWrapper}>
         {roleBasedSlideNav.map((item) => (
           <div
@@ -159,7 +169,8 @@ const SideNav = () => {
           </div>
           <div className={styles.infoWrapper}>
             <div className={styles.navUserInfo}>
-              <span>{userData.name || "User"}</span> {/* Accessing name directly */}
+              <span>{userData.name || "User"}</span>{" "}
+              {/* Accessing name directly */}
               <span className={styles.navEmail}>{userData.email}</span>
             </div>
           </div>

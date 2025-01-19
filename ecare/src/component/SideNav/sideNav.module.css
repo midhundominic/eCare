@@ -60,6 +60,17 @@
   color: #fff;
 }
 
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+.logoImage {
+  width: 30px;  
+  height: 30px;  
+  margin-right: 4px;  
+}
+
 @media (max-width: 768px) {
   .navItemContainer {
     color: #fff;

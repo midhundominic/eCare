@@ -1,10 +1,9 @@
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt"); // For password hashing (optional but recommended)
+const bcrypt = require("bcrypt");
 const PatientModel = require("../models/patientModel");
 const DoctorModel = require("../models/doctorModel");
 const CoordinatorModel = require("../models/coordinatorModel");
 
-// Replace with your own secret key for JWT signing
 const JWT_SECRET = process.env.JWT_SECRET || "midhun12345";
 
 const signin = async (req, res) => {
@@ -29,18 +28,37 @@ const signin = async (req, res) => {
       const token = jwt.sign(
         { userId: patient._id, email: patient.email, role: patient.role },
         JWT_SECRET,
-        { expiresIn: "1h" }
+        { expiresIn: "24h" }
       );
 
-      return res.status(201).json({
-        message: "Login Successful",
-        data: {
-          email: patient.email,
-          role: patient.role,
-          name: patient.name,
-          userId: patient._id,
-        },
-        token:token,
+      // Set up session
+      req.session.userId = patient._id;
+      req.session.role = patient.role;
+      req.session.email = patient.email;
+
+      return req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.status(500).json({ message: 'Session initialization failed' });
+        }
+
+        // Set HTTP-only cookie
+        res.cookie('token', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        });
+
+        return res.status(201).json({
+          message: "Login Successful",
+          data: {
+            email: patient.email,
+            role: patient.role,
+            name: patient.name,
+            userId: patient._id,
+          },
+          token: token,
+        });
       });
     }
 
@@ -57,19 +75,38 @@ const signin = async (req, res) => {
       const token = jwt.sign(
         { userId: doctor._id, email: doctor.email, role: doctor.role },
         JWT_SECRET,
-        { expiresIn: "1h" }
+        { expiresIn: "24h" }
       );
 
-      return res.status(201).json({
-        message: "Login Successful",
-        data: {
-          email: doctor.email,
-          role: doctor.role,
-          firstName: doctor.firstName,
-          lastName: doctor.lastName,
-          doctorId: doctor._id,
-        },
-        token:token,
+      // Set up session
+      req.session.userId = doctor._id;
+      req.session.role = doctor.role;
+      req.session.email = doctor.email;
+
+      return req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.status(500).json({ message: 'Session initialization failed' });
+        }
+
+        // Set HTTP-only cookie
+        res.cookie('token', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        });
+
+        return res.status(201).json({
+          message: "Login Successful",
+          data: {
+            email: doctor.email,
+            role: doctor.role,
+            firstName: doctor.firstName,
+            lastName: doctor.lastName,
+            doctorId: doctor._id,
+          },
+          token: token,
+        });
       });
     }
 
@@ -84,25 +121,40 @@ const signin = async (req, res) => {
       }
 
       const token = jwt.sign(
-        {
-          userId: coordinator._id,
-          email: coordinator.email,
-          role: coordinator.role,
-        },
+        { userId: coordinator._id, email: coordinator.email, role: coordinator.role },
         JWT_SECRET,
-        { expiresIn: "1h" }
+        { expiresIn: "24h" }
       );
 
-      return res.status(201).json({
-        message: "Login Successful",
-        data: {
-          coordinatorId: coordinator._id,
-          email: coordinator.email,
-          role: coordinator.role,
-          firstName: coordinator.firstName,
-          lastName: coordinator.lastName,
-        },
-        token:token,
+      // Set up session
+      req.session.userId = coordinator._id;
+      req.session.role = coordinator.role;
+      req.session.email = coordinator.email;
+
+      return req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.status(500).json({ message: 'Session initialization failed' });
+        }
+
+        // Set HTTP-only cookie
+        res.cookie('token', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        });
+
+        return res.status(201).json({
+          message: "Login Successful",
+          data: {
+            coordinatorId: coordinator._id,
+            email: coordinator.email,
+            role: coordinator.role,
+            firstName: coordinator.firstName,
+            lastName: coordinator.lastName,
+          },
+          token: token,
+        });
       });
     }
 
@@ -114,4 +166,38 @@ const signin = async (req, res) => {
   }
 };
 
-module.exports = { signin };
+// Add logout controller
+const logout = async (req, res) => {
+  try {
+    // Clear session
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Session destruction error:', err);
+        return res.status(500).json({ 
+          success: false,
+          message: 'Logout failed' 
+        });
+      }
+
+      // Clear HTTP-only cookie
+      res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict'
+      });
+      
+      return res.status(201).json({
+        success: true,
+        message: "Logged out successfully"
+      });
+    });
+  } catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({ 
+      success: false,
+      message: "Server error during logout" 
+    });
+  }
+};
+
+module.exports = { signin, logout };

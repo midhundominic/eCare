@@ -154,4 +154,16 @@ const Router = () => {
   );
 };
 
+// Protected Route component
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  const userData = JSON.parse(localStorage.getItem('userData'));
+
+  if (!token || !userData) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+};
+
 export default Router;

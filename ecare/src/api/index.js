@@ -1,8 +1,10 @@
 import axios from "axios";
 import { toast, Slide } from "react-toastify";
 
+
 const apiClient = axios.create({
   baseURL: "http://localhost:5001/api",
+  withCredentials: true,
   timeout: 30000, // Optional: Set timeout
   headers: {
     "Content-Type": "application/json", // Default headers
@@ -13,7 +15,6 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
-    console.log("Token: ", token);
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
@@ -30,7 +31,7 @@ apiClient.interceptors.response.use(
       return response;
     }
     // Handle non-200 responses
-    toast.error("Unexpected response status: " + response.status);
+    // toast.error("Unexpected response status: " + response.status);
     return Promise.reject(new Error("Unexpected response status"));
   },
   (error) => {
@@ -47,6 +48,14 @@ apiClient.interceptors.response.use(
         error.response.data.message ||
         "Bad request: Please check your input and try again.";
     }
+    
+        if (error.response?.status === 401) {
+          localStorage.clear();
+          // window.location.href = Login;
+          return Promise.reject(error);
+        }
+       
+      
     // Handle other HTTP status errors if needed
     else if (error.response.status >= 500) {
       errorMessage =
@@ -61,3 +70,4 @@ apiClient.interceptors.response.use(
 );
 
 export default apiClient;
+

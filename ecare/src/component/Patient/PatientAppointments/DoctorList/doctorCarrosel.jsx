@@ -5,6 +5,9 @@ import DoctorIcon from "../../../../assets/icons/ic_doctor.png";
 import EastIcon from "@mui/icons-material/East";
 import WestIcon from "@mui/icons-material/West";
 import { IconButton } from "@mui/material";
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import StarHalfIcon from '@mui/icons-material/StarHalf';
 
 const DoctorList = ({ doctorsList, handleSelectDoctor, selectedDoctor }) => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -57,6 +60,48 @@ const DoctorList = ({ doctorsList, handleSelectDoctor, selectedDoctor }) => {
     return style;
   }, [itemPerPage]);
 
+  const renderStarRating = (rating) =>{
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+
+    // Add full stars
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(
+        <StarIcon 
+          key={`full-${i}`} 
+          className={styles.starIcon} 
+          sx={{ color: '#FFD700' }}
+        />
+      );
+    }
+
+    // Add half star if needed
+    if (hasHalfStar) {
+      stars.push(
+        <StarHalfIcon 
+          key="half" 
+          className={styles.starIcon} 
+          sx={{ color: '#FFD700' }}
+        />
+      );
+    }
+
+    // Add empty stars
+    const emptyStars = 5 - Math.ceil(rating);
+    for (let i = 0; i < emptyStars; i++) {
+      stars.push(
+        <StarBorderIcon 
+          key={`empty-${i}`} 
+          className={styles.starIcon} 
+          sx={{ color: '#FFD700' }}
+        />
+      );
+    }
+
+    return stars;
+  };
+
   return (
     <div className={styles.docListRoot}>
       <div className={styles.titleContainer}>
@@ -104,6 +149,11 @@ const DoctorList = ({ doctorsList, handleSelectDoctor, selectedDoctor }) => {
                   className={styles.docName}
                 >{`${doc.firstName} ${doc.lastName}`}</span>
                 <span className={styles.docCaption}>{doc.specialization}</span>
+                <div className={styles.ratingContainer}>
+                  <div className={styles.stars}>
+                    {renderStarRating(doc.rating)}
+                  </div>
+                </div>
               </div>
             </div>
           );
