@@ -224,7 +224,7 @@ const MedicineList = () => {
         fullWidth
       >
         <DialogTitle>Add New Medicine</DialogTitle>
-        <form onSubmit={handleAddMedicine}>
+        
           <DialogContent dividers>
             <TextField
               label="Medicine Name"
@@ -294,11 +294,11 @@ const MedicineList = () => {
             <Button onClick={() => setOpenDialog(false)} color="inherit">
               Cancel
             </Button>
-            <Button type="submit" color="primary">
+            <Button onClick = {handleAddMedicine} color="primary">
               Add Medicine
             </Button>
           </DialogActions>
-        </form>
+       
       </Dialog>
     </div>
   );

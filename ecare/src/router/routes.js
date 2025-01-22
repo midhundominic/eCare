@@ -1,4 +1,4 @@
-import ScheduledAppointments from "../component/Doctor/ScheduledAppointments";
+
 
 export const ROUTES = {
   DEFAULT: "/",
@@ -38,6 +38,11 @@ export const ROUTES = {
   COMPLETED_RESULT: "/coordinator/completed-test",
   MEDICINE_LIST: "/coordinator/medicineList",
   ADMIN_REVIEW: "/admin/review",
+  LABORATORY_HOME: "/laboratory/home",
+  LABORATORY_RESULT: "/laboratory/result",
+  LABORATORY_REGISTRATION: "/admin/laboratory/register",
+  LABORATORY_LIST: "/admin/laboratory/list",
+  LABORATORY_PROFILE: "/laboratory/profile"
 };
 
 export const NON_AUTH_ROUTES = [
@@ -71,4 +76,9 @@ export const NON_AUTH_ROUTES = [
   ROUTES.COMPLETED_RESULT,
   ROUTES.MEDICINE_LIST,
   ROUTES.ADMIN_REVIEW,
+  ROUTES.LABORATORY_HOME,
+  ROUTES.LABORATORY_RESULT,
+  ROUTES.LABORATORY_REGISTRATION,
+  ROUTES.LABORATORY_LIST,
+  ROUTES.LABORATORY_PROFILE,
 ];

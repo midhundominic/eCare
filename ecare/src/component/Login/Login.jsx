@@ -110,6 +110,9 @@ const Login = () => {
             case 3:
               navigate(ROUTES.COORDINATOR_HOME);
               break;
+            case 4: 
+              navigate(ROUTES.LABORATORY_HOME);
+              break;
             default:
               navigate(ROUTES.PATIENT_HOME); // Default route
           }

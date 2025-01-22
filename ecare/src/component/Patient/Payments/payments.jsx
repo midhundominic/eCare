@@ -41,8 +41,28 @@ const Payments = () => {
   const handleDownload = async (payment) => {
     try {
       setGeneratingPdf(true);
-      const blob = await pdf(<PaymentReceiptTemplate payment={payment} />).toBlob();
-      saveAs(blob, `E-Care_Receipt_${payment._id}.pdf`);
+      
+      // Extract required data from the populated payment object
+      const {
+        patient,
+        appointmentId: appointment,
+      } = payment;
+
+      // Extract doctor from the populated appointment
+      const doctor = appointment.doctorId;
+
+      console.log("Receipt data:", { payment, patient, appointment, doctor }); // Debug log
+
+      const blob = await pdf(
+        <PaymentReceiptTemplate 
+          payment={payment}
+          patient={patient}
+          appointment={appointment}
+          doctor={doctor}
+        />
+      ).toBlob();
+      
+      saveAs(blob, `medicloud_${payment._id}.pdf`);
     } catch (error) {
       console.error('Error generating PDF:', error);
     } finally {

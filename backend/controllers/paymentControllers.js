@@ -63,7 +63,7 @@ exports.createOrder = async (req, res) => {
   
     try {
       const paymentDetails = new PaymentModel({
-        user: userId,
+        patient: userId,
         appointmentId,
         amount,
       });
@@ -79,10 +79,23 @@ exports.createOrder = async (req, res) => {
   exports.getPaymentsByUser = async (req, res) => {
     const userId = req.params.userId;
     try {
-      const payments = await PaymentModel.find({ user: userId }).sort({ createdAt: -1 });
+      const payments = await PaymentModel.find({ patient: userId })
+        .populate('patient', 'name email')
+        .populate({
+          path: 'appointmentId',
+          populate: {
+            path: 'doctorId',
+            select: 'firstName lastName specialization'
+          }
+        })
+        .sort({ createdAt: -1 });
+      
       res.status(201).json(payments);
     } catch (error) {
-      res.status(500).json({ message: "Error retrieving payment details", error: error.message });
+      res.status(500).json({ 
+        message: "Error retrieving payment details", 
+        error: error.message 
+      });
     }
   };
   
