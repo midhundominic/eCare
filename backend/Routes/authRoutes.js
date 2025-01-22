@@ -21,6 +21,7 @@ const medicineControllers = require('../controllers/medicineControllers');
 const prescriptionControllers = require('../controllers/prescriptionController');
 const medicineController = require('../controllers/medicineController');
 const consultationControllers = require('../controllers/consultationControllers');
+const laboratoryControllers = require('../controllers/laboratoryControllers');
 
 //patient
 
@@ -166,5 +167,10 @@ router.delete('/medicines/:medicineId', medicineController.deleteMedicine);
 
 router.get('/doctor/patients/:doctorId', consultationControllers.getConsultedPatients);
 router.get('/doctor/prescriptions/:patientId', consultationControllers.getPatientPrescriptions);
+
+
+//pharmacy
+router.post('/pharmacist-registration',laboratoryControllers.registerLaboratory);
+router.get('/laboratory-view',laboratoryControllers.getAllLaboratory);
 
 module.exports = router;

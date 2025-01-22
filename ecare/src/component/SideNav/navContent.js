@@ -83,18 +83,24 @@ export const NAV_CONTENT_ADMIN = [
   },
   {
     id: 5,
+    title: "Laboratory",
+    link: ROUTES.LABORATORY_LIST,
+    icon: PeopleRoundedIcon,
+  },
+  {
+    id: 6,
     title: "Appointments",
     link: ROUTES.ADMIN_APPOINTMENTS,
     icon: CalendarMonthIcon,
   },
   {
-    id: 6,
+    id: 7,
     title: "Leave",
     link: ROUTES.ADMIN_LEAVE,
     icon: EditCalendarIcon,
   },
   {
-    id: 7,
+    id: 8,
     title: "Reviews",
     link: ROUTES.ADMIN_REVIEW,
     icon: ReviewsIcon,
@@ -132,7 +138,7 @@ export const NAV_CONTENT_COORDINATOR = [
   {
     id: 1,
     title: "Dashboard",
-    link: ROUTES.PATIENT_HOME,
+    link: ROUTES.COORDINATOR_HOME,
     icon: DashboardCustomizeRoundedIcon,
   },
 
@@ -162,4 +168,19 @@ export const NAV_CONTENT_COORDINATOR = [
     link: ROUTES.MEDICINE_LIST,
     icon: AutoStoriesIcon,
   },
+];
+
+export const NAV_CONTENT_LABORATORY =[
+  {
+    id: 1,
+    title: "Dashboard",
+    link: ROUTES.LABORATORY_HOME,
+    icon:DashboardCustomizeRoundedIcon
+  },
+  {
+    id: 2,
+    title: "Result",
+    link: ROUTES.LABORATORY_RESULT,
+    icon: AutoStoriesIcon
+  }
 ];

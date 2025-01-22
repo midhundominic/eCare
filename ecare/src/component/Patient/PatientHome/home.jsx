@@ -11,6 +11,7 @@ import hospitalImages from "./hospitalImages";
 import styles from "./patientHome.module.css";
 import { ROUTES } from "../../../router/routes";
 import { getAppointments } from "../../../services/appointmentServices";
+import { toast } from 'react-toastify';
 
 const PatientHome = () => {
   const navigate = useNavigate();
@@ -40,22 +41,27 @@ const PatientHome = () => {
       const patientId = userData?.userId;
       const response = await getAppointments(patientId);
       
-      // Filter for upcoming appointments only
-      const upcomingAppts = response.data(appointment => {
-        const appointmentDate = new Date(appointment.appointmentDate);
-        return appointmentDate >= new Date();
-      });
+      if (response.data && response.data.appointments) {
+        // Filter for upcoming appointments only
+        const upcomingAppts = response.data.appointments.filter(appointment => {
+          const appointmentDate = new Date(appointment.appointmentDate);
+          return appointmentDate >= new Date();
+        });
 
-      // Sort by date (nearest first)
-      upcomingAppts.sort((a, b) => 
-        new Date(a.appointmentDate) - new Date(b.appointmentDate)
-      );
+        // Sort by date (nearest first)
+        upcomingAppts.sort((a, b) => 
+          new Date(a.appointmentDate) - new Date(b.appointmentDate)
+        );
 
-      // Take only the next 3 appointments
-      setUpcomingAppointments(upcomingAppts.slice(0, 3));
+        // Take only the next 3 appointments
+        setUpcomingAppointments(upcomingAppts.slice(0, 3));
+      } else {
+        setUpcomingAppointments([]);
+      }
     } catch (error) {
       console.error("Error fetching appointments:", error);
       toast.error("Failed to fetch appointments");
+      setUpcomingAppointments([]);
     } finally {
       setLoading(false);
     }
@@ -77,7 +83,7 @@ const PatientHome = () => {
     {
       title: "Find Doctor",
       icon: <LocalHospitalIcon />,
-      route: ROUTES.PATIENT_DOCTORS,
+      route: ROUTES.PATIENT_DOCTOR,
       color: "#9C27B0"
     },
     {
@@ -141,14 +147,18 @@ const PatientHome = () => {
             {upcomingAppointments.map((appointment, index) => (
               <Paper key={index} className={styles.appointmentCard}>
                 <div className={styles.appointmentInfo}>
-                  <h4>{appointment.doctorName}</h4>
-                  <p>{appointment.specialization}</p>
-                  <p>{appointment.dateTime}</p>
+                  <h4>
+                    Dr. {appointment.doctorId?.firstName} {appointment.doctorId?.lastName}
+                  </h4>
+                  <p>{appointment.doctorId?.specialization}</p>
+                  <p>
+                    {new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.timeSlot}
+                  </p>
                 </div>
                 <Button 
                   variant="outlined" 
                   color="primary"
-                  onClick={() => navigate(`/appointments/${appointment.id}`)}
+                  onClick={() => navigate(`/appointments/${appointment._id}`)}
                 >
                   View Details
                 </Button>
@@ -161,7 +171,7 @@ const PatientHome = () => {
             <Button 
               variant="contained" 
               color="primary"
-              onClick={() => navigate(ROUTES.PATIENT_APPOINTMENTS)}
+              onClick={() => navigate(ROUTES.PATIENT_APPOINTMENT)}
             >
               Book Now
             </Button>

@@ -23,6 +23,12 @@ const getPatientProfile = async (req, res) => {
       height: patient.height || 0,
       isProfileComplete: patient.isProfileComplete || false,
       profilePhoto: patient.profilePhoto || "",
+      address: patient.address || "",
+      district: patient.district || "",
+      city: patient.city || "",
+      pincode: patient.pincode || "",
+      phone: patient.phone || "",
+      isProfileComplete: patient.isProfileComplete || "",
     };
 
     res.status(201).json({ data: profile });
@@ -46,7 +52,7 @@ const getPatientProfile = async (req, res) => {
 
 // UPDATE patient profile by email
 const updatePatientProfile = async (req, res) => {
-  const {name, email, dateOfBirth, gender, weight, height} = req.body;
+  const {name, email, dateOfBirth, gender, weight, height, address, district , city, pincode, phone} = req.body;
   console.log(req.body);
 
   try {
@@ -64,6 +70,33 @@ const updatePatientProfile = async (req, res) => {
     patient.weight = weight || patient.weight;
     patient.height = height || patient.height;
     patient.name = name || patient.name;
+    patient.address= address || patient.address;
+    patient.district= district || patient.district;
+    patient.city = city || patient.city;
+    patient.pincode = pincode || patient.pincode;
+    patient.phone = phone || patient.phone;
+
+     // Check if all required fields are filled
+     const requiredFields = [
+      'name',
+      'dateOfBirth',
+      'gender',
+      'weight',
+      'height',
+      'address',
+      'district',
+      'city',
+      'pincode',
+      'phone'
+    ];
+
+    const isComplete = requiredFields.every(field => {
+      const value = patient[field];
+      return value !== null && value !== undefined && value !== '';
+    });
+
+    // Update isProfileComplete based on the check
+    patient.isProfileComplete = isComplete;
 
     // Mark profile as complete and generate admission number if not already set
     if (!patient.isProfileComplete) {

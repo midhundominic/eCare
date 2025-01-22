@@ -42,6 +42,13 @@ import CompletedTests from "../component/Coordinator/CompletedTest";
 import DoctorAppointments from "../component/Doctor/ScheduledAppointments";
 import CoordinatorMedicine from "../component/Coordinator/Medicine";
 
+import LaboratoryHome from "../component/Laboratory/LaboratoryHome";
+import LaboratoryResult from "../component/Laboratory/LaboratoryResult";
+
+import LaboratoryRegistration from "../component/Admin/RegisterLaboratory";
+import LaboratoryList from "../component/Admin/LaboratoryList";
+import LaboratoryProfile from '../component/Laboratory/LaboratoryProfile';
+
 const Router = () => {
   const location = useLocation();
   const isAuthRoute = !NON_AUTH_ROUTES.includes(location.pathname);
@@ -147,6 +154,13 @@ const Router = () => {
 
             <Route path={ROUTES.COMPLETED_RESULT} element={<CompletedTests/>}/>
             <Route path={ROUTES.MEDICINE_LIST} element={<CoordinatorMedicine/>}/>
+
+            <Route path = {ROUTES.LABORATORY_HOME} element={<LaboratoryHome/>}/>
+            <Route path = {ROUTES.LABORATORY_RESULT} element={<LaboratoryResult/>}/>
+
+            <Route path = {ROUTES.LABORATORY_REGISTRATION} element={<LaboratoryRegistration/>}/>
+            <Route path = {ROUTES.LABORATORY_LIST} element={<LaboratoryList/>}/>
+            <Route path ={ROUTES.LABORATORY_PROFILE} element={<LaboratoryProfile/>}/>
           </Routes>
         </Main>
       )}

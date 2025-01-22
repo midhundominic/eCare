@@ -28,6 +28,13 @@ const PatientSchema = new mongoose.Schema({
     required: false,
   }, // Unique admission number
 
+  address: { type: String, default: ""},
+  district: {type: String, default: ""},
+  city: { type: String, default: ""},
+  pincode: { type: String, default: ""},
+  phone: {type: Number, default: ""},
+
+
   consultations: [{
     doctorId: { type: mongoose.Schema.Types.ObjectId, ref: 'doctor' },
     firstVisit: { type: Date, default: Date.now },

@@ -11,6 +11,7 @@ import {
   NAV_CONTENT_ADMIN,
   NAV_CONTENT_COORDINATOR,
   NAV_CONTENT_DOCTOR,
+  NAV_CONTENT_LABORATORY,
   NAV_CONTENT_PATIENT,
 } from "./navContent";
 import styles from "./sideNav.module.css";
@@ -84,6 +85,8 @@ const SideNav = () => {
         return NAV_CONTENT_DOCTOR;
       case 3:
         return NAV_CONTENT_COORDINATOR;
+      case 4:
+        return NAV_CONTENT_LABORATORY;
       default:
         return NAV_CONTENT_PATIENT;
     }
@@ -113,6 +116,9 @@ const SideNav = () => {
         break;
       case 3:
         navigate(ROUTES.COORDINATOR_PROFILE);
+        break;
+      case 4:
+        navigate(ROUTES.LABORATORY_PROFILE);
         break;
       default:
         navigate(ROUTES.PATIENT_PROFILE);

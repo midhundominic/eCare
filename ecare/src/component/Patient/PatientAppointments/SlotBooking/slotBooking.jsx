@@ -16,6 +16,8 @@ import {
   savePaymentDetails,
 } from "../../../../services/paymentServices";
 import { usePatient } from "../../../../context/patientContext";
+import ProfileCompletionDialog from "../../PatientProfile/ProfileCompletionDialog";
+import { getProfilePatient } from "../../../../services/profileServices";
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -36,6 +38,22 @@ const SlotBooking = ({ selectedDoctor }) => {
   const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState("2024-10-22");
+  const [showProfileDialog, setShowProfileDialog] = useState(false);
+  const [patientProfile, setPatientProfile] = useState(null);
+
+  useEffect(() => {
+    fetchPatientProfile();
+  }, []);
+
+  const fetchPatientProfile = async () => {
+    try {
+      const response = await getProfilePatient();
+      const profileData = response?.data?.data;
+      setPatientProfile(profileData);
+    } catch (error) {
+      console.error("Error fetching patient profile:", error);
+    }
+  };
 
   const { patient } = usePatient();
 
@@ -97,6 +115,17 @@ const SlotBooking = ({ selectedDoctor }) => {
 
   const handleBookSlot = async () => {
     try {
+      // Fetch latest profile data
+      const profileResponse = await getProfilePatient();
+      const profileData = profileResponse?.data?.data;
+
+      // Check if profile is complete
+      if (!profileData?.isProfileComplete === false) {
+        setShowProfileDialog(true);
+        return;
+      }
+
+      // Rest of your booking logic
       const userData = JSON.parse(localStorage.getItem("userData"));
       const patientId = userData?.userId;
 
@@ -105,6 +134,7 @@ const SlotBooking = ({ selectedDoctor }) => {
         return;
       }
 
+      // Load Razorpay script and proceed with payment
       const isLoaded = await loadRazorpayScript();
       if (!isLoaded) {
         toast.error("Razorpay SDK failed to load. Please try again later.");
@@ -181,6 +211,40 @@ const SlotBooking = ({ selectedDoctor }) => {
     }
   };
 
+  const handleProfileComplete = async () => {
+    try {
+      // Fetch latest profile data after update
+      const response = await getProfilePatient();
+      const profileData = response?.data?.data;
+      setPatientProfile(profileData);
+
+      // If profile is complete, close dialog and proceed with booking
+      if (profileData?.isProfileComplete) {
+        setShowProfileDialog(false);
+        // Directly call the payment flow
+        const userData = JSON.parse(localStorage.getItem("userData"));
+        const patientId = userData?.userId;
+
+        if (!patientId) {
+          toast.error("Patient Id is missing. Please log in again.");
+          return;
+        }
+
+        const isLoaded = await loadRazorpayScript();
+        if (!isLoaded) {
+          toast.error("Razorpay SDK failed to load. Please try again later.");
+          return;
+        }
+
+        const orderData = await createPaymentOrder(200 * 100);
+        // ... rest of the payment handling code
+      }
+    } catch (error) {
+      console.error("Error checking profile completion:", error);
+      toast.error("Error updating profile");
+    }
+  };
+
   return (
     <div className={styles.slotRoot}>
       <span>Choose date and time</span>
@@ -242,6 +306,11 @@ const SlotBooking = ({ selectedDoctor }) => {
             >
               Book
             </Button>
+            <ProfileCompletionDialog
+              open={showProfileDialog}
+              onClose={() => setShowProfileDialog(false)}
+              onComplete={handleProfileComplete}
+            />
           </div>
         </>
       )}

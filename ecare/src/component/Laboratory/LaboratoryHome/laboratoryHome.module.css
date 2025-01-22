@@ -1,0 +1,115 @@
+.homeContainer {
+  padding: 24px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.welcomeBanner {
+  background: linear-gradient(135deg, #1976d2 0%, #64b5f6 100%);
+  color: white;
+  padding: 40px;
+  margin-bottom: 24px;
+  border-radius: 12px;
+}
+
+.welcomeContent {
+  max-width: 800px;
+}
+
+.statsContainer {
+  margin-bottom: 32px;
+}
+
+.statCard {
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.statCard:hover {
+  transform: translateY(-5px);
+}
+
+.statIcon {
+  font-size: 48px !important;
+  margin-bottom: 16px;
+  color: #1976d2;
+}
+
+.sectionTitle {
+  margin: 32px 0 16px 0 !important;
+  color: #333;
+}
+
+.actionCard {
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.actionCard:hover {
+  transform: translateY(-5px);
+}
+
+.actionCard .MuiIconButton-root {
+  color: white;
+  padding: 16px;
+  margin-bottom: 8px;
+}
+
+.serviceCard {
+  height: 100%;
+  transition: transform 0.2s;
+}
+
+.serviceCard:hover {
+  transform: translateY(-5px);
+}
+
+.serviceImage {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.reportsCard {
+  margin-bottom: 32px;
+}
+
+.reportItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.reportItem:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 600px) {
+  .homeContainer {
+    padding: 16px;
+  }
+
+  .welcomeBanner {
+    padding: 24px;
+  }
+
+  .reportItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .reportItem button {
+    align-self: flex-end;
+  }
+}
