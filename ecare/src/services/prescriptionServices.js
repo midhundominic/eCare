@@ -48,34 +48,37 @@ export const getPrescriptionDetails = async () => {
 
 export const uploadTestResult = async (formData) => {
   try {
-    const response = await apiClient.post('/prescriptions/upload-test-result', formData, {
+    const token = localStorage.getItem('token'); // Get token from localStorage
+    const response = await apiClient.post('/laboratory/upload-result', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
-      },
+        'Authorization': `Bearer ${token}` // Add the token to the headers
+      }
     });
-    return response.data;
+    return response;
   } catch (error) {
-    throw new Error(error.response?.data?.message || 'Error uploading test result');
+    throw error;
   }
 };
 
-export const downloadTestResult = async (testResultId) => {
+export const downloadTestResult = async (resultId) => {
   try {
     const response = await apiClient.get(`/prescriptions/test-result/${testResultId}`, {
       responseType: 'blob'
     });
     
-    const blob = new Blob([response.data], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(blob);
+    const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `test-result-${testResultId}.pdf`);
+    link.setAttribute('download', `test_result_${resultId}.pdf`);
+    
     document.body.appendChild(link);
+    
     link.click();
-    link.remove();
-    window.URL.revokeObjectURL(url);
+    
+    link.parentNode.removeChild(link);
+    return response;
   } catch (error) {
-    console.error("Error downloading test result", error);
     throw error;
   }
 };
@@ -83,9 +86,37 @@ export const downloadTestResult = async (testResultId) => {
 export const getPrescriptionByAppointment = async (appointmentId) => {
   try {
     const response = await apiClient.get(`/prescriptions/appointment/${appointmentId}`);
-    return response.data;
+    return response;
   } catch (error) {
-    console.error("Error fetching prescription", error);
+    throw error;
+  }
+};
+
+export const getCompletedTests = async () => {
+  try {
+    const response = await apiClient.get('/laboratory/completed-tests');
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateTestResult = async (resultId, data) => {
+  try {
+    const response = await apiClient.put(`/laboratory/update-result/${resultId}`, data);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getPendingTests = async () => {
+  try {
+    const response = await apiClient.get('/laboratory/pending-tests');
+    console.log("Pending Tests",response);
+    return response;
+    
+  } catch (error) {
     throw error;
   }
 };

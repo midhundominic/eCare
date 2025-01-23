@@ -3,30 +3,45 @@ import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Typography, Chip, Box, Divider } from "@mui/material";
+import { Typography, Chip, Box, Divider, Table, TableBody, TableCell, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from "@mui/material";
 import dayjs from "dayjs";
+import { toast } from 'react-toastify';
+import DownloadIcon from '@mui/icons-material/Download';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 import styles from "./records.module.css";
-import { getPrescriptionHistory } from "../../../../services/doctorServices";
+import { getPrescriptionHistory, downloadTestResult } from "../../../../services/prescriptionServices";
 
 const PatientRecords = ({ patient }) => {
-  const [appointments, setAppointments] = useState([]);
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [selectedTest, setSelectedTest] = useState(null);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCompletedAppointments = async () => {
-      const patientId = patient._id;
-      if (!patientId) return;
-
-      try {
-        const res = await getPrescriptionHistory(patientId);
-        setAppointments(res?.data?.appointments || []);
-      } catch (error) {
-        console.error("Error fetching appointments:", error);
-      }
-    };
-
-    fetchCompletedAppointments();
+    if (patient?._id) {
+      fetchPrescriptionHistory();
+    }
   }, [patient]);
+
+  const fetchPrescriptionHistory = async () => {
+    try {
+      const response = await getPrescriptionHistory(patient._id);
+      setPrescriptions(response.data);
+    } catch (error) {
+      toast.error('Error fetching prescription history');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDownload = async (resultId) => {
+    try {
+      await downloadTestResult(resultId);
+    } catch (error) {
+      toast.error('Error downloading test result');
+    }
+  };
 
   const renderMedicines = (medicines) => (
     <div className={styles.medicineSection}>
@@ -70,48 +85,100 @@ const PatientRecords = ({ patient }) => {
     </div>
   );
 
+  if (loading) {
+    return (
+      <div className={styles.loadingContainer}>
+        <CircularProgress />
+      </div>
+    );
+  }
+
   return (
-    <div className={styles.recordRoot}>
-      {appointments.map((appointment) => (
-        <Accordion key={appointment._id}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>
-              {dayjs(appointment.appointmentDate).format("DD MMM YYYY")}
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            {appointment.prescription ? (
-              <div className={styles.prescriptionDetails}>
-                {appointment.prescription.medicines?.length > 0 && 
-                  renderMedicines(appointment.prescription.medicines)}
-                
-                <Divider className={styles.divider} />
-                
-                {appointment.prescription.tests?.length > 0 && 
-                  renderTests(appointment.prescription.tests)}
-                
-                {appointment.prescription.notes && (
-                  <>
-                    <Divider className={styles.divider} />
-                    <div className={styles.notesSection}>
-                      <Typography variant="subtitle2" className={styles.sectionTitle}>
-                        Notes
-                      </Typography>
-                      <Typography variant="body2">
-                        {appointment.prescription.notes}
-                      </Typography>
-                    </div>
-                  </>
-                )}
-              </div>
-            ) : (
-              <Typography color="textSecondary">
-                No prescription available for this appointment
-              </Typography>
-            )}
-          </AccordionDetails>
-        </Accordion>
-      ))}
+    <div className={styles.recordsContainer}>
+      <Typography variant="h5" className={styles.title}>
+        Test Results History
+      </Typography>
+
+      <Paper className={styles.tableContainer}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Date</TableCell>
+              <TableCell>Test Name</TableCell>
+              <TableCell>Doctor</TableCell>
+              <TableCell>Laboratory Remarks</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {prescriptions.map((prescription) => (
+              prescription.tests.map((test) => (
+                test.resultId && (
+                  <TableRow key={test.resultId._id}>
+                    <TableCell>
+                      {new Date(test.resultId.uploadDate).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>{test.testName}</TableCell>
+                    <TableCell>
+                      {`Dr. ${prescription.doctorId.firstName} ${prescription.doctorId.lastName}`}
+                    </TableCell>
+                    <TableCell>{test.resultId.remarks}</TableCell>
+                    <TableCell className={styles.actionButtons}>
+                      <Button
+                        startIcon={<VisibilityIcon />}
+                        onClick={() => {
+                          setSelectedTest(test.resultId);
+                          setViewDialogOpen(true);
+                        }}
+                      >
+                        View
+                      </Button>
+                      <Button
+                        startIcon={<DownloadIcon />}
+                        onClick={() => handleDownload(test.resultId._id)}
+                      >
+                        Download
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                )
+              ))
+            ))}
+          </TableBody>
+        </Table>
+      </Paper>
+
+      {/* View Dialog */}
+      <Dialog 
+        open={viewDialogOpen} 
+        onClose={() => setViewDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>Test Result</DialogTitle>
+        <DialogContent>
+          <Box className={styles.viewContent}>
+            <iframe
+              src={selectedTest?.resultFileUrl}
+              title="Test Result"
+              width="100%"
+              height="500px"
+              className={styles.pdfViewer}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setViewDialogOpen(false)}>Close</Button>
+          <Button 
+            onClick={() => handleDownload(selectedTest?._id)}
+            variant="contained" 
+            color="primary"
+            startIcon={<DownloadIcon />}
+          >
+            Download
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

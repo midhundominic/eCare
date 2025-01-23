@@ -20,19 +20,24 @@ const authMiddleware = (req, res, next) => {
     // Verify token
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    //check if token expired
+    // Check if token expired
     if(decoded.exp < Date.now() / 1000){
       return res.status(401).json({
         success: false,
         message: 'Token has expired',
         isSessionExpired: true
-      })
+      });
     }
 
     // Add user info to request
     req.user = decoded;
 
-    //add session check
+    // Temporarily disable session check for file uploads
+    if (req.originalUrl.includes('/upload-result')) {
+      return next();
+    }
+
+    // Session check for other routes
     if(!req.session?.userId || req.session.userId !=decoded.userId){
       return res.status(401).json({
         success: false,
@@ -48,7 +53,8 @@ const authMiddleware = (req, res, next) => {
       success: false,
       message: error.message === 'jwt expired'
         ? 'Token has expired' 
-        : 'Invalid token'
+        : 'Invalid token',
+      isSessionExpired: true
     });
   }
 };

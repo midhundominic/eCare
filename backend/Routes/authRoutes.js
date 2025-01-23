@@ -22,6 +22,7 @@ const prescriptionControllers = require('../controllers/prescriptionController')
 const medicineController = require('../controllers/medicineController');
 const consultationControllers = require('../controllers/consultationControllers');
 const laboratoryControllers = require('../controllers/laboratoryControllers');
+const { testResultUpload } = require('../middleware/upload');
 
 //patient
 
@@ -169,8 +170,14 @@ router.get('/doctor/patients/:doctorId', consultationControllers.getConsultedPat
 router.get('/doctor/prescriptions/:patientId', consultationControllers.getPatientPrescriptions);
 
 
-//pharmacy
+//laboratory
 router.post('/pharmacist-registration',laboratoryControllers.registerLaboratory);
 router.get('/laboratory-view',laboratoryControllers.getAllLaboratory);
+
+router.get('/laboratory/pending-tests', laboratoryControllers.getPendingTests);
+router.post('/laboratory/upload-result',authMiddleware,testResultUpload, laboratoryControllers.uploadTestResult);
+router.put('/laboratory/update-result/:resultId', laboratoryControllers.updateTestResult);
+router.get('/laboratory/completed-tests', laboratoryControllers.getCompletedTests);
+router.get('/download-result/:resultId', laboratoryControllers.downloadTestResult);
 
 module.exports = router;
