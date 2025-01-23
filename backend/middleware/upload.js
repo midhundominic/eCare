@@ -9,43 +9,42 @@ cloudinary.config({
   timeout: 120000 // 2 minutes timeout for Cloudinary
 });
 
-const createStorage = (folderName)=>{
+const createStorage = (folderName) => {
   return new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: folderName,
-    allowed_formats: ['jpg', 'jpeg', 'png', 'avif'],
-    transformation: [
-      { width: 800, height: 800, crop: "limit" }, // Reduce image size
-      { quality: "auto:good" } // Optimize quality
-    ]
-  }
-});
+    cloudinary: cloudinary,
+    params: {
+      folder: folderName,
+      resource_type: 'auto', // Allow auto-detection of file type
+      allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
+      transformation: [{ quality: "auto:good" }] // Remove size limit for PDFs
+    }
+  });
 };
 
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image/')) {
+  if (file.mimetype === 'application/pdf' || file.mimetype.startsWith('image/')) {
     cb(null, true);
   } else {
-    cb(new Error('Not an image! Please upload an image.'), false);
+    cb(new Error('Invalid file type! Please upload a PDF or image file.'), false);
   }
 };
 
-const createUploadMiddleware = (folderName)=>{
+const createUploadMiddleware = (folderName) => {
   const storage = createStorage(folderName);
   
   return multer({
     storage: storage,
     limits: {
-      fileSize: 5 * 1024 * 1024, 
-      fieldSize: 10 * 1024 * 1024 
+      fileSize: 15 * 1024 * 1024, // 15MB limit
+      fieldSize: 20 * 1024 * 1024 
     },
     fileFilter: fileFilter
-  }).single('profilePhoto');
+  }).single('file');
 };
   
 
 module.exports = {
   doctorProfileUpload: createUploadMiddleware('doctor-profiles'),
-  patientProfileUpload: createUploadMiddleware('patient-profiles')
+  patientProfileUpload: createUploadMiddleware('patient-profiles'),
+  testResultUpload: createUploadMiddleware('test-results')
 };

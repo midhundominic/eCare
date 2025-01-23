@@ -16,9 +16,11 @@ import {
 } from "./navContent";
 import styles from "./sideNav.module.css";
 import { ROUTES } from "../../router/routes";
-import logo from "../../assets/images/logo.png"
+import logo from "../../assets/images/logo.png";
+import useAuth from "../../component/Authentication"
 
 const SideNav = () => {
+  useAuth();
   const [activeNav, setActiveNav] = useState(1);
   const [userData, setUserData] = useState(null);
   const [profileImage, setProfileImage] = useState("");

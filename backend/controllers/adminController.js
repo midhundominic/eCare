@@ -4,6 +4,9 @@ const CoordinatorModel = require('../models/coordinatorModel');
 const PatientModel = require('../models/patientModel');
 const AppointmentModel = require('../models/appointmentModel');
 const PrescriptionModel = require('../models/prescriptionModel');
+const jwt = require("jsonwebtoken");
+
+const JWT_SECRET = process.env.JWT_SECRET || "midhun12345";
 
 const adminSignin = async (req, res) => {
   const { email, password } = req.body;
@@ -24,14 +27,46 @@ const adminSignin = async (req, res) => {
       return res.status(401).json({ message: "Invalid password" });
     }
 
-    return res.status(201).json({
-      message: "Login Successful",
-      data: { role: 0, name: "Admin", email: ADMIN_EMAIL },
+    // Generate a token for the admin
+    const token = jwt.sign(
+      { email: ADMIN_EMAIL, role: 'admin' },
+      JWT_SECRET,
+      { expiresIn: "24h" } // Token expires in 24 hours
+    );
+
+    // Set up session for admin
+    req.session.email = ADMIN_EMAIL;
+    req.session.role = 'admin';
+
+    return req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        return res.status(500).json({ message: 'Session initialization failed' });
+      }
+
+      // Set HTTP-only cookie
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      });
+
+      return res.status(201).json({
+        message: "Login Successful",
+        data: {
+          role: 0,
+          name: "Admin",
+          email: ADMIN_EMAIL
+        },
+        token: token,
+      });
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 

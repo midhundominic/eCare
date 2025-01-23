@@ -56,8 +56,8 @@ const Login = () => {
           password: "",
         });
         if (response.data) {
-          localStorage.setItem('userData', JSON.stringify(response.data.data));
           localStorage.setItem("userData",JSON.stringify(response.data));
+          localStorage.setItem('token', JSON.stringify(response.token)); 
           navigate(ROUTES.ADMIN_HOME);
         }
       } catch (err) {

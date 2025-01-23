@@ -179,8 +179,15 @@ export const NAV_CONTENT_LABORATORY =[
   },
   {
     id: 2,
+    title: "Pending Tests",
+    link: ROUTES.LABORATORY_PENDING,
+    icon: LibraryBooksIcon
+  },
+  {
+    id: 3,
     title: "Result",
     link: ROUTES.LABORATORY_RESULT,
     icon: AutoStoriesIcon
-  }
+  },
+  
 ];

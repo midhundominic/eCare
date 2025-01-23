@@ -44,10 +44,12 @@ import CoordinatorMedicine from "../component/Coordinator/Medicine";
 
 import LaboratoryHome from "../component/Laboratory/LaboratoryHome";
 import LaboratoryResult from "../component/Laboratory/LaboratoryResult";
+import LaboratoryPending from "../component/Laboratory/LaboratoryPending";
 
 import LaboratoryRegistration from "../component/Admin/RegisterLaboratory";
 import LaboratoryList from "../component/Admin/LaboratoryList";
 import LaboratoryProfile from '../component/Laboratory/LaboratoryProfile';
+
 
 const Router = () => {
   const location = useLocation();
@@ -161,6 +163,7 @@ const Router = () => {
             <Route path = {ROUTES.LABORATORY_REGISTRATION} element={<LaboratoryRegistration/>}/>
             <Route path = {ROUTES.LABORATORY_LIST} element={<LaboratoryList/>}/>
             <Route path ={ROUTES.LABORATORY_PROFILE} element={<LaboratoryProfile/>}/>
+            <Route path ={ROUTES.LABORATORY_PENDING} element={<LaboratoryPending/>}/>
           </Routes>
         </Main>
       )}

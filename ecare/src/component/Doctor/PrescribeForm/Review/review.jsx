@@ -48,7 +48,8 @@ const DoctorReview = () => {
 
           if (prescriptionData) {
             setComment(prescriptionData.notes || '');
-            setTests(prescriptionData.tests.map(test => test.testName));
+            const existingTests = prescriptionData.tests.map(test => test.testName);
+            setTests(existingTests);
             
             const formattedMedicines = prescriptionData.medicines.map(med => ({
               name: {
@@ -234,14 +235,16 @@ const DoctorReview = () => {
         <div className={styles.section}>
           <span className={styles.caption}>Tests</span>
           <div className={styles.medicalTests}>
-            {MEDICAL_TESTS.map((test) => {
-              return (
-                <Checkbox
-                  name={test.label}
-                  title={test.label}
-                  key={test.id}
-                  onChange={handleTestChange}
-                />
+             {MEDICAL_TESTS.map((test) => {
+            const isChecked = tests.includes(test.label);
+            return (
+              <Checkbox
+                name={test.label}
+                title={test.label}
+                key={test.id}
+                value={isChecked}
+                onChange={handleTestChange}
+              />
               );
             })}
           </div>
