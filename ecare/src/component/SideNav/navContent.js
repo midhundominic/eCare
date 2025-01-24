@@ -8,6 +8,7 @@ import BadgeRoundedIcon from "@mui/icons-material/BadgeRounded";
 import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import ReviewsIcon from '@mui/icons-material/Reviews';
+import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 
 import { ROUTES } from "../../router/routes";
 
@@ -54,6 +55,12 @@ export const NAV_CONTENT_PATIENT = [
     link: ROUTES.PATIENT_PAYMENTS,
     icon: PaymentIcon,
   },
+  {
+    id: 8,
+    title: "Chat Bot",
+    link: ROUTES.CHATBOT,
+    icon: ChatBubbleIcon,
+  }
 ];
 
 export const NAV_CONTENT_ADMIN = [

@@ -50,6 +50,8 @@ import LaboratoryRegistration from "../component/Admin/RegisterLaboratory";
 import LaboratoryList from "../component/Admin/LaboratoryList";
 import LaboratoryProfile from '../component/Laboratory/LaboratoryProfile';
 
+import ChatBot from "../component/ChatBot";
+
 
 const Router = () => {
   const location = useLocation();
@@ -164,6 +166,7 @@ const Router = () => {
             <Route path = {ROUTES.LABORATORY_LIST} element={<LaboratoryList/>}/>
             <Route path ={ROUTES.LABORATORY_PROFILE} element={<LaboratoryProfile/>}/>
             <Route path ={ROUTES.LABORATORY_PENDING} element={<LaboratoryPending/>}/>
+            <Route path ={ROUTES.CHATBOT} element={<ChatBot/>}/>
           </Routes>
         </Main>
       )}

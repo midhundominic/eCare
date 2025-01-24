@@ -43,7 +43,8 @@ export const ROUTES = {
   LABORATORY_REGISTRATION: "/admin/laboratory/register",
   LABORATORY_LIST: "/admin/laboratory/list",
   LABORATORY_PROFILE: "/laboratory/profile",
-  LABORATORY_PENDING: "/laboratory/pendingtest"
+  LABORATORY_PENDING: "/laboratory/pendingtest",
+  CHATBOT: "/medicloud/chatbot"
 };
 
 export const NON_AUTH_ROUTES = [
@@ -82,5 +83,6 @@ export const NON_AUTH_ROUTES = [
   ROUTES.LABORATORY_REGISTRATION,
   ROUTES.LABORATORY_LIST,
   ROUTES.LABORATORY_PROFILE,
-  ROUTES.LABORATORY_PENDING
+  ROUTES.LABORATORY_PENDING,
+  ROUTES.CHATBOT
 ];

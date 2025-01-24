@@ -23,6 +23,7 @@ const medicineController = require('../controllers/medicineController');
 const consultationControllers = require('../controllers/consultationControllers');
 const laboratoryControllers = require('../controllers/laboratoryControllers');
 const { testResultUpload } = require('../middleware/upload');
+const chatControlers = require ("../controllers/chatControllers");
 
 //patient
 
@@ -179,5 +180,9 @@ router.post('/laboratory/upload-result',authMiddleware,testResultUpload, laborat
 router.put('/laboratory/update-result/:resultId', laboratoryControllers.updateTestResult);
 router.get('/laboratory/completed-tests', laboratoryControllers.getCompletedTests);
 router.get('/download-result/:resultId', laboratoryControllers.downloadTestResult);
+
+//chatbot
+router.post('/chat', authMiddleware, chatControlers.chatWithBot);
+router.get('/chat/history', authMiddleware, chatControlers.getChatHistory);
 
 module.exports = router;
