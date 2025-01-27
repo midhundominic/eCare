@@ -14,10 +14,19 @@ const chatMessageSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  category: {
+    type: String,
+    enum: ['doctor_inquiry', 'laboratory', 'medicine', 'general'],
+    default: 'general'
+  },
   timestamp: {
     type: Date,
     default: Date.now
   }
 });
+
+// Add indexes for better query performance
+chatMessageSchema.index({ userId: 1, timestamp: -1 });
+chatMessageSchema.index({ category: 1 });
 
 module.exports = mongoose.model('ChatMessage', chatMessageSchema);
