@@ -63,7 +63,7 @@ export const uploadTestResult = async (formData) => {
 
 export const downloadTestResult = async (resultId) => {
   try {
-    const response = await apiClient.get(`/prescriptions/test-result/${testResultId}`, {
+    const response = await apiClient.get(`/download-result/${resultId}`, {
       responseType: 'blob'
     });
     

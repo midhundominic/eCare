@@ -16,7 +16,7 @@ const Home = () => {
           <div className={styles.notificationStatus} />
         </div>
       </div>
-      <h1>Coordinator Portal </h1>
+      <h1>Pharmacy </h1>
     </div>
   );
 };
