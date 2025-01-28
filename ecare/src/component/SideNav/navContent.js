@@ -9,6 +9,7 @@ import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import ReviewsIcon from '@mui/icons-material/Reviews';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
+import MedicationIcon from '@mui/icons-material/Medication';
 
 import { ROUTES } from "../../router/routes";
 
@@ -60,6 +61,12 @@ export const NAV_CONTENT_PATIENT = [
     title: "Chat Bot",
     link: ROUTES.CHATBOT,
     icon: ChatBubbleIcon,
+  },
+  {
+    id: 9,
+    title: "Health Assistant",
+    link: ROUTES.VIRTUALHEALTHASSISTANT,
+    icon: MedicationIcon,
   }
 ];
 

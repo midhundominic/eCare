@@ -51,6 +51,7 @@ import LaboratoryList from "../component/Admin/LaboratoryList";
 import LaboratoryProfile from '../component/Laboratory/LaboratoryProfile';
 
 import ChatBot from "../component/ChatBot";
+import VirtualHealthAssistant from "../component/Patient/Virtual Health Assistant";
 
 
 const Router = () => {
@@ -167,6 +168,7 @@ const Router = () => {
             <Route path ={ROUTES.LABORATORY_PROFILE} element={<LaboratoryProfile/>}/>
             <Route path ={ROUTES.LABORATORY_PENDING} element={<LaboratoryPending/>}/>
             <Route path ={ROUTES.CHATBOT} element={<ChatBot/>}/>
+            <Route path ={ROUTES.VIRTUALHEALTHASSISTANT} element={<VirtualHealthAssistant/>}/>
           </Routes>
         </Main>
       )}
