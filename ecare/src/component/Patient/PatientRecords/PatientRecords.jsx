@@ -10,9 +10,16 @@ import {
   AccordionSummary,
   AccordionDetails,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Box,
+  Typography,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import DownloadIcon from "@mui/icons-material/Download";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import styles from "./patientRecords.module.css";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import PrescriptionTemplate from "./prescriptionTemplate";
@@ -21,6 +28,8 @@ import { calculateAge } from "../../../utils/helper";
 const PatientRecords = () => {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedTest, setSelectedTest] = useState(null);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchRecords = async () => {
@@ -33,8 +42,11 @@ const PatientRecords = () => {
         }
 
         const response = await getPrescriptionHistory(patientId);
-        console.log("Prescription records:", response.data); // For debugging
-        setRecords(response.data || []);
+        if (response.data.success) {
+          setRecords(response.data.data || []);
+        } else {
+          toast.error(response.data.message || "Error fetching records");
+        }
       } catch (error) {
         console.error("Error:", error);
         toast.error("Error fetching patient records");
@@ -44,6 +56,34 @@ const PatientRecords = () => {
     };
     fetchRecords();
   }, []);
+
+  const handleDownloadResult = async (resultId) => {
+    try {
+      const response = await downloadTestResult(resultId);
+      if (response.data?.success && response.data?.fileUrl) {
+        window.open(response.data.fileUrl, '_blank');
+      } else {
+        toast.error(response.data?.message || 'Error: File URL not found');
+      }
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error('Error downloading test result');
+    }
+  };
+
+  const handleViewResult = (test) => {
+    if (test.resultId && test.resultId.resultFileUrl) {
+      setSelectedTest({
+        resultId: test.resultId._id,
+        resultFileUrl: test.resultId.resultFileUrl,
+        testName: test.testName,
+        remarks: test.resultId.remarks
+      });
+      setViewDialogOpen(true);
+    } else {
+      toast.error('Test result file not available');
+    }
+  };
 
   const PrescriptionDownloadButton = ({ prescription, doctor, patient }) => (
     <PDFDownloadLink
@@ -122,15 +162,25 @@ const PatientRecords = () => {
                     {record.tests.map((test, idx) => (
                       <li key={idx} className={styles.testItem}>
                         <span>{test.testName}</span>
-                        {test.resultId ? (
-                          <Button
-                            startIcon={<DownloadIcon />}
-                            onClick={() => handleDownloadResult(test.resultId)}
-                            variant="contained"
-                            size="small"
-                          >
-                            Download Result
-                          </Button>
+                        {test.resultId && test.resultId.resultFileUrl ? (
+                          <div className={styles.testActions}>
+                            <Button
+                              startIcon={<VisibilityIcon />}
+                              onClick={() => handleViewResult(test)}
+                              variant="outlined"
+                              size="small"
+                            >
+                              View
+                            </Button>
+                            <Button
+                              startIcon={<DownloadIcon />}
+                              onClick={() => handleDownloadResult(test.resultId._id)}
+                              variant="contained"
+                              size="small"
+                            >
+                              Download
+                            </Button>
+                          </div>
                         ) : (
                           <span className={styles.pendingResult}>
                             Result not available
@@ -163,6 +213,50 @@ const PatientRecords = () => {
           </AccordionDetails>
         </Accordion>
       ))}
+
+      {/* View Test Result Dialog */}
+      <Dialog 
+        open={viewDialogOpen} 
+        onClose={() => setViewDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          Test Result - {selectedTest?.testName}
+        </DialogTitle>
+        <DialogContent>
+          <Box className={styles.viewContent}>
+            {selectedTest?.resultFileUrl ? (
+              <iframe
+                src={selectedTest.resultFileUrl}
+                title="Test Result"
+                width="100%"
+                height="500px"
+                className={styles.pdfViewer}
+              />
+            ) : (
+              <Typography color="error" align="center">
+                Error loading test result
+              </Typography>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setViewDialogOpen(false)}>
+            Close
+          </Button>
+          {selectedTest?.resultId && (
+            <Button 
+              onClick={() => handleDownloadResult(selectedTest.resultId)}
+              variant="contained" 
+              color="primary"
+              startIcon={<DownloadIcon />}
+            >
+              Download
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

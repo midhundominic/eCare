@@ -8,7 +8,9 @@ import {
   CardContent, 
   IconButton,
   Button,
-  CircularProgress
+  CircularProgress,
+  Box,
+  Divider
 } from '@mui/material';
 import {
   Science,
@@ -16,9 +18,15 @@ import {
   Timeline,
   Notifications,
   MedicalServices,
-  LocalHospital
+  LocalHospital,
+  TrendingUp,
+  CheckCircle
 } from '@mui/icons-material';
+import { toast } from 'react-toastify';
 import styles from './laboratoryHome.module.css';
+import {ROUTES} from "../../../router/routes"
+import { getPendingTests, getCompletedTests } from '../../../services/prescriptionServices';
+import { getAllTests } from '../../../services/labTestServices';
 
 const LaboratoryHome = () => {
   const navigate = useNavigate();
@@ -29,51 +37,77 @@ const LaboratoryHome = () => {
     totalPatients: 0,
     recentReports: []
   });
+  const [labTests, setLabTests] = useState([]);
 
   useEffect(() => {
-    // Simulate loading data
-    setTimeout(() => {
-      setStats({
-        pendingTests: 15,
-        completedTests: 45,
-        totalPatients: 60,
-        recentReports: [
-          { id: 1, patientName: 'John Doe', testType: 'Blood Test', date: '2024-03-20' },
-          { id: 2, patientName: 'Jane Smith', testType: 'X-Ray', date: '2024-03-19' },
-          { id: 3, patientName: 'Mike Johnson', testType: 'MRI Scan', date: '2024-03-18' }
-        ]
-      });
-      setLoading(false);
-    }, 1000);
+    fetchLabStats();
+    fetchLabTests();
   }, []);
 
-  const quickActions = [
-    { title: 'New Test', icon: <Science />, color: '#4CAF50', path: '/new-test' },
-    { title: 'View Reports', icon: <Assignment />, color: '#2196F3', path: '/reports' },
-    { title: 'Analytics', icon: <Timeline />, color: '#9C27B0', path: '/analytics' },
-    { title: 'Notifications', icon: <Notifications />, color: '#FF9800', path: '/notifications' }
-  ];
+  const fetchLabStats = async () => {
+    try {
+      const [pendingResponse, completedResponse] = await Promise.all([
+        getPendingTests(),
+        getCompletedTests()
+      ]);
 
-  const services = [
-    {
-      title: 'Blood Tests',
-      description: 'Complete blood work analysis including CBC, lipid profile, and more.',
-      icon: '/images/blood-test.jpg'
+      const pendingTests = pendingResponse.data;
+      const completedTests = completedResponse.data;
+
+      // Get unique patients
+      const allPatients = new Set([
+        ...pendingTests.map(test => test.patientId),
+        ...completedTests.map(test => test.patientId)
+      ]);
+
+      // Get recent reports (last 5)
+      const recentReports = completedTests
+        .sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))
+        .slice(0, 5);
+
+      setStats({
+        pendingTests: pendingTests.length,
+        completedTests: completedTests.length,
+        totalPatients: allPatients.size,
+        recentReports
+      });
+    } catch (error) {
+      toast.error('Error fetching laboratory statistics');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchLabTests = async () => {
+    try {
+      const response = await getAllTests();
+      setLabTests(response.data);
+    } catch (error) {
+      toast.error('Error fetching laboratory tests');
+    }
+  };
+
+  const quickActions = [
+    { 
+      title: 'Pending Tests', 
+      icon: <Science />, 
+      color: '#4CAF50', 
+      path: '/laboratory/pendingtest',
+      count: stats.pendingTests
     },
-    {
-      title: 'Imaging Services',
-      description: 'X-rays, MRI scans, CT scans, and ultrasound services.',
-      icon: '/images/imaging.jpg'
+    { 
+      title: 'Completed Tests', 
+      icon: <CheckCircle />, 
+      color: '#2196F3', 
+      path: '/laboratory/result',
+      count: stats.completedTests
     },
-    {
-      title: 'Pathology',
-      description: 'Comprehensive pathology services for accurate diagnosis.',
-      icon: '/images/pathology.jpg'
-    },
-    {
-      title: 'Special Tests',
-      description: 'Specialized diagnostic tests and health screenings.',
-      icon: '/images/special-tests.jpg'
+    { 
+      title: 'Analytics', 
+      icon: <TrendingUp />, 
+      color: '#9C27B0', 
+      path: '/laboratory/analytics',
+      count: null
     }
   ];
 
@@ -90,9 +124,9 @@ const LaboratoryHome = () => {
       {/* Welcome Banner */}
       <Paper elevation={3} className={styles.welcomeBanner}>
         <div className={styles.welcomeContent}>
-          <Typography variant="h4">Welcome to Laboratory Management</Typography>
+          <Typography variant="h4">Laboratory Dashboard</Typography>
           <Typography variant="subtitle1">
-            Manage your laboratory operations efficiently and effectively
+            Manage and track laboratory tests efficiently
           </Typography>
         </div>
       </Paper>
@@ -100,29 +134,53 @@ const LaboratoryHome = () => {
       {/* Quick Stats */}
       <Grid container spacing={3} className={styles.statsContainer}>
         <Grid item xs={12} md={4}>
-          <Card className={styles.statCard}>
+          <Card className={`${styles.statCard} ${styles.pendingCard}`}>
             <CardContent>
-              <LocalHospital className={styles.statIcon} />
-              <Typography variant="h6">Pending Tests</Typography>
-              <Typography variant="h4">{stats.pendingTests}</Typography>
+              <Box className={styles.statHeader}>
+                <Science className={styles.statIcon} />
+                <Typography variant="h6">Pending Tests</Typography>
+              </Box>
+              <Typography variant="h3">{stats.pendingTests}</Typography>
+              <Button 
+                variant="outlined" 
+                color="primary"
+                onClick={() => navigate('/laboratory/pendingtest')}
+                className={styles.statButton}
+              >
+                View Pending Tests
+              </Button>
             </CardContent>
           </Card>
         </Grid>
+
         <Grid item xs={12} md={4}>
-          <Card className={styles.statCard}>
+          <Card className={`${styles.statCard} ${styles.completedCard}`}>
             <CardContent>
-              <MedicalServices className={styles.statIcon} />
-              <Typography variant="h6">Completed Tests</Typography>
-              <Typography variant="h4">{stats.completedTests}</Typography>
+              <Box className={styles.statHeader}>
+                <CheckCircle className={styles.statIcon} />
+                <Typography variant="h6">Completed Tests</Typography>
+              </Box>
+              <Typography variant="h3">{stats.completedTests}</Typography>
+              <Button 
+                variant="outlined" 
+                color="primary"
+                onClick={() => navigate('/laboratory/result')}
+                className={styles.statButton}
+              >
+                View Completed Tests
+              </Button>
             </CardContent>
           </Card>
         </Grid>
+
         <Grid item xs={12} md={4}>
-          <Card className={styles.statCard}>
+          <Card className={`${styles.statCard} ${styles.patientsCard}`}>
             <CardContent>
-              <Assignment className={styles.statIcon} />
-              <Typography variant="h6">Total Patients</Typography>
-              <Typography variant="h4">{stats.totalPatients}</Typography>
+              <Box className={styles.statHeader}>
+                <Assignment className={styles.statIcon} />
+                <Typography variant="h6">Total Patients</Typography>
+              </Box>
+              <Typography variant="h3">{stats.totalPatients}</Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -150,18 +208,31 @@ const LaboratoryHome = () => {
         ))}
       </Grid>
 
-      {/* Services */}
+      {/* Lab Tests Services */}
       <Typography variant="h5" className={styles.sectionTitle}>
-        Our Services
+        Available Laboratory Tests
       </Typography>
       <Grid container spacing={3} className={styles.servicesContainer}>
-        {services.map((service, index) => (
-          <Grid item xs={12} md={6} lg={3} key={index}>
+        {labTests.map((test) => (
+          <Grid item xs={12} md={6} lg={3} key={test._id}>
             <Card className={styles.serviceCard}>
-              <img src={service.icon} alt={service.title} className={styles.serviceImage} />
               <CardContent>
-                <Typography variant="h6">{service.title}</Typography>
-                <Typography variant="body2">{service.description}</Typography>
+                <Box className={styles.serviceHeader}>
+                  <Science className={styles.serviceIcon} />
+                  <Typography variant="h6">{test.label}</Typography>
+                </Box>
+                <Typography variant="body2" color="textSecondary" className={styles.servicePrice}>
+                  Rs. {test.amount}
+                </Typography>
+                <Button 
+                  variant="outlined" 
+                  color="primary"
+                  fullWidth
+                  className={styles.serviceButton}
+                  onClick={() => navigate('/laboratory/tests')}
+                >
+                  View Details
+                </Button>
               </CardContent>
             </Card>
           </Grid>
@@ -169,23 +240,45 @@ const LaboratoryHome = () => {
       </Grid>
 
       {/* Recent Reports */}
-      <Typography variant="h5" className={styles.sectionTitle}>
-        Recent Reports
-      </Typography>
-      <Card className={styles.reportsCard}>
+      <Card className={styles.recentReportsCard}>
         <CardContent>
-          {stats.recentReports.map((report) => (
-            <div key={report.id} className={styles.reportItem}>
-              <div>
-                <Typography variant="subtitle1">{report.patientName}</Typography>
-                <Typography variant="body2">{report.testType}</Typography>
-              </div>
-              <Typography variant="body2">{report.date}</Typography>
-              <Button variant="outlined" size="small">
-                View Report
-              </Button>
+          <Typography variant="h6" className={styles.sectionTitle}>
+            Recent Test Reports
+          </Typography>
+          <Divider className={styles.divider} />
+          
+          {stats.recentReports.length > 0 ? (
+            <div className={styles.reportsGrid}>
+              {stats.recentReports.map((report) => (
+                <Paper key={report.resultId} className={styles.reportItem}>
+                  <div className={styles.reportInfo}>
+                    <Typography variant="subtitle1" className={styles.patientName}>
+                      {report.patientName}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      {report.testName}
+                    </Typography>
+                    <Typography variant="caption" color="textSecondary">
+                      {new Date(report.uploadDate).toLocaleDateString()}
+                    </Typography>
+                  </div>
+                  <div className={styles.reportActions}>
+                    <Button 
+                      variant="outlined" 
+                      size="small"
+                      onClick={() => navigate(`/laboratory/results?id=${report.resultId}`)}
+                    >
+                      View Details
+                    </Button>
+                  </div>
+                </Paper>
+              ))}
             </div>
-          ))}
+          ) : (
+            <Typography variant="body1" className={styles.noReports}>
+              No recent test reports available
+            </Typography>
+          )}
         </CardContent>
       </Card>
     </div>

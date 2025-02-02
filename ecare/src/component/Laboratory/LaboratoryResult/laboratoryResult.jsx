@@ -19,6 +19,7 @@ import { toast } from 'react-toastify';
 import EditIcon from '@mui/icons-material/Edit';
 import DownloadIcon from '@mui/icons-material/Download';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import styles from './laboratoryResult.module.css';
 import { getCompletedTests, updateTestResult, downloadTestResult } from '../../../services/prescriptionServices';
 
@@ -29,6 +30,7 @@ const LaboratoryResult = () => {
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [newRemarks, setNewRemarks] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
     fetchCompletedTests();
@@ -46,12 +48,38 @@ const LaboratoryResult = () => {
   const handleEdit = async () => {
     try {
       setLoading(true);
-      await updateTestResult(selectedTest.resultId, { remarks: newRemarks });
-      toast.success('Test result updated successfully');
-      setEditDialogOpen(false);
-      fetchCompletedTests();
+      const userData = JSON.parse(localStorage.getItem("userData"));
+      const userId = userData.userId;
+
+      // Create FormData object
+      const formData = new FormData();
+      
+      // Always append remarks and userId
+      formData.append('remarks', newRemarks);
+      formData.append('userId', userId);
+      
+      // Only append file if one is selected
+      if (selectedFile) {
+        formData.append('file', selectedFile);
+      }
+
+      // Log formData contents for debugging
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
+
+      const response = await updateTestResult(selectedTest.resultId, formData);
+      
+      if (response.data.success) {
+        toast.success('Test result updated successfully');
+        setEditDialogOpen(false);
+        setSelectedFile(null);
+        setNewRemarks('');
+        fetchCompletedTests();
+      }
     } catch (error) {
-      toast.error('Error updating test result');
+      console.error('Update error:', error);
+      toast.error(error.response?.data?.message || 'Error updating test result');
     } finally {
       setLoading(false);
     }
@@ -134,11 +162,41 @@ const LaboratoryResult = () => {
         <DialogTitle>Edit Test Result</DialogTitle>
         <DialogContent>
           <Box className={styles.editContent}>
-            <Typography variant="h6" gutterBottom>
-              Test Details
-            </Typography>
-            <Typography><strong>Patient:</strong> {selectedTest?.patientName}</Typography>
-            <Typography><strong>Test:</strong> {selectedTest?.testName}</Typography>
+            <Box className={styles.patientInfo}>
+              <Typography variant="h6" gutterBottom>Test Details</Typography>
+              <Typography><strong>Patient:</strong> {selectedTest?.patientName}</Typography>
+              <Typography><strong>Test:</strong> {selectedTest?.testName}</Typography>
+            </Box>
+
+            <Box className={styles.uploadSection}>
+              <Typography variant="subtitle1" gutterBottom>
+                Update Test Result File (Optional)
+              </Typography>
+              <input
+                accept="application/pdf"
+                type="file"
+                onChange={(e) => setSelectedFile(e.target.files[0])}
+                style={{ display: 'none' }}
+                id="test-result-edit"
+              />
+              <label htmlFor="test-result-edit">
+                <Button
+                  variant="outlined"
+                  component="span"
+                  startIcon={<CloudUploadIcon />}
+                  fullWidth
+                  className={styles.uploadButton}
+                >
+                  {selectedFile ? 'Change PDF File' : 'Select New PDF File'}
+                </Button>
+              </label>
+              {selectedFile && (
+                <Typography className={styles.fileName}>
+                  Selected file: {selectedFile.name}
+                </Typography>
+              )}
+            </Box>
+
             <TextField
               multiline
               rows={4}
@@ -152,7 +210,12 @@ const LaboratoryResult = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => {
+            setEditDialogOpen(false);
+            setSelectedFile(null);
+          }}>
+            Cancel
+          </Button>
           <Button 
             onClick={handleEdit} 
             variant="contained" 

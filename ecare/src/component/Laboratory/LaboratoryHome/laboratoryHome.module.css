@@ -14,37 +14,112 @@
 .welcomeBanner {
   background: linear-gradient(135deg, #1976d2 0%, #64b5f6 100%);
   color: white;
-  padding: 40px;
+  padding: 32px;
   margin-bottom: 24px;
   border-radius: 12px;
 }
 
 .welcomeContent {
-  max-width: 800px;
+  text-align: center;
 }
 
 .statsContainer {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .statCard {
-  text-align: center;
+  height: 100%;
   transition: transform 0.2s;
+  border-radius: 12px;
 }
 
 .statCard:hover {
   transform: translateY(-5px);
 }
 
-.statIcon {
-  font-size: 48px !important;
+.statHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 16px;
+}
+
+.statIcon {
+  font-size: 32px !important;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.pendingCard .statIcon {
+  background-color: #e3f2fd;
   color: #1976d2;
 }
 
+.completedCard .statIcon {
+  background-color: #e8f5e9;
+  color: #4caf50;
+}
+
+.patientsCard .statIcon {
+  background-color: #f3e5f5;
+  color: #9c27b0;
+}
+
+.statButton {
+  margin-top: 16px !important;
+  width: 100%;
+}
+
+.recentReportsCard {
+  border-radius: 12px;
+}
+
 .sectionTitle {
-  margin: 32px 0 16px 0 !important;
-  color: #333;
+  margin-bottom: 16px !important;
+  color: #2c3e50;
+}
+
+.divider {
+  margin-bottom: 24px !important;
+}
+
+.reportsGrid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.reportItem {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 8px;
+  transition: transform 0.2s;
+}
+
+.reportItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.reportInfo {
+  flex: 1;
+}
+
+.patientName {
+  font-weight: 600 !important;
+  color: #2c3e50;
+}
+
+.reportActions {
+  margin-left: 16px;
+}
+
+.noReports {
+  text-align: center;
+  color: #666;
+  padding: 32px;
 }
 
 .actionCard {
@@ -66,10 +141,13 @@
 .serviceCard {
   height: 100%;
   transition: transform 0.2s;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%);
 }
 
 .serviceCard:hover {
   transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .serviceImage {
@@ -82,16 +160,34 @@
   margin-bottom: 32px;
 }
 
-.reportItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 0;
-  border-bottom: 1px solid #eee;
+.servicesContainer {
+  margin-bottom: 32px;
 }
 
-.reportItem:last-child {
-  border-bottom: none;
+.serviceHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.serviceIcon {
+  font-size: 28px !important;
+  padding: 8px;
+  border-radius: 8px;
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.servicePrice {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  color: #2c3e50 !important;
+  margin: 12px 0 !important;
+}
+
+.serviceButton {
+  margin-top: 16px !important;
 }
 
 @media (max-width: 600px) {
@@ -103,13 +199,21 @@
     padding: 24px;
   }
 
-  .reportItem {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+  .reportsGrid {
+    grid-template-columns: 1fr;
   }
 
-  .reportItem button {
-    align-self: flex-end;
+  .reportItem {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .reportActions {
+    margin-left: 0;
+  }
+
+  .servicesContainer {
+    margin-bottom: 24px;
   }
 }

@@ -29,7 +29,7 @@ export const updatePrescription = async (appointmentId, prescriptionData) => {
 export const getPrescriptionHistory = async (patientId) => {
   try {
     const response = await apiClient.get(`/prescriptions/patient/${patientId}`);
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error fetching prescription history", error);
     throw error;
@@ -101,9 +101,13 @@ export const getCompletedTests = async () => {
   }
 };
 
-export const updateTestResult = async (resultId, data) => {
+export const updateTestResult = async (resultId, formData) => {
   try {
-    const response = await apiClient.put(`/laboratory/update-result/${resultId}`, data);
+    const response = await apiClient.put(`/laboratory/results/${resultId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    });
     return response;
   } catch (error) {
     throw error;
