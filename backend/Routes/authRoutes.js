@@ -179,7 +179,7 @@ router.get('/laboratory-view',laboratoryControllers.getAllLaboratory);
 
 router.get('/laboratory/pending-tests', laboratoryControllers.getPendingTests);
 router.post('/laboratory/upload-result',authMiddleware,testResultUpload, laboratoryControllers.uploadTestResult);
-router.put('/laboratory/update-result/:resultId', laboratoryControllers.updateTestResult);
+router.put('/laboratory/results/:resultId', authMiddleware,testResultUpload,laboratoryControllers.updateTestResult);
 router.get('/laboratory/completed-tests', laboratoryControllers.getCompletedTests);
 router.get('/download-result/:resultId', laboratoryControllers.downloadTestResult);
 

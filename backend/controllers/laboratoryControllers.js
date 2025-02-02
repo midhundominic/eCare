@@ -146,21 +146,51 @@ const uploadTestResult = async (req, res) => {
 
 const updateTestResult = async (req, res) => {
   try {
-    const { resultId } = req.params;
-    const { remarks } = req.body;
+      const { resultId } = req.params;
+      const { remarks, userId } = req.body;
+      const file = req.file;
+      console.log("params",req.params);
+      console.log("body",req.body);
+   
+      // Find existing test result
+      const existingResult = await TestResult.findById(resultId);
+      if (!existingResult) {
+          return res.status(404).json({
+              success: false,
+              message: 'Test result not found'
+          });
+      }
 
-    const testResult = await TestResult.findById(resultId);
-    if (!testResult) {
-      return res.status(404).json({ message: 'Test result not found' });
-    }
+      // Update object to store changes
+      const updateData = {
+          remarks: remarks || existingResult.remarks,
+          updatedBy: userId,
+          updatedAt: Date.now()
+      };
 
-    testResult.remarks = remarks;
-    testResult.lastUpdated = Date.now();
-    await testResult.save();
+      // If new file is uploaded, update the PDF URL
+      if (file) {
+          updateData.resultFileUrl = file.path; // Cloudinary URL is automatically stored in file.path
+      }
 
-    res.status(201).json({ message: 'Test result updated successfully' });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+      // Update the test result
+      const updatedResult = await TestResult.findByIdAndUpdate(
+          resultId,
+          updateData,
+          { new: true }
+      );
+
+      res.status(201).json({
+          success: true,
+          message: 'Test result updated successfully',
+          data: updatedResult
+      });
+    } catch (error) {
+      console.error('Update test result error:', error);
+      res.status(500).json({
+          success: false,
+          message: error.message || 'Error updating test result'
+      });
   }
 };
 
