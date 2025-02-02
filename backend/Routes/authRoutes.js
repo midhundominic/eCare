@@ -25,6 +25,7 @@ const laboratoryControllers = require('../controllers/laboratoryControllers');
 const { testResultUpload } = require('../middleware/upload');
 const chatControlers = require ("../controllers/chatControllers");
 const labTestControllers = require("../controllers/labTestControllers");
+const geminiControllers = require("../controllers/geminiControllers");
 
 //patient
 
@@ -185,6 +186,10 @@ router.get('/download-result/:resultId', laboratoryControllers.downloadTestResul
 //chatbot
 router.post('/chat', authMiddleware, chatControlers.chatWithBot);
 router.get('/chat/history', authMiddleware, chatControlers.getChatHistory);
+
+//Gemini
+router.post('/gemini/chat', authMiddleware, geminiControllers.chatWithGemini);
+router.get('/gemini/chat/history', authMiddleware, geminiControllers.getChatHistory);
 
 //Lab test
 router.get('/laboratory/tests',labTestControllers.getAllTests);
