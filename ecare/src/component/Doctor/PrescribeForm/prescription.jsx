@@ -13,12 +13,14 @@ import { calculateAge } from "../../../utils/helper";
 import WeightIcon from "../../../assets/icons/ic_weight.png";
 import HeightIcon from "../../../assets/icons/ic_height.png";
 import PatientRecords from "./Records/records";
+import { getAllTests } from '../../../services/labTestServices';
 
 const PrescribeForm = () => {
   const [searchParams] = useSearchParams();
 
   const [appointment, setAppointment] = useState(null);
   const [activeTab, setActiveTab] = React.useState(0);
+  const [labTests, setLabTests] = useState([]);
 
   const handleChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -34,10 +36,19 @@ const PrescribeForm = () => {
         toast.error("Error fetching appointment details");
       }
     };
+    const fetchTests = async () => {
+      try {
+        const response = await getAllTests();
+        setLabTests(response.data);
+      } catch (error) {
+        toast.error('Error fetching lab tests');
+      }
+    };
     const appointmentId = searchParams.get("appointmentId");
     // const doctorId = searchParams.get("doctorId");
     if (appointmentId) {
       fetchAppointmentDetails();
+      fetchTests();
     }
   }, []);
 
@@ -102,7 +113,7 @@ const PrescribeForm = () => {
         </Tabs>
       </Box>
       <TabPanel value={activeTab} index={0}>
-        <DoctorReview />
+        <DoctorReview labTests={labTests} />
       </TabPanel>
       <TabPanel value={activeTab} index={1}>
         <PatientRecords patient={patientInfo} />

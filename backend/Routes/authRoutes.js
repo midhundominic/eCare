@@ -24,6 +24,7 @@ const consultationControllers = require('../controllers/consultationControllers'
 const laboratoryControllers = require('../controllers/laboratoryControllers');
 const { testResultUpload } = require('../middleware/upload');
 const chatControlers = require ("../controllers/chatControllers");
+const labTestControllers = require("../controllers/labTestControllers");
 
 //patient
 
@@ -184,5 +185,11 @@ router.get('/download-result/:resultId', laboratoryControllers.downloadTestResul
 //chatbot
 router.post('/chat', authMiddleware, chatControlers.chatWithBot);
 router.get('/chat/history', authMiddleware, chatControlers.getChatHistory);
+
+//Lab test
+router.get('/laboratory/tests',labTestControllers.getAllTests);
+router.post('/laboratory/tests',labTestControllers.createTest);
+router.put('/laboratory/tests/:id',labTestControllers.updateTest);
+router.delete('/laboratory/tests/:id',labTestControllers.deleteTest);
 
 module.exports = router;

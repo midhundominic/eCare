@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 
 import styles from "./review.module.css";
 import AutoCompleteInput from "../../../Common/AutoComplete/autoComplete";
-import { FREQUENCY, INITIAL_MEDICINE_ARR, MEDICAL_TESTS } from "../constants";
+import { FREQUENCY, INITIAL_MEDICINE_ARR } from "../constants";
 import Checkbox from "../../../Common/Checkbox";
 import Button from "../../../Common/Button";
 import { ROUTES } from "../../../../router/routes";
@@ -16,7 +16,7 @@ import { getMedicinesList } from "../../../../services/medicineservices";
 import { submitPrescription,updatePrescription,getPrescriptionByAppointment } from "../../../../services/prescriptionServices";
 
 
-const DoctorReview = () => {
+const DoctorReview = ({ labTests = [] }) => {
   const [comment, setComment] = useState("");
   const [tests, setTests] = useState([]);
   const [medicines, setMedicines] = useState(INITIAL_MEDICINE_ARR);
@@ -92,6 +92,8 @@ const DoctorReview = () => {
     e.preventDefault();
     
     const prescriptionData = {
+      appointmentId: searchParams.get("appointmentId"),
+      doctorId: searchParams.get("doctorId"),
       medicines: medicines
         .filter((med) => med.name?.value)
         .map((med) => ({
@@ -101,8 +103,8 @@ const DoctorReview = () => {
           isSOS: med.isSOS || false,
           beforeFood: med.bf || false,
         })),
-      tests: tests.map(test => ({
-        testName: test,
+      tests: tests.map(testName => ({
+        testName,
         isCompleted: false
       })),
       notes: comment,
@@ -113,16 +115,13 @@ const DoctorReview = () => {
         await updatePrescription(appointmentId, prescriptionData);
         toast.success("Prescription updated successfully");
       } else {
-        await submitPrescription({
-          ...prescriptionData,
-          appointmentId: appointmentId,
-          doctorId: searchParams.get("doctorId"),
-        });
+        await submitPrescription(prescriptionData);
         toast.success("Prescription submitted successfully");
       }
-      navigate(ROUTES.SCHEDULED_APPOINTMENTS);
+      navigate(ROUTES.SCHEDULED_APPOINTMENT);
     } catch (error) {
-      toast.error(error.response?.data?.message || `Error ${isUpdateMode ? 'updating' : 'submitting'} prescription`);
+      console.error("Error:", error);
+      toast.error(error.response?.data?.message || "Error submitting prescription");
     }
   };
 
@@ -235,18 +234,22 @@ const DoctorReview = () => {
         <div className={styles.section}>
           <span className={styles.caption}>Tests</span>
           <div className={styles.medicalTests}>
-             {MEDICAL_TESTS.map((test) => {
-            const isChecked = tests.includes(test.label);
-            return (
-              <Checkbox
-                name={test.label}
-                title={test.label}
-                key={test.id}
-                value={isChecked}
-                onChange={handleTestChange}
-              />
-              );
-            })}
+            {Array.isArray(labTests) && labTests.length > 0 ? (
+              labTests.map((test) => {
+                const isChecked = tests.includes(test.label);
+                return (
+                  <Checkbox
+                    name={test.label}
+                    title={`${test.label}`}
+                    key={test._id || test.label}
+                    value={isChecked}
+                    onChange={handleTestChange}
+                  />
+                );
+              })
+            ) : (
+              <p>No laboratory tests available</p>
+            )}
           </div>
         </div>
 

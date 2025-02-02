@@ -91,7 +91,7 @@ export const NAV_CONTENT_ADMIN = [
   },
   {
     id: 4,
-    title: "Care Coordinator",
+    title: "Pharmacy",
     link: ROUTES.ADMIN_COORDINATOR_LIST,
     icon: PeopleRoundedIcon,
   },
@@ -119,6 +119,12 @@ export const NAV_CONTENT_ADMIN = [
     link: ROUTES.ADMIN_REVIEW,
     icon: ReviewsIcon,
   },
+  {
+    id: 9,
+    title: "Laboratory Test",
+    link: ROUTES.ADMIN_LABTEST_LIST,
+    icon: PeopleRoundedIcon
+  }
 ];
 
 export const NAV_CONTENT_DOCTOR = [

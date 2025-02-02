@@ -24,6 +24,7 @@ export const ROUTES = {
   COORDINATOR_HOME: "/coordinator/home",
   ADMIN_COORDINATOR_LIST: "/admin/coordinator",
   ADMIN_PATIENT_LIST: "/admin/patient",
+  ADMIN_LABTEST_LIST: "/admin/labtest",
   FORGOT_PASSWORD: "/forgotpassword",
   RESET_PASSWORD: "/resetpassword",
   VARIFY_CODE: "/varify",
@@ -86,5 +87,6 @@ export const NON_AUTH_ROUTES = [
   ROUTES.LABORATORY_PROFILE,
   ROUTES.LABORATORY_PENDING,
   ROUTES.CHATBOT,
-  ROUTES.VIRTUALHEALTHASSISTANT
+  ROUTES.VIRTUALHEALTHASSISTANT,
+  ROUTES.ADMIN_LABTEST_LIST
 ];
