@@ -67,7 +67,13 @@ export const NAV_CONTENT_PATIENT = [
     title: "Health Assistant",
     link: ROUTES.VIRTUALHEALTHASSISTANT,
     icon: MedicationIcon,
-  }
+  },
+  {
+  id: 10,
+  title: "Chatbot Gemini",
+  link: ROUTES.GEMINI_CHATBOT,
+  icon: MedicationIcon,
+ }
 ];
 
 export const NAV_CONTENT_ADMIN = [

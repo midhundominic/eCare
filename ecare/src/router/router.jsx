@@ -54,6 +54,8 @@ import ChatBot from "../component/ChatBot";
 import VirtualHealthAssistant from "../component/Patient/Virtual Health Assistant";
 import LabTestList from "../component/Admin/LaboratoryTest";
 
+import GeminiChatbot from "../component/Patient/GeminiChatbot";
+
 
 const Router = () => {
   const location = useLocation();
@@ -171,6 +173,7 @@ const Router = () => {
             <Route path ={ROUTES.CHATBOT} element={<ChatBot/>}/>
             <Route path ={ROUTES.VIRTUALHEALTHASSISTANT} element={<VirtualHealthAssistant/>}/>
             <Route path ={ROUTES.ADMIN_LABTEST_LIST} element={<LabTestList/>}/>
+            <Route path ={ROUTES.GEMINI_CHATBOT} element={<GeminiChatbot/>}/>
           </Routes>
         </Main>
       )}

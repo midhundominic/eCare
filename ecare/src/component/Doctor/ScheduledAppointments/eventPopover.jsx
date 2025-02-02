@@ -10,17 +10,19 @@ const EventPopover = (props) => {
     appointment 
   } = props;
 
+  const parsedAppointment = JSON.parse(appointment);
   const {
     title,
-    extendedProps: { _id, status },
-  } = JSON.parse(appointment);
+    extendedProps: { _id, status, prescription }
+  } = parsedAppointment;
 
   const isCompleted = status === "completed";
+  const hasPrescription = !!prescription;
 
   return (
     <div className={styles.popoverRoot}>
       <span>{title}</span>
-      {isCompleted ? (
+      {isCompleted && hasPrescription ? (
         <Button
           onClick={() => handleUpdatePrescription(_id)}
           styles={{ btnPrimary: styles.updateBtn }}

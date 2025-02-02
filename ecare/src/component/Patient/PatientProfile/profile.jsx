@@ -67,7 +67,7 @@ const Profile = () => {
       const file = document.querySelector('input[type="file"]').files[0];
 
       const formData = new FormData();
-      formData.append("profilePhoto", file);
+      formData.append("file", file);
       formData.append("email", profileData.email);
 
       try {

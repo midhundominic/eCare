@@ -31,6 +31,7 @@ const DoctorReview = ({ labTests = [] }) => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
+        setIsLoading(true);
         // Fetch medicines list
         const medicinesList = await getMedicinesList();
         setMedicineOptions(
@@ -43,30 +44,43 @@ const DoctorReview = ({ labTests = [] }) => {
 
         // If update mode, fetch existing prescription
         if (isUpdateMode && appointmentId) {
-          const response = await getPrescriptionByAppointment(appointmentId);
-          const prescriptionData = response.data;
+          try {
+            const response = await getPrescriptionByAppointment(appointmentId);
 
-          if (prescriptionData) {
-            setComment(prescriptionData.notes || '');
-            const existingTests = prescriptionData.tests.map(test => test.testName);
-            setTests(existingTests);
-            
-            const formattedMedicines = prescriptionData.medicines.map(med => ({
-              name: {
-                label: med.medicine.name,
-                value: med.medicine._id
-              },
-              frequency: med.frequency,
-              days: med.days.toString(),
-              isSOS: med.isSOS || false,
-              bf: med.beforeFood || false
-            }));
-            
-            setMedicines([...formattedMedicines, ...INITIAL_MEDICINE_ARR]);
+            if (response?.data) {
+              const prescriptionData = response.data;
+              setComment(prescriptionData.notes || '');
+              
+              // Handle tests
+              if (prescriptionData.tests && Array.isArray(prescriptionData.tests)) {
+                const existingTests = prescriptionData.tests.map(test => test.testName);
+                setTests(existingTests);
+              }
+              
+              // Handle medicines
+              if (prescriptionData.medicines && Array.isArray(prescriptionData.medicines)) {
+                const formattedMedicines = prescriptionData.medicines.map(med => ({
+                  name: {
+                    label: med.medicine?.name || '',
+                    value: med.medicine?._id || ''
+                  },
+                  frequency: med.frequency || '',
+                  days: med.days?.toString() || '',
+                  isSOS: med.isSOS || false,
+                  bf: med.beforeFood || false
+                }));
+                
+                setMedicines([...formattedMedicines, ...INITIAL_MEDICINE_ARR]);
+              }
+            }
+          } catch (error) {
+            console.error("Error fetching prescription:", error);
+            toast.error("Error fetching existing prescription");
           }
         }
       } catch (error) {
-        toast.error("Error fetching prescription data");
+        console.error("Error in fetchInitialData:", error);
+        toast.error("Error loading prescription data");
       } finally {
         setIsLoading(false);
       }
@@ -118,7 +132,7 @@ const DoctorReview = ({ labTests = [] }) => {
         await submitPrescription(prescriptionData);
         toast.success("Prescription submitted successfully");
       }
-      navigate(ROUTES.SCHEDULED_APPOINTMENT);
+      navigate(ROUTES.SCHEDULED_APPOINTMENTS);
     } catch (error) {
       console.error("Error:", error);
       toast.error(error.response?.data?.message || "Error submitting prescription");

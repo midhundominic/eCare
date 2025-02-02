@@ -86,7 +86,7 @@ export const downloadTestResult = async (resultId) => {
 export const getPrescriptionByAppointment = async (appointmentId) => {
   try {
     const response = await apiClient.get(`/prescriptions/appointment/${appointmentId}`);
-    return response;
+    return response.data;
   } catch (error) {
     throw error;
   }

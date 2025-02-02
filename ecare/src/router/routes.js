@@ -47,6 +47,7 @@ export const ROUTES = {
   LABORATORY_PENDING: "/laboratory/pendingtest",
   CHATBOT: "/medicloud/chatbot",
   VIRTUALHEALTHASSISTANT: "/health/assistant",
+  GEMINI_CHATBOT: "/patient/chatbot",
 };
 
 export const NON_AUTH_ROUTES = [
@@ -88,5 +89,6 @@ export const NON_AUTH_ROUTES = [
   ROUTES.LABORATORY_PENDING,
   ROUTES.CHATBOT,
   ROUTES.VIRTUALHEALTHASSISTANT,
-  ROUTES.ADMIN_LABTEST_LIST
+  ROUTES.ADMIN_LABTEST_LIST,
+  ROUTES.GEMINI_CHATBOT,
 ];

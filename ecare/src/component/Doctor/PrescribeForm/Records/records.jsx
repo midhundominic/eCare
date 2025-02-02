@@ -1,13 +1,34 @@
 import React, { useEffect, useState } from "react";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
+import {
+  Typography,
+  Chip,
+  Box,
+  Divider,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress,
+  Tabs,
+  Tab,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Typography, Chip, Box, Divider, Table, TableBody, TableCell, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from "@mui/material";
 import dayjs from "dayjs";
 import { toast } from 'react-toastify';
 import DownloadIcon from '@mui/icons-material/Download';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import PrescriptionTemplate from "../../../Patient/PatientRecords/prescriptionTemplate";
 
 import styles from "./records.module.css";
 import { getPrescriptionHistory, downloadTestResult } from "../../../../services/prescriptionServices";
@@ -17,6 +38,7 @@ const PatientRecords = ({ patient }) => {
   const [selectedTest, setSelectedTest] = useState(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [tabValue, setTabValue] = useState(0);
 
   useEffect(() => {
     if (patient?._id) {
@@ -43,6 +65,10 @@ const PatientRecords = ({ patient }) => {
     }
   };
 
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
   const renderMedicines = (medicines) => (
     <div className={styles.medicineSection}>
       <Typography variant="subtitle2" className={styles.sectionTitle}>
@@ -62,27 +88,150 @@ const PatientRecords = ({ patient }) => {
     </div>
   );
 
-  const renderTests = (tests) => (
-    <div className={styles.testSection}>
-      <Typography variant="subtitle2" className={styles.sectionTitle}>
-        Tests Prescribed
-      </Typography>
-      {tests.map((test, index) => (
-        <Box key={index} className={styles.testItem}>
-          <Typography variant="body2">{test.testName}</Typography>
-          {test.isCompleted ? (
-            <Chip 
-              size="small" 
-              label="Completed" 
-              color="success"
-              onClick={() => handleViewResult(test.resultId)}
-            />
-          ) : (
-            <Chip size="small" label="Pending" color="default" />
-          )}
-        </Box>
+  const renderPrescriptionHistory = () => (
+    <div className={styles.prescriptionContainer}>
+      {prescriptions.map((record) => (
+        <Accordion key={record._id} className={styles.recordAccordion}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <div className={styles.summaryContent}>
+              <span>{dayjs(record.createdAt).format("DD MMM YYYY")}</span>
+              <span>
+                Dr. {record.doctorId?.firstName} {record.doctorId?.lastName}
+              </span>
+            </div>
+          </AccordionSummary>
+          <AccordionDetails>
+            <div className={styles.prescriptionDetails}>
+              {record.medicines?.length > 0 && (
+                <div className={styles.section}>
+                  <h3>Medicines</h3>
+                  <ul>
+                    {record.medicines.map((medicine, idx) => (
+                      <li key={idx}>
+                        <span>{medicine.medicine?.name}</span>
+                        <span>{medicine.frequency} for {medicine.days} days</span>
+                        <span>{medicine.beforeFood ? "Before food" : "After food"}</span>
+                        {medicine.isSOS && <Chip size="small" label="SOS" color="warning" />}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {record.tests?.length > 0 && (
+                <div className={styles.section}>
+                  <h3>Tests</h3>
+                  <ul>
+                    {record.tests.map((test, idx) => (
+                      <li key={idx} className={styles.testItem}>
+                        <span>{test.testName}</span>
+                        {test.resultId ? (
+                          <Button
+                            startIcon={<DownloadIcon />}
+                            onClick={() => handleDownload(test.resultId._id)}
+                            variant="contained"
+                            size="small"
+                          >
+                            Download Result
+                          </Button>
+                        ) : (
+                          <span className={styles.pendingResult}>Pending</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {record.notes && (
+                <div className={styles.section}>
+                  <h3>Notes</h3>
+                  <p>{record.notes}</p>
+                </div>
+              )}
+
+              <div className={styles.actionButtons}>
+                <PDFDownloadLink
+                  document={
+                    <PrescriptionTemplate
+                      prescription={record}
+                      doctor={record.doctorId}
+                      patient={{
+                        name: patient.name,
+                        age: patient.age,
+                        gender: patient.gender,
+                      }}
+                    />
+                  }
+                  fileName={`prescription_${dayjs(record.createdAt).format('DDMMYYYY')}.pdf`}
+                >
+                  {({ loading }) => (
+                    <Button
+                      startIcon={<DownloadIcon />}
+                      variant="contained"
+                      disabled={loading}
+                    >
+                      {loading ? 'Generating...' : 'Download Prescription'}
+                    </Button>
+                  )}
+                </PDFDownloadLink>
+              </div>
+            </div>
+          </AccordionDetails>
+        </Accordion>
       ))}
     </div>
+  );
+
+  const renderTestResults = () => (
+    <Paper className={styles.tableContainer}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Date</TableCell>
+            <TableCell>Test Name</TableCell>
+            <TableCell>Doctor</TableCell>
+            <TableCell>Laboratory Remarks</TableCell>
+            <TableCell>Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {prescriptions.map((prescription) => (
+            prescription.tests.map((test) => (
+              test.resultId && (
+                <TableRow key={test.resultId._id}>
+                  <TableCell>
+                    {dayjs(test.resultId.uploadDate).format("DD MMM YYYY")}
+                  </TableCell>
+                  <TableCell>{test.testName}</TableCell>
+                  <TableCell>
+                    Dr. {prescription.doctorId.firstName} {prescription.doctorId.lastName}
+                  </TableCell>
+                  <TableCell>{test.resultId.remarks}</TableCell>
+                  <TableCell className={styles.actionButtons}>
+                    <Button
+                      startIcon={<VisibilityIcon />}
+                      onClick={() => {
+                        setSelectedTest(test.resultId);
+                        setViewDialogOpen(true);
+                      }}
+                    >
+                      View
+                    </Button>
+                    <Button
+                      startIcon={<DownloadIcon />}
+                      onClick={() => handleDownload(test.resultId._id)}
+                    >
+                      Download
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              )
+            ))
+          ))}
+        </TableBody>
+      </Table>
+    </Paper>
   );
 
   if (loading) {
@@ -95,58 +244,14 @@ const PatientRecords = ({ patient }) => {
 
   return (
     <div className={styles.recordsContainer}>
-      <Typography variant="h5" className={styles.title}>
-        Test Results History
-      </Typography>
+      <Tabs value={tabValue} onChange={handleTabChange} className={styles.tabs}>
+        <Tab label="Prescriptions" />
+        <Tab label="Test Results" />
+      </Tabs>
 
-      <Paper className={styles.tableContainer}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Date</TableCell>
-              <TableCell>Test Name</TableCell>
-              <TableCell>Doctor</TableCell>
-              <TableCell>Laboratory Remarks</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {prescriptions.map((prescription) => (
-              prescription.tests.map((test) => (
-                test.resultId && (
-                  <TableRow key={test.resultId._id}>
-                    <TableCell>
-                      {new Date(test.resultId.uploadDate).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>{test.testName}</TableCell>
-                    <TableCell>
-                      {`Dr. ${prescription.doctorId.firstName} ${prescription.doctorId.lastName}`}
-                    </TableCell>
-                    <TableCell>{test.resultId.remarks}</TableCell>
-                    <TableCell className={styles.actionButtons}>
-                      <Button
-                        startIcon={<VisibilityIcon />}
-                        onClick={() => {
-                          setSelectedTest(test.resultId);
-                          setViewDialogOpen(true);
-                        }}
-                      >
-                        View
-                      </Button>
-                      <Button
-                        startIcon={<DownloadIcon />}
-                        onClick={() => handleDownload(test.resultId._id)}
-                      >
-                        Download
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                )
-              ))
-            ))}
-          </TableBody>
-        </Table>
-      </Paper>
+      <div className={styles.tabContent}>
+        {tabValue === 0 ? renderPrescriptionHistory() : renderTestResults()}
+      </div>
 
       {/* View Dialog */}
       <Dialog 

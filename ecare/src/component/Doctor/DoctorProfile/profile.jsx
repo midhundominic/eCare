@@ -95,7 +95,7 @@ const Profile = () => {
       }
   
       const formData = new FormData();
-      formData.append("profilePhoto", file);
+      formData.append("file", file);
       formData.append("email", profileData.email);
   
       try {
