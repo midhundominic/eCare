@@ -162,6 +162,14 @@ const PatientRecords = () => {
                     {record.tests.map((test, idx) => (
                       <li key={idx} className={styles.testItem}>
                         <span>{test.testName}</span>
+                        <span>{test.resultId?.lastUpdated ? new Date(test.resultId?.lastUpdated).toLocaleString('en-US',{
+                          weekday: 'short',
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        }): []}</span>
                         {test.resultId && test.resultId.resultFileUrl ? (
                           <div className={styles.testActions}>
                             <Button

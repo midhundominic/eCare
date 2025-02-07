@@ -116,7 +116,15 @@ const LaboratoryResult = () => {
                 <TableCell>{test.patientName}</TableCell>
                 <TableCell>{test.testName}</TableCell>
                 <TableCell>
-                  {new Date(test.uploadDate).toLocaleDateString()}
+                  {new Date(test.uploadDate).toLocaleDateString("en-US", {
+                    weekday: "short",
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                  })}
                 </TableCell>
                 <TableCell>{test.remarks}</TableCell>
                 <TableCell className={styles.actionButtons}>
