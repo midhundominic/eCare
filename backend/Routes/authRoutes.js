@@ -162,10 +162,15 @@ router.get('/prescriptions/appointment/:appointmentId', prescriptionControllers.
 
 //medicine
 
-router.post('/medicines/add',medicineController.addMedicine);
+router.get('/medicines/suggestions', medicineController.getMedicineSuggestions);
+router.post('/medicines/add', medicineController.addMedicine);
 router.get('/medicines/list', medicineController.getMedicinesList);
 router.patch('/medicines/stock/:medicineId', medicineController.updateMedicineStock);
 router.delete('/medicines/:medicineId', medicineController.deleteMedicine);
+router.get('/medicines/:medicineId', medicineController.getMedicineDetails);
+router.get('/medicines/:medicineId/stock', medicineController.getMedicineStock);
+router.put('/medicines/:medicineId', medicineController.updateMedicine);
+
 
 
 
