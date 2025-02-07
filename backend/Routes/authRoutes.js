@@ -197,4 +197,7 @@ router.post('/laboratory/tests',labTestControllers.createTest);
 router.put('/laboratory/tests/:id',labTestControllers.updateTest);
 router.delete('/laboratory/tests/:id',labTestControllers.deleteTest);
 
+//Prescription Recognitio
+router.post('prescriptions/process-image',)
+
 module.exports = router;
