@@ -72,10 +72,8 @@
 
 .cardActions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 16px;
-  border-top: 1px solid #eee;
+  justify-content: flex-end;
+  margin-top: 8px;
 }
 
 .stockControls {
@@ -109,4 +107,15 @@
 /* Hide spinner for number input in Firefox */
 .stockInput input[type="number"] {
   -moz-appearance: textfield;
+}
+
+.container {
+  padding: 20px;
+}
+
+.actionBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
