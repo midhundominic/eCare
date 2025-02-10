@@ -16,6 +16,13 @@ import { ROUTES } from "../../router/routes";
 import LoginButton from "../LoginButton";
 import { usePatient } from "../../context/patientContext";
 import { useDoctor } from "../../context/doctorContext";
+import { 
+  getBiometricAuthOptions, 
+  verifyBiometricAuth 
+} from '../../services/biometricServices';
+import { startAuthentication } from '@simplewebauthn/browser';
+import FaceLogin from "./FaceLogin";
+import Button from '../Common/Button'
 
 const auth = getAuth(firebaseApp);
 const googleProvider = new GoogleAuthProvider();
@@ -50,6 +57,92 @@ const Login = () => {
       errors.password = "Please enter your password";
     }
     return errors;
+  };
+  
+  // const handleFaceLogin = async (verificationResult) => {
+  //   try {
+  //     setIsLoading(true);
+      
+  //     if (verificationResult.verified) {
+  //       const userData = verificationResult.user;
+        
+  //       // Store user data and token
+  //       localStorage.setItem("token", verificationResult.token);
+  //       localStorage.setItem("userData", JSON.stringify({
+  //         email: userData.email,
+  //         name: userData.name,
+  //         role: userData.role,
+  //         userId: userData.userId,
+  //       }));
+  
+  //       // Update context and navigate
+  //       if (userData.role === 1) {
+  //         setPatient(userData);
+  //         navigate(ROUTES.PATIENT_HOME);
+  //       } else {
+  //         setDoctor(userData);
+  //         navigate(ROUTES.DOCTOR_HOME);
+  //       }
+  
+  //       toast.success("Login Successful");
+  //     }
+  //   } catch (error) {
+  //     console.error('Face login error:', error);
+  //     toast.error(error.message || 'Face login failed');
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  const handleBiometricLogin = async () => {
+    try {
+      setIsLoading(true);
+      
+      const authOptions = await getBiometricAuthOptions();
+      console.log('Auth options received:', authOptions);
+
+      if (!authOptions?.options) {
+        throw new Error('Failed to get authentication options');
+      }
+
+      const credential = await startAuthentication(authOptions.options);
+      console.log('Credential received:', credential);
+
+      const verificationResult = await verifyBiometricAuth(credential);
+      console.log('Verification result:', verificationResult);
+
+      if (verificationResult.verified) {
+        // Store token and user data consistently with regular login
+        localStorage.setItem("token", verificationResult.token);
+        
+        const userData = {
+          email: verificationResult.data.email,
+          name: verificationResult.data.name,
+          role: verificationResult.data.role,
+          userId: verificationResult.data.id
+        };
+        
+        localStorage.setItem("userData", JSON.stringify(userData));
+
+        // Update context based on role
+        if (verificationResult.data.role === 1) {
+          setPatient(verificationResult.data);
+          navigate(ROUTES.PATIENT_HOME);
+        } else if (verificationResult.data.role === 2) {
+          setDoctor(verificationResult.data);
+          navigate(ROUTES.DOCTOR_HOME);
+        }
+
+        toast.success("Biometric login successful");
+      } else {
+        toast.error('Biometric authentication failed');
+      }
+    } catch (error) {
+      console.error('Biometric authentication error:', error);
+      toast.error(error.message || 'Failed to authenticate with biometrics');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -251,7 +344,7 @@ const Login = () => {
             />
           </div>
           <div className={styles.signupLink}>
-            Don’t have an account?{" "}
+            Don't have an account?{" "}
             <a
               href="#"
               onClick={() => {
@@ -262,6 +355,19 @@ const Login = () => {
             </a>
           </div>
         </form>
+        {/* <FaceLogin
+         onSuccess={handleFaceLogin}
+         onError={(error) => toast.error(error)}
+        /> */}
+        <div className={styles.biometric}>
+        <button 
+          onClick={handleBiometricLogin}
+          className={styles.biometricButton}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Authenticating...' : 'Login with Fingerprint'}
+        </button>
+        </div>
       </div>
       <div className={styles.imageWrapper}>
         <img className={styles.frontImage} src={FrontImage} alt="Login" />

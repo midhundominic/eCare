@@ -30,6 +30,9 @@ apiClient.interceptors.response.use(
     if (response.status === 201) {
       return response;
     }
+    if (response.status === 200) {
+      return response;
+    }
     // Handle non-200 responses
     // toast.error("Unexpected response status: " + response.status);
     return Promise.reject(new Error("Unexpected response status"));

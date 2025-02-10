@@ -15,6 +15,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { Fade } from "@mui/material";
 import UpdateButtons from "./UpdateButtons/updateButtons";
 import AddressInfo from "./addressInfo";
+import BiometricSetup from './biometricSetup';
+import FaceSetup from './faceSetup';
 
 const Profile = () => {
   const [profileData, setProfileData] = useState(null); // Initialize with null
@@ -28,6 +30,10 @@ const Profile = () => {
     cloud: { cloudName: "ddrazuqb0" },
   });
 
+  const userDataString = localStorage.getItem('userData');
+  const userData = userDataString ? JSON.parse(userDataString) : null;
+  const userId = userData?.userId;
+  console.log("!111111",userId);
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -221,6 +227,8 @@ const Profile = () => {
         setIsEditing={setIsEditing}
         handleSave={handleSave}
       />
+      <BiometricSetup userId={userId} />
+      {/* <FaceSetup userId={userId} /> */}
     </div>
   );
 };
