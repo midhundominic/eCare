@@ -5,9 +5,14 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
+    "@simplewebauthn/server": "^7.4.0",
+    "@tensorflow-models/face-detection": "^1.0.2",
+    "@tensorflow/tfjs-backend-webgl": "^4.15.0",
+    "@tensorflow/tfjs-node": "^4.15.0",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
+    "canvas": "^3.1.0",
     "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
@@ -27,6 +32,7 @@
     "nodemon": "^3.1.7",
     "openai": "^4.80.0",
     "razorpay": "^2.9.5",
+    "sharp": "^0.32.6",
     "token": "^0.1.0",
     "web": "^0.0.2"
   }

@@ -2,6 +2,12 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET || "midhun12345";
 
 const authMiddleware = (req, res, next) => {
+  // Allow biometric authentication endpoint without token
+  if (req.originalUrl.includes('/api/biometric/authenticate-biometric') || 
+      req.originalUrl.includes('/api/biometric/verify-authentication')) {
+    return next();
+  }
+
   try {
     // Check for token in different places
     const token = 
@@ -32,13 +38,15 @@ const authMiddleware = (req, res, next) => {
     // Add user info to request
     req.user = decoded;
 
-    // Temporarily disable session check for file uploads
-    if (req.originalUrl.includes('/upload-result')) {
+    // Temporarily disable session check for specific routes
+    if (req.originalUrl.includes('/upload-result') || 
+        req.originalUrl.includes('/api/biometric/register') ||
+        req.originalUrl.includes('/api/biometric/verify-registration')) {
       return next();
     }
 
     // Session check for other routes
-    if(!req.session?.userId || req.session.userId !=decoded.userId){
+    if(!req.session?.userId || req.session.userId != decoded.userId){
       return res.status(401).json({
         success: false,
         message: 'Invalid session',

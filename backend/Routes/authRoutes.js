@@ -26,6 +26,7 @@ const { testResultUpload } = require('../middleware/upload');
 const chatControlers = require ("../controllers/chatControllers");
 const labTestControllers = require("../controllers/labTestControllers");
 const geminiControllers = require("../controllers/geminiControllers");
+const biometricController = require("../controllers/biometricController")
 
 //patient
 
@@ -204,5 +205,12 @@ router.delete('/laboratory/tests/:id',labTestControllers.deleteTest);
 
 //Prescription Recognitio
 router.post('prescriptions/process-image',)
+
+//Biometric
+// router.post('/biometric/register', authMiddleware,biometricController.generateRegistrationOptions);
+// router.post('/biometric/verify-registration', authMiddleware,biometricController.verifyRegistration);
+// router.post('/biometric/authenticate-biometric',biometricController.generateAuthenticationOptions);
+// router.post('/biometric/verify-authentication',biometricController.verifyAuthentication);
+
 
 module.exports = router;

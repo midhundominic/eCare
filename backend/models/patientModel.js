@@ -2,6 +2,26 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const dayjs = require("dayjs");
 
+const credentialSchema = new mongoose.Schema({
+  credentialID: {
+    type: String,
+    required: true
+  },
+  publicKey: {
+    type: Buffer,
+    required: true
+  },
+  counter: {
+    type: Number,
+    default: 0
+  },
+  credentialDeviceType: String,
+  credentialBackedUp: Boolean,
+  transports: [String],
+  fmt: String,
+  aaguid: String
+});
+
 const PatientSchema = new mongoose.Schema({
   // Basic info
   name: { type: String, required: true },
@@ -45,6 +65,7 @@ const PatientSchema = new mongoose.Schema({
   isProfileComplete: { type: Boolean, default: false },
   lastUpdated: { type: Date, default: Date.now },
   address: { type: String, required: false, default: "" },
+  biometricCredentials: [credentialSchema]
 });
 
 // Pre-save hook to hash password before saving
