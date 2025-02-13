@@ -7,6 +7,7 @@ require('dotenv').config();
 const sessionMiddleware = require('./middleware/session');
 const biometricRoutes = require('./Routes/biometricRoutes');
 const faceAuthRoutes = require('./Routes/faceAuthRoutes');
+const mlRoutes = require('./Routes/mlRoutes');
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(express.urlencoded( { extended :true ,limit:"50mb"} ));
 app.use("/api", authRoutes); // Use the routes
 app.use('/api/biometric', biometricRoutes);
 app.use('/api/face-auth',faceAuthRoutes);
+app.use('/api/ml',mlRoutes);
 
 app.use('/src/assets/doctorProfile', express.static('src/assets/doctorProfile'));
 app.use('/src/assets', express.static('src/assets'));
