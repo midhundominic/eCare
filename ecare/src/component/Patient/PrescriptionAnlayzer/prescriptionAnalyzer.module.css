@@ -1,0 +1,123 @@
+.body{
+    padding: 10px;
+   
+}
+
+.uploader{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    margin-bottom: 30px;
+}
+
+.inputFile{
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.bodyPreview{
+    margin-bottom: 20px;
+}
+
+.preview{
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgb(0, 0, 0, 0.1);
+}
+
+.button{
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color:#357abd;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: width 0.4s ease, border-radius 0.4s ease;
+    width: 200px;
+}
+
+.button:hover {
+    background-color: #2b6ba7;
+    
+}
+
+.button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Error message */
+.error {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #ffdddd;
+    color: #ff4d4d;
+    border-radius: 5px;
+    border: 1px solid #ff4d4d;
+    text-align: center;
+    font-size: 1rem;
+}
+
+/* Analysis result section */
+.bodyResult {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.h3 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+/* Each result section */
+.reesult, .diagnoses, .dosage {
+    margin-bottom: 20px;
+}
+
+.h4 {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* Lists inside the result sections */
+.medications, .dosage, .diagnosesResult {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.medications li, .dosage li, .diagnosesResult li {
+    font-size: 1rem;
+    color: #555;
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.medications li:last-child, .dosage li:last-child, .diagnosesResult li:last-child {
+    border-bottom: none;
+}
+
+/* Extracted text area */
+.extracted_text {
+    font-family: 'Courier New', Courier, monospace;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 1rem;
+    color: #333;
+    background-color: #f4f4f4;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+}

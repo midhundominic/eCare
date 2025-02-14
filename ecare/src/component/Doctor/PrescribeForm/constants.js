@@ -36,3 +36,4 @@ export const INITIAL_MEDICINE_ARR = [
 //   { id: 27, label: "PCR" },
 //   { id: 28, label: "Antibody Test" },
 // ];
+ 

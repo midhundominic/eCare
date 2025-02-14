@@ -73,7 +73,15 @@ export const NAV_CONTENT_PATIENT = [
   title: "Chatbot Gemini",
   link: ROUTES.GEMINI_CHATBOT,
   icon: MedicationIcon,
+ },
+ {
+  id: 11,
+  title: "Prescripion Analyzer",
+  link: ROUTES.PRESCRIPTION_ANALYZER,
+  icon: LibraryBooksIcon,
+
  }
+
 ];
 
 export const NAV_CONTENT_ADMIN = [
