@@ -361,6 +361,7 @@ const Login = () => {
         /> */}
         <div className={styles.biometric}>
         <button 
+          id="fingerprintButton"
           onClick={handleBiometricLogin}
           className={styles.biometricButton}
           disabled={isLoading}

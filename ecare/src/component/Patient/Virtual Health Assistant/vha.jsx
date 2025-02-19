@@ -13,7 +13,8 @@ import {
   Card,
   CardContent,
   Alert,
-  Chip
+  Chip,
+  Avatar
 } from '@mui/material';
 import {
   Timeline,
@@ -28,6 +29,9 @@ import MonitorHeartIcon from '@mui/icons-material/MonitorHeart';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
+import { analyzeHealthData, getChatResponse } from '../../../services/healthAssistant';
+import SendIcon from '@mui/icons-material/Send';
+import { styled } from '@mui/material/styles';
 import styles from './vha.module.css';
 
 const VirtualHealthAssistant = () => {
@@ -48,6 +52,9 @@ const VirtualHealthAssistant = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [error, setError] = useState('');
   const [healthHistory, setHealthHistory] = useState([]);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [currentMessage, setCurrentMessage] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
 
   const steps = ['Enter Health Data', 'AI Analysis', 'Recommendations'];
 
@@ -55,31 +62,73 @@ const VirtualHealthAssistant = () => {
     setHealthData({ ...healthData, [field]: event.target.value });
   };
 
+  const updateHealthHistory = () => {
+    const newEntry = {
+      date: new Date().toISOString(),
+      metrics: healthData,
+      analysis: analysis
+    };
+
+    // Add the new entry to the history
+    setHealthHistory(prevHistory => [...prevHistory, newEntry]);
+
+    // You could also save this to localStorage or your backend
+    try {
+      localStorage.setItem('healthHistory', JSON.stringify([...healthHistory, newEntry]));
+    } catch (error) {
+      console.error('Error saving health history:', error);
+    }
+  };
+
+  // Load health history from localStorage on component mount
+  useEffect(() => {
+    try {
+      const savedHistory = localStorage.getItem('healthHistory');
+      if (savedHistory) {
+        setHealthHistory(JSON.parse(savedHistory));
+      }
+    } catch (error) {
+      console.error('Error loading health history:', error);
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      const response = await fetch('/api/health/analyze', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(healthData)
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message);
-
-      setAnalysis(data);
+      // Pass the healthData to the analyzeHealthData function
+      const response = await analyzeHealthData(healthData);
+      console.log("Response VHA", response);
+      
+      setAnalysis(response.result); // Make sure to access the result property
       setActiveStep(2);
-      updateHealthHistory();
+      updateHealthHistory(); // Call updateHealthHistory after successful analysis
     } catch (err) {
       setError(err.message || 'Error analyzing health data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleChat = async () => {
+    if (!currentMessage.trim()) return;
+
+    try {
+      setChatLoading(true);
+      const newMessage = { type: 'user', content: currentMessage };
+      setChatMessages(prev => [...prev, newMessage]);
+
+      const context = analysis ? JSON.stringify(analysis) : '';
+      const response = await getChatResponse(currentMessage, context);
+
+      setChatMessages(prev => [...prev, { type: 'ai', content: response.response }]);
+      setCurrentMessage('');
+    } catch (error) {
+      setError('Failed to get AI response');
+    } finally {
+      setChatLoading(false);
     }
   };
 
@@ -90,6 +139,7 @@ const VirtualHealthAssistant = () => {
           <TextField
             fullWidth
             label="Blood Sugar (mg/dL)"
+            id="bloodSugar"
             type="number"
             value={healthData.bloodSugar}
             onChange={handleInputChange('bloodSugar')}
@@ -100,6 +150,7 @@ const VirtualHealthAssistant = () => {
           <TextField
             fullWidth
             label="Systolic BP (mmHg)"
+            id="bp"
             type="number"
             value={healthData.systolicBP}
             onChange={handleInputChange('systolicBP')}
@@ -110,6 +161,7 @@ const VirtualHealthAssistant = () => {
           <TextField
             fullWidth
             label="Diastolic BP (mmHg)"
+            id="dbp"
             type="number"
             value={healthData.diastolicBP}
             onChange={handleInputChange('diastolicBP')}
@@ -120,6 +172,7 @@ const VirtualHealthAssistant = () => {
           <TextField
             fullWidth
             label="Temperature (°F)"
+            id="temp"
             type="number"
             value={healthData.temperature}
             onChange={handleInputChange('temperature')}
@@ -130,6 +183,7 @@ const VirtualHealthAssistant = () => {
           <TextField
             fullWidth
             label="Oxygen Level (%)"
+            id="oxygen"
             type="number"
             value={healthData.oxygenLevel}
             onChange={handleInputChange('oxygenLevel')}
@@ -140,6 +194,7 @@ const VirtualHealthAssistant = () => {
           <TextField
             fullWidth
             label="Cholesterol (mg/dL)"
+            id="cholestrol"
             type="number"
             value={healthData.cholesterol}
             onChange={handleInputChange('cholesterol')}
@@ -149,6 +204,7 @@ const VirtualHealthAssistant = () => {
       </Grid>
       <Button
         type="submit"
+        id="submit"
         variant="contained"
         color="primary"
         className={styles.submitButton}
@@ -175,23 +231,27 @@ const VirtualHealthAssistant = () => {
                 <Card className={styles.timelineCard}>
                   <CardContent>
                     <Typography variant="h6">Health Status</Typography>
-                    <Typography>{analysis.healthStatus}</Typography>
+                    <Typography>{analysis.aiAnalysis}</Typography> {/* Show AI analysis */}
                     <Box mt={1}>
-                      {analysis.riskFactors.map((risk, index) => (
-                        <Chip
-                          key={index}
-                          label={risk}
-                          color="warning"
-                          variant="outlined"
-                          className={styles.chip}
-                        />
-                      ))}
+                      {analysis.risks && analysis.risks.length > 0 ? (
+                        analysis.risks.map((risk, index) => (
+                          <Chip
+                            key={index}
+                            label={risk}
+                            color="warning"
+                            variant="outlined"
+                            className={styles.chip}
+                          />
+                        ))
+                      ) : (
+                        <Typography>No specific health risks identified.</Typography>
+                      )}
                     </Box>
                   </CardContent>
                 </Card>
               </TimelineContent>
             </TimelineItem>
-
+  
             <TimelineItem>
               <TimelineSeparator>
                 <TimelineDot color="secondary">
@@ -203,16 +263,20 @@ const VirtualHealthAssistant = () => {
                 <Card className={styles.timelineCard}>
                   <CardContent>
                     <Typography variant="h6">Diet Recommendations</Typography>
-                    <ul className={styles.recommendationList}>
-                      {analysis.dietPlan.map((item, index) => (
-                        <li key={index}>{item}</li>
-                      ))}
-                    </ul>
+                    {analysis.recommendations?.length > 0 ? (
+                      <ul className={styles.recommendationList}>
+                        {analysis.recommendations.map((item, index) => (
+                          <li key={index}>{item}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <Typography>No specific diet recommendations available.</Typography>
+                    )}
                   </CardContent>
                 </Card>
               </TimelineContent>
             </TimelineItem>
-
+  
             <TimelineItem>
               <TimelineSeparator>
                 <TimelineDot color="success">
@@ -224,17 +288,21 @@ const VirtualHealthAssistant = () => {
                 <Card className={styles.timelineCard}>
                   <CardContent>
                     <Typography variant="h6">Exercise Plan</Typography>
-                    <ul className={styles.recommendationList}>
-                      {analysis.exercisePlan.map((item, index) => (
-                        <li key={index}>{item}</li>
-                      ))}
-                    </ul>
+                    {analysis.exercisePlan?.length > 0 ? (
+                      <ul className={styles.recommendationList}>
+                        {analysis.exercisePlan.map((item, index) => (
+                          <li key={index}>{item}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <Typography>No specific exercise plan available.</Typography>
+                    )}
                   </CardContent>
                 </Card>
               </TimelineContent>
             </TimelineItem>
           </Timeline>
-
+  
           {analysis.urgentCare && (
             <Alert severity="warning" className={styles.alert}>
               {analysis.urgentCare}
@@ -242,6 +310,66 @@ const VirtualHealthAssistant = () => {
           )}
         </>
       )}
+    </Box>
+  );
+  
+
+  const renderChat = () => (
+    <Box className={styles.chatContainer}>
+      <div className={styles.messages}>
+        {chatMessages.map((msg, index) => (
+          <div key={index} className={`${styles.message} ${msg.type === 'user' ? styles.userMessage : styles.aiMessage}`}>
+            {msg.type === 'ai' && (
+              <Avatar className={styles.doctorAvatar}>
+                <LocalHospitalIcon />
+              </Avatar>
+            )}
+            <Typography>{msg.content}</Typography>
+          </div>
+        ))}
+      </div>
+      <div className={styles.chatInput}>
+        <TextField
+          fullWidth
+          value={currentMessage}
+          onChange={(e) => setCurrentMessage(e.target.value)}
+          placeholder="Ask any health-related questions..."
+          onKeyPress={(e) => e.key === 'Enter' && handleChat()}
+        />
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleChat}
+          disabled={chatLoading}
+          endIcon={<SendIcon />}
+        >
+          Send
+        </Button>
+      </div>
+    </Box>
+  );
+
+  const renderHealthHistory = () => (
+    <Box className={styles.historyContainer}>
+      <Typography variant="h6" gutterBottom>
+        Health History
+      </Typography>
+      {healthHistory.map((entry, index) => (
+        <Card key={index} className={styles.historyCard}>
+          <CardContent>
+            <Typography variant="subtitle2" color="textSecondary">
+              {new Date(entry.date).toLocaleDateString()}
+            </Typography>
+            <Typography variant="body2">
+              Blood Sugar: {entry.metrics.bloodSugar} mg/dL
+            </Typography>
+            <Typography variant="body2">
+              BP: {entry.metrics.systolicBP}/{entry.metrics.diastolicBP} mmHg
+            </Typography>
+            {/* Add more metrics as needed */}
+          </CardContent>
+        </Card>
+      ))}
     </Box>
   );
 
@@ -269,6 +397,8 @@ const VirtualHealthAssistant = () => {
         <Box className={styles.content}>
           {activeStep === 0 && renderHealthDataForm()}
           {activeStep === 2 && renderAnalysis()}
+          {analysis && renderChat()}
+          {healthHistory.length > 0 && renderHealthHistory()}
         </Box>
       </Paper>
     </Box>

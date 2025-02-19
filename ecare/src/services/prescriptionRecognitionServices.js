@@ -1,27 +1,19 @@
 import apiClient from "../api";
 
-export const analyzePrescriptionImage = async (imageFile) => {
-  try {
-    const formData = new FormData();
-    formData.append('prescriptionImage', imageFile);
+export const analyzePrescription = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
 
-    const response = await apiClient.post('/prescriptions/process-image', formData, {
+  try {
+    const response = await apiClient.post('/prescriptions/analyze', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
     return response.data;
   } catch (error) {
-    throw error;
-  }
-};
-
-export const analyzePrescriptionText = async (text) => {
-  try {
-    const response = await apiClient.post('/prescriptions/analyze', { text });
-    return response.data;
-  } catch (error) {
-    throw error;
+    console.error('Upload error:', error);
+    throw new Error(error.response?.data?.message || 'Failed to analyze prescription');
   }
 };
 

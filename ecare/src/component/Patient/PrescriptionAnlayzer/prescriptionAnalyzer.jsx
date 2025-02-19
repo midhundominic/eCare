@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { analyzePrescription } from '../../../services/mlServices';
+// import { analyzePrescription } from '../../../services/mlServices';
+import {analyzePrescription} from '../../../services/prescriptionRecognitionServices';
 import PageTitle from '../../Common/PageTitle';
 import styles from './prescriptionAnalyzer.module.css';
 
@@ -13,18 +14,31 @@ const PrescriptionAnalyzer = () => {
     const handleFileSelect = (event) => {
         const file = event.target.files[0];
         if (file) {
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                setError('File size too large. Please upload an image less than 5MB.');
+                return;
+            }
             setSelectedFile(file);
             setPreview(URL.createObjectURL(file));
+            setError(null);
+            setAnalysis(null);
         }
     };
 
     const handleAnalyze = async () => {
         try {
+            if (!selectedFile) {
+                setError('Please select a file first');
+                return;
+            }
+
             setLoading(true);
             setError(null);
+            console.log('Uploading file:', selectedFile); // Add this for debugging
             const result = await analyzePrescription(selectedFile);
             setAnalysis(result.result);
         } catch (err) {
+            console.error('Analysis error:', err); // Add this for debugging
             setError(err.message || 'Error analyzing prescription');
         } finally {
             setLoading(false);
@@ -72,7 +86,7 @@ const PrescriptionAnalyzer = () => {
                 <div className={styles.bodyResult}>
                     <h3 className={styles.h3}>Analysis Results:</h3>
                     
-                    <div className={styles.reesult}>
+                    <div className={styles.result}>
                         <h4 className={styles.h4}>Medications:</h4>
                         <ul className={styles.medications}>
                             {analysis.analysis.medications.map((med, index) => (
@@ -86,6 +100,15 @@ const PrescriptionAnalyzer = () => {
                         <ul className={styles.dosage}>
                             {analysis.analysis.dosages.map((dosage, index) => (
                                 <li key={index}>{dosage}</li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    <div className="mb-4">
+                        <h4 className={styles.h4}>Frequencies:</h4>
+                        <ul className={styles.frequencies}>
+                            {analysis.analysis.frequencies.map((freq, index) => (
+                                <li key={index}>{freq}</li>
                             ))}
                         </ul>
                     </div>
