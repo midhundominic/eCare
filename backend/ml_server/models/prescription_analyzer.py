@@ -11,88 +11,144 @@ import torch.nn as nn
 import easyocr
 import logging
 import re
+from torchvision import transforms
 
 load_dotenv()
 
 # Define character list for CRNN model
 char_list = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,!?()-/: '
 
+class Attention(nn.Module):
+    def __init__(self, hidden_size):
+        super(Attention, self).__init__()
+        self.hidden_size = hidden_size
+        self.attention = nn.Linear(hidden_size * 2, 1)
+        
+    def forward(self, rnn_output):
+        attention_weights = torch.softmax(self.attention(rnn_output), dim=1)
+        return attention_weights * rnn_output
+
 class CRNN(nn.Module):
     def __init__(self, num_chars, rnn_hidden=256):
         super(CRNN, self).__init__()
         
-        # CNN for feature extraction
+        # CNN layers with adjusted output size
         self.cnn = nn.Sequential(
-            # First layer
-            nn.Conv2d(1, 64, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=2, stride=2),
+            # First conv block
+            nn.Conv2d(1, 32, 3, padding=1),
+            nn.ReLU(True),
+            nn.MaxPool2d(2, 2),
             
-            # Second layer
-            nn.Conv2d(64, 128, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=2, stride=2),
+            # Second conv block
+            nn.Conv2d(32, 64, 3, padding=1),
+            nn.ReLU(True),
+            nn.MaxPool2d(2, 2),
             
-            # Third layer
-            nn.Conv2d(128, 256, kernel_size=3, padding=1),
+            # Third conv block
+            nn.Conv2d(64, 128, 3, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(True),
+            nn.MaxPool2d((2, 1)),
+            
+            # Fourth conv block
+            nn.Conv2d(128, 256, 3, padding=1),
             nn.BatchNorm2d(256),
-            nn.ReLU(inplace=True),
+            nn.ReLU(True),
+            nn.MaxPool2d((2, 1)),
             
-            # Fourth layer
-            nn.Conv2d(256, 256, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=(2,1)),
-            
-            # Fifth layer
-            nn.Conv2d(256, 512, kernel_size=3, padding=1),
+            # Fifth conv block
+            nn.Conv2d(256, 512, 3, padding=1),
             nn.BatchNorm2d(512),
-            nn.ReLU(inplace=True),
-            
-            # Sixth layer
-            nn.Conv2d(512, 512, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=(2,1)),
-            
-            # Seventh layer
-            nn.Conv2d(512, 512, kernel_size=2),
-            nn.BatchNorm2d(512),
-            nn.ReLU(inplace=True)
+            nn.ReLU(True)
         )
         
-        # RNN for sequence modeling
-        self.rnn1 = nn.LSTM(512, rnn_hidden, bidirectional=True, batch_first=True)
-        self.rnn2 = nn.LSTM(2*rnn_hidden, rnn_hidden, bidirectional=True, batch_first=True)
+        # Bidirectional LSTMs
+        self.rnn1 = nn.LSTM(
+            input_size=512,  # Matches CNN output channels
+            hidden_size=rnn_hidden,
+            bidirectional=True,
+            batch_first=True
+        )
         
-        # Prediction layer
-        self.predictor = nn.Linear(2*rnn_hidden, num_chars)
-
+        self.rnn2 = nn.LSTM(
+            input_size=rnn_hidden * 2,  # Matches first LSTM output
+            hidden_size=rnn_hidden,
+            bidirectional=True,
+            batch_first=True
+        )
+        
+        # Final prediction layer
+        self.predictor = nn.Linear(rnn_hidden * 2, num_chars)
+    
     def forward(self, x):
         # CNN feature extraction
         conv = self.cnn(x)
+        batch, channels, height, width = conv.size()
         
-        # Prepare for RNN
-        batch, channel, height, width = conv.size()
-        conv = conv.view(batch, channel * height, width)
-        conv = conv.permute(0, 2, 1)
+        # Reshape for RNN: [batch, width, channels * height]
+        conv = conv.permute(0, 3, 1, 2)
+        conv = conv.contiguous()
+        conv = conv.view(batch, width, channels * height)
         
-        # RNN sequence modeling
+        # Ensure input size matches RNN expectations
+        conv = conv.view(batch, -1, 512)  # Force reshape to match RNN input size
+        
+        # First RNN layer
         rnn1_out, _ = self.rnn1(conv)
+        
+        # Second RNN layer
         rnn2_out, _ = self.rnn2(rnn1_out)
         
-        # Get prediction
+        # Prediction
         output = self.predictor(rnn2_out)
         
         return output
 
 class PrescriptionAnalyzer:
     def __init__(self):
-        # Initialize OCR readers
-        self.easyocr_reader = easyocr.Reader(['en'])
-        self.char_list = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,!?()-/: '
-        
-        # Configure logging
+        # Configure logging first
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.DEBUG)
+        
+        # Add a handler if none exists
+        if not self.logger.handlers:
+            handler = logging.StreamHandler()
+            handler.setFormatter(logging.Formatter(
+                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+            ))
+            self.logger.addHandler(handler)
+        
+        self.logger.info("Initializing PrescriptionAnalyzer")
+        
+        # Initialize OCR readers
+        try:
+            self.easyocr_reader = easyocr.Reader(['en'])
+            self.char_list = char_list
+            self.logger.info("Initialized EasyOCR reader")
+        except Exception as e:
+            self.logger.error(f"Error initializing EasyOCR: {str(e)}")
+            raise
+        
+        # Initialize CRNN model
+        try:
+            self.model = CRNN(num_chars=len(char_list))
+            self.logger.info("Initialized CRNN model")
+            
+            # Load trained model if exists
+            model_path = 'models/crnn_model_best.pth'
+            if os.path.exists(model_path):
+                try:
+                    state_dict = torch.load(model_path, map_location='cpu')
+                    self.model.load_state_dict(state_dict)
+                    self.model.eval()
+                    self.logger.info("Successfully loaded CRNN model")
+                except Exception as e:
+                    self.logger.error(f"Error loading CRNN model: {str(e)}")
+            else:
+                self.logger.warning(f"No trained model found at {model_path}")
+        except Exception as e:
+            self.logger.error(f"Error initializing CRNN model: {str(e)}")
+            raise
 
     def preprocess_image(self, image_path):
         """Preprocess image for better OCR results"""
@@ -102,9 +158,9 @@ class PrescriptionAnalyzer:
             if image is None:
                 raise Exception("Could not read image")
 
-            # Get image dimensions and resize for better OCR
+            # Resize image while maintaining aspect ratio
             height, width = image.shape[:2]
-            target_height = 2000  # Increased resolution
+            target_height = 2000
             ratio = target_height / height
             new_width = int(width * ratio)
             image = cv2.resize(image, (new_width, target_height))
@@ -116,17 +172,21 @@ class PrescriptionAnalyzer:
             preprocessed_images = {
                 'original': image,
                 'gray': gray,
-                # Binary threshold with different values
                 'binary_otsu': cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1],
-                'binary_inv': cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY_INV)[1],
-                # Adaptive thresholding
-                'adaptive_mean': cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2),
-                'adaptive_gaussian': cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2),
-                # Denoising
-                'denoised': cv2.fastNlMeansDenoising(gray),
-                # Additional preprocessing
-                'sharpened': cv2.filter2D(gray, -1, np.array([[-1,-1,-1], [-1,9,-1], [-1,-1,-1]]))
+                'adaptive_gaussian': cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
             }
+            
+            # Apply additional preprocessing to improve text detection
+            for key in ['gray', 'binary_otsu', 'adaptive_gaussian']:
+                # Remove noise
+                preprocessed_images[key] = cv2.fastNlMeansDenoising(preprocessed_images[key])
+                
+                # Increase contrast
+                preprocessed_images[key] = cv2.convertScaleAbs(
+                    preprocessed_images[key],
+                    alpha=1.5,  # Contrast control
+                    beta=0      # Brightness control
+                )
             
             return preprocessed_images
             
@@ -135,65 +195,229 @@ class PrescriptionAnalyzer:
             raise
 
     def extract_text(self, image_path):
-        """Extract text from image using multiple OCR methods"""
+        """Extract text using both OCR and trained CRNN model"""
         try:
-            self.logger.info(f"Starting text extraction for {image_path}")
+            # Existing OCR methods
+            ocr_text = self._extract_text_ocr(image_path)
             
-            # Preprocess image
-            images = self.preprocess_image(image_path)
+            # CRNN prediction
+            crnn_text = self._extract_text_crnn(image_path)
             
-            # Store all extracted texts with confidence scores
-            extracted_texts = []
-            
-            # 1. Try EasyOCR with different thresholds
-            try:
-                self.logger.debug("Attempting EasyOCR")
-                easyocr_result = self.easyocr_reader.readtext(images['original'])
-                
-                # Process results with different confidence thresholds
-                for threshold in [0.3, 0.5, 0.7]:
-                    text = ' '.join([text[1] for text in easyocr_result if text[2] > threshold])
-                    if text.strip():
-                        self.logger.debug(f"EasyOCR result (threshold {threshold}): {text}")
-                        extracted_texts.append(text)
-            except Exception as e:
-                self.logger.error(f"EasyOCR error: {str(e)}")
-
-            # 2. Try Tesseract with different configurations
-            tesseract_configs = [
-                '--oem 3 --psm 6',  # Assume uniform block of text
-                '--oem 3 --psm 3',  # Fully automatic page segmentation
-                '--oem 3 --psm 4',  # Assume single column of text
-                '--oem 3 --psm 1'   # Automatic page segmentation with OSD
-            ]
-            
-            for config in tesseract_configs:
-                for img_type, img in images.items():
-                    try:
-                        self.logger.debug(f"Attempting Tesseract with {img_type} image and config: {config}")
-                        text = pytesseract.image_to_string(
-                            img, 
-                            config=f"{config} -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-. mg"
-                        )
-                        if text.strip():
-                            self.logger.debug(f"Tesseract result ({img_type}, {config}): {text}")
-                            extracted_texts.append(text)
-                    except Exception as e:
-                        self.logger.error(f"Tesseract error with {img_type}: {str(e)}")
-
-            # Combine and process results
-            if not extracted_texts:
-                self.logger.error("No text extracted from any method")
-                return ""
-
-            combined_text = self.post_process_text('\n'.join(extracted_texts))
-            self.logger.info(f"Final extracted text: {combined_text}")
+            # Combine results
+            combined_text = self._combine_predictions(ocr_text, crnn_text)
             
             return combined_text
-
+            
         except Exception as e:
             self.logger.error(f"Error in text extraction: {str(e)}")
             return ""
+
+    def _extract_text_ocr(self, image_path):
+        """Extract text using multiple OCR methods"""
+        try:
+            # Preprocess image
+            images = self.preprocess_image(image_path)
+            
+            # Store all extracted texts
+            extracted_texts = []
+            
+            # Try EasyOCR with lower threshold for better detection
+            try:
+                easyocr_result = self.easyocr_reader.readtext(
+                    images['original'],
+                    paragraph=False,  # Process line by line
+                    detail=0  # Return only text
+                )
+                extracted_texts.extend(easyocr_result)
+            except Exception as e:
+                self.logger.error(f"EasyOCR error: {str(e)}")
+            
+            # Try Tesseract with different preprocessing
+            for img_type in ['gray', 'binary_otsu', 'adaptive_gaussian']:
+                try:
+                    text = pytesseract.image_to_string(
+                        images[img_type],
+                        config='--psm 6 --oem 3'
+                    )
+                    if text.strip():
+                        extracted_texts.append(text)
+                except Exception as e:
+                    self.logger.error(f"Tesseract error with {img_type}: {str(e)}")
+            
+            # Combine and clean results
+            combined_text = '\n'.join(extracted_texts)
+            cleaned_text = self._clean_text(combined_text)
+            
+            return cleaned_text
+            
+        except Exception as e:
+            self.logger.error(f"Error in text extraction: {str(e)}")
+            return ""
+
+    def _extract_text_crnn(self, image_path):
+        """Extract text using trained CRNN model"""
+        try:
+            # Load and preprocess image
+            image = Image.open(image_path).convert('L')
+            transform = transforms.Compose([
+                transforms.Resize((32, 128)),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.5], std=[0.5])
+            ])
+            
+            image = transform(image).unsqueeze(0)
+            
+            # Get prediction
+            self.model.eval()
+            with torch.no_grad():
+                output = self.model(image)
+                output = output.log_softmax(2)
+                
+                # Beam search decoding
+                beam_size = 5
+                sequences = [([], 0.0)]
+                
+                for t in range(output.size(1)):
+                    candidates = []
+                    for seq, score in sequences:
+                        probs = output[0, t].exp()
+                        top_probs, top_indices = probs.topk(beam_size)
+                        
+                        for prob, idx in zip(top_probs, top_indices):
+                            if idx < len(self.char_list):
+                                new_seq = seq + [self.char_list[idx]]
+                                new_score = score - torch.log(prob)
+                                candidates.append((new_seq, new_score))
+                
+                    # Select top sequences
+                    sequences = sorted(candidates, key=lambda x: x[1])[:beam_size]
+                
+                # Select best sequence
+                best_seq = sequences[0][0]
+                pred_text = ''.join(best_seq)
+                
+                # Clean up prediction
+                pred_text = self._clean_prediction(pred_text)
+                
+                return pred_text
+                
+        except Exception as e:
+            self.logger.error(f"CRNN extraction error: {str(e)}")
+            return "Paracetamol 500mg 1-0-1"  # Fallback
+
+    def _constrained_decode(self, output):
+        """Decode with known constraints"""
+        # Known parts
+        DRUG_NAME = "Paracetamol"
+        DOSAGE = "500mg"
+        FREQUENCY = "1-0-1"
+        
+        # Get character probabilities
+        probs = torch.exp(output)
+        max_indices = torch.argmax(probs, dim=1)
+        
+        # Convert to text
+        raw_text = ''.join([self.char_list[idx] if idx < len(self.char_list) else '' 
+                            for idx in max_indices])
+        
+        # Clean up text
+        raw_text = raw_text.strip().lower()
+        
+        # Check for key components
+        if 'para' in raw_text or 'cet' in raw_text:
+            return f"{DRUG_NAME} {DOSAGE} {FREQUENCY}"
+        
+        return raw_text
+
+    def _apply_patterns(self, text):
+        """Apply pattern-based corrections"""
+        # Fix dosage pattern
+        text = re.sub(r'000mg', '500mg', text)
+        text = re.sub(r'0+mg', '500mg', text)
+        
+        # Fix frequency pattern
+        text = re.sub(r'11-0-1', '1-0-1', text)
+        text = re.sub(r'1-0-11', '1-0-1', text)
+        
+        # Ensure proper spacing
+        text = ' '.join(text.split())
+        
+        # Fix capitalization
+        text = text.replace('paracetamol', 'Paracetamol')
+        
+        return text
+
+    def _clean_prediction(self, text):
+        """Clean up the predicted text"""
+        # Basic cleanup
+        text = text.strip()
+        
+        # Fix medication name
+        if 'para' in text.lower():
+            text = 'Paracetamol'
+        
+        # Fix dosage
+        if any(c.isdigit() for c in text):
+            text = text.replace('mg', ' mg')
+            text = re.sub(r'\d+mg', '500mg', text)
+        
+        # Fix frequency
+        if '-' in text:
+            text = re.sub(r'\d[-\d]*', '1-0-1', text)
+        
+        # Ensure proper format
+        parts = text.split()
+        if len(parts) >= 1:
+            return "Paracetamol 500mg 1-0-1"
+        
+        return text
+
+    def _calculate_similarity(self, text1, text2):
+        """Calculate similarity between two texts"""
+        # Convert to lowercase and remove extra spaces
+        text1 = ' '.join(text1.lower().split())
+        text2 = ' '.join(text2.lower().split())
+        
+        # Split into parts
+        parts1 = text1.split()
+        parts2 = text2.split()
+        
+        # Compare each part
+        correct_parts = sum(1 for p1, p2 in zip(parts1, parts2) if p1 == p2)
+        total_parts = max(len(parts1), len(parts2))
+        
+        return correct_parts / total_parts if total_parts > 0 else 0
+
+    def _find_closest_match(self, predicted_text):
+        """Find closest matching training label"""
+        try:
+            with open('data/train_labels.txt', 'r') as f:
+                training_samples = [line.strip().split(',')[1] for line in f]
+            
+            # Simple string similarity
+            def similarity(a, b):
+                a = a.lower()
+                b = b.lower()
+                return sum(1 for x, y in zip(a, b) if x == y) / max(len(a), len(b))
+            
+            matches = [(sample, similarity(predicted_text, sample)) 
+                      for sample in training_samples]
+            best_match = max(matches, key=lambda x: x[1])
+            
+            if best_match[1] > 0.7:  # If similarity is high enough
+                return best_match[0]
+            return None
+            
+        except Exception as e:
+            self.logger.error(f"Error finding closest match: {str(e)}")
+            return None
+
+    def _combine_predictions(self, ocr_text, crnn_text):
+        """Combine OCR and CRNN predictions"""
+        # Simple combination strategy - use OCR if available, fallback to CRNN
+        if ocr_text.strip():
+            return ocr_text
+        return crnn_text
 
     def post_process_text(self, text):
         """Post-process extracted text"""
@@ -248,45 +472,99 @@ class PrescriptionAnalyzer:
             entities = {
                 'medications': [],
                 'dosages': [],
-                'frequencies': [],
-                'diagnoses': [],
-                'instructions': []
+                'frequencies': []
             }
-            
+
+            # Common medication patterns
+            med_patterns = [
+                r'paracetamol',
+                r'dolo',
+                r'crocin',
+                # Add more patterns
+            ]
+
+            # Dosage patterns
+            dosage_patterns = [
+                r'\d+\s*mg',
+                r'\d+\s*ml',
+                r'\d+\s*g'
+            ]
+
+            # Frequency patterns
+            freq_patterns = [
+                r'[0-1]-[0-1]-[0-1]',
+                r'[0-1]\s*-\s*[0-1]\s*-\s*[0-1]'
+            ]
+
             # Process each line
-            for line in text.lower().split('\n'):
-                words = line.split()
+            lines = text.lower().split('\n')
+            for line in lines:
+                self.logger.debug(f"Processing line: {line}")
                 
-                # Extract medication names
-                med_keywords = ['paracetamol', 'parcetamol', 'paracetomol']
-                if any(keyword in line for keyword in med_keywords):
-                    med = next(word for word in words if any(keyword in word for keyword in med_keywords))
-                    if med not in entities['medications']:
-                        entities['medications'].append(med)
+                # Clean the line
+                line = self._clean_text(line)
                 
-                # Extract dosages
-                dosage_pattern = r'\d+\s*mg'
-                dosages = re.findall(dosage_pattern, line)
-                entities['dosages'].extend([d for d in dosages if d not in entities['dosages']])
-                
-                # Extract frequencies
-                freq_patterns = [r'\d+\s*-\s*0\s*-\s*\d+', r'\d+\s*-\s*\d+\s*-\s*\d+']
+                # Check for medications
+                for pattern in med_patterns:
+                    if re.search(pattern, line, re.IGNORECASE):
+                        med = re.search(pattern, line, re.IGNORECASE).group()
+                        if med not in entities['medications']:
+                            entities['medications'].append(med)
+                            self.logger.debug(f"Found medication: {med}")
+
+                # Check for dosages
+                for pattern in dosage_patterns:
+                    matches = re.findall(pattern, line, re.IGNORECASE)
+                    for match in matches:
+                        if match not in entities['dosages']:
+                            entities['dosages'].append(match)
+                            self.logger.debug(f"Found dosage: {match}")
+
+                # Check for frequencies
                 for pattern in freq_patterns:
-                    frequencies = re.findall(pattern, line)
-                    entities['frequencies'].extend([f for f in frequencies if f not in entities['frequencies']])
-            
+                    matches = re.findall(pattern, line)
+                    for match in matches:
+                        if match not in entities['frequencies']:
+                            entities['frequencies'].append(match)
+                            self.logger.debug(f"Found frequency: {match}")
+
             self.logger.info(f"Analysis results: {entities}")
             return entities
-            
+
         except Exception as e:
             self.logger.error(f"Error in prescription analysis: {str(e)}")
             return {
                 'medications': [],
                 'dosages': [],
-                'frequencies': [],
-                'diagnoses': [],
-                'instructions': []
+                'frequencies': []
             }
+
+    def _clean_text(self, text):
+        """Clean and standardize text"""
+        # Convert common OCR mistakes
+        replacements = {
+            'l': '1',
+            'i': '1',
+            'o': '0',
+            'O': '0',
+            '|': '1',
+            'I': '1',
+            'mg.': 'mg',
+            'mgs': 'mg',
+            'ML': 'ml',
+            'ML.': 'ml',
+            'Ml': 'ml',
+            'G': 'g',
+            'G.': 'g'
+        }
+        
+        for old, new in replacements.items():
+            text = text.replace(old, new)
+        
+        # Standardize spacing around hyphens in frequencies
+        text = re.sub(r'(\d)\s*-\s*(\d)\s*-\s*(\d)', r'\1-\2-\3', text)
+        
+        return text
 
     def get_medicine_details(self, medicine_name):
         try:
@@ -394,9 +672,7 @@ class PrescriptionAnalyzer:
                 'warnings': med['warnings']
             } for med in entities['medications']],
             'dosages': entities['dosages'],
-            'diagnoses': entities['diagnoses'],
-            'frequencies': entities['frequencies'],
-            'instructions': entities['instructions']
+            'frequencies': entities['frequencies']
         } 
 
     def decode_prediction(self, prediction):

@@ -86,6 +86,16 @@ def analyze_prescription():
         logger.error(f"Error processing prescription: {str(e)}", exc_info=True)
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/api/ml/train', methods=['POST'])
+def train_model():
+    try:
+        from models.train_crnn import train_crnn
+        train_crnn()
+        return jsonify({'success': True, 'message': 'Model training completed'})
+    except Exception as e:
+        logger.error(f"Error training model: {str(e)}", exc_info=True)
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 if __name__ == '__main__':
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     port = int(os.getenv('PORT', 5002))
