@@ -1,5 +1,7 @@
 const axios = require('axios');
 const FormData = require('form-data');
+const fs = require('fs');
+const path = require('path');
 
 const ML_SERVER_URL = process.env.ML_SERVER_URL || 'http://localhost:5002/api/ml';
 
@@ -14,9 +16,15 @@ const mlController = {
             }
 
             const formData = new FormData();
-            formData.append('prescription', req.file.buffer, {
+            
+            // Create a Buffer from the file data
+            const buffer = req.file.buffer;
+            
+            // Append the file to form data
+            formData.append('prescription', buffer, {
                 filename: req.file.originalname,
-                contentType: req.file.mimetype
+                contentType: req.file.mimetype,
+                knownLength: buffer.length
             });
 
             const response = await axios.post(
@@ -24,18 +32,21 @@ const mlController = {
                 formData,
                 {
                     headers: {
-                        ...formData.getHeaders()
-                    }
+                        ...formData.getHeaders(),
+                        'Accept': 'application/json',
+                    },
+                    maxContentLength: Infinity,
+                    maxBodyLength: Infinity
                 }
             );
 
             res.json(response.data);
         } catch (error) {
-            console.error('Error analyzing prescription:', error);
+            console.error('Error analyzing prescription:', error.response?.data || error.message);
             res.status(500).json({
                 success: false,
                 message: 'Error analyzing prescription',
-                error: error.message
+                error: error.response?.data?.error || error.message
             });
         }
     }

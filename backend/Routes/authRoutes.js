@@ -26,7 +26,10 @@ const { testResultUpload } = require('../middleware/upload');
 const chatControlers = require ("../controllers/chatControllers");
 const labTestControllers = require("../controllers/labTestControllers");
 const geminiControllers = require("../controllers/geminiControllers");
-const biometricController = require("../controllers/biometricController")
+const biometricController = require("../controllers/biometricController");
+const prescriptionRecognition = require('../controllers/prescriptionRecognition');
+const { prescriptionUpload } = require('../middleware/upload');
+const healthAssistantControllers = require('../controllers/healthAssistantControllers');
 
 //patient
 
@@ -204,13 +207,17 @@ router.put('/laboratory/tests/:id',labTestControllers.updateTest);
 router.delete('/laboratory/tests/:id',labTestControllers.deleteTest);
 
 //Prescription Recognitio
-router.post('prescriptions/process-image',)
+router.post('/prescriptions/analyze',authMiddleware,prescriptionUpload,prescriptionRecognition.analyzePrescription)
 
 //Biometric
 // router.post('/biometric/register', authMiddleware,biometricController.generateRegistrationOptions);
 // router.post('/biometric/verify-registration', authMiddleware,biometricController.verifyRegistration);
 // router.post('/biometric/authenticate-biometric',biometricController.generateAuthenticationOptions);
 // router.post('/biometric/verify-authentication',biometricController.verifyAuthentication);
+
+//VHA
+router.post('/health/analyze',healthAssistantControllers.analyzeHealth);
+router.post('/health/chat',healthAssistantControllers.chatWithAI);
 
 
 module.exports = router;

@@ -46,5 +46,6 @@ const createUploadMiddleware = (folderName) => {
 module.exports = {
   doctorProfileUpload: createUploadMiddleware('doctor-profiles'),
   patientProfileUpload: createUploadMiddleware('patient-profiles'),
-  testResultUpload: createUploadMiddleware('test-results')
+  testResultUpload: createUploadMiddleware('test-results'),
+  prescriptionUpload: createUploadMiddleware('prescriptions')
 };
