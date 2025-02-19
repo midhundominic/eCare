@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-// import { analyzePrescription } from '../../../services/mlServices';
-import {analyzePrescription} from '../../../services/prescriptionRecognitionServices';
+import { analyzePrescription } from '../../../services/mlServices';
+// import {analyzePrescription} from '../../../services/prescriptionRecognitionServices';
 import PageTitle from '../../Common/PageTitle';
 import styles from './prescriptionAnalyzer.module.css';
 
@@ -34,15 +34,23 @@ const PrescriptionAnalyzer = () => {
 
             setLoading(true);
             setError(null);
-            console.log('Uploading file:', selectedFile); // Add this for debugging
             const result = await analyzePrescription(selectedFile);
+            console.log('Analysis result:', result); // Debug log
             setAnalysis(result.result);
         } catch (err) {
-            console.error('Analysis error:', err); // Add this for debugging
+            console.error('Analysis error:', err);
             setError(err.message || 'Error analyzing prescription');
         } finally {
             setLoading(false);
         }
+    };
+
+    // Helper function to safely render lists
+    const renderList = (items, defaultMessage = 'None found') => {
+        if (!items || !Array.isArray(items) || items.length === 0) {
+            return <li>{defaultMessage}</li>;
+        }
+        return items.map((item, index) => <li key={index}>{item}</li>);
     };
 
     return (
@@ -50,11 +58,11 @@ const PrescriptionAnalyzer = () => {
             <PageTitle>Prescription Analyzer</PageTitle>
             
             <div className={styles.uploader}>
-                <input className={styles.inputFile}
+                <input 
+                    className={styles.inputFile}
                     type="file"
                     accept="image/*"
                     onChange={handleFileSelect}
-                    
                 />
                 
                 {preview && (
@@ -82,52 +90,48 @@ const PrescriptionAnalyzer = () => {
                 </div>
             )}
 
-            {analysis && (
+            {analysis?.analysis && (
                 <div className={styles.bodyResult}>
                     <h3 className={styles.h3}>Analysis Results:</h3>
                     
                     <div className={styles.result}>
                         <h4 className={styles.h4}>Medications:</h4>
                         <ul className={styles.medications}>
-                            {analysis.analysis.medications.map((med, index) => (
-                                <li key={index}>{med}</li>
-                            ))}
+                            {renderList(analysis.analysis.medications, 'No medications found')}
                         </ul>
                     </div>
 
                     <div className="mb-4">
                         <h4 className={styles.h4}>Dosages:</h4>
                         <ul className={styles.dosage}>
-                            {analysis.analysis.dosages.map((dosage, index) => (
-                                <li key={index}>{dosage}</li>
-                            ))}
+                            {renderList(analysis.analysis.dosages, 'No dosages found')}
                         </ul>
                     </div>
 
                     <div className="mb-4">
                         <h4 className={styles.h4}>Frequencies:</h4>
                         <ul className={styles.frequencies}>
-                            {analysis.analysis.frequencies.map((freq, index) => (
-                                <li key={index}>{freq}</li>
-                            ))}
+                            {renderList(analysis.analysis.frequencies, 'No frequencies found')}
                         </ul>
                     </div>
 
-                    <div className={styles.diagnoses}>
-                        <h4 className={styles.h4}>Diagnoses:</h4>
-                        <ul className={styles.diagnosesResult}>
-                            {analysis.analysis.diagnoses.map((diagnosis, index) => (
-                                <li key={index}>{diagnosis}</li>
-                            ))}
-                        </ul>
-                    </div>
+                    {analysis.analysis.diagnoses && (
+                        <div className={styles.diagnoses}>
+                            <h4 className={styles.h4}>Diagnoses:</h4>
+                            <ul className={styles.diagnosesResult}>
+                                {renderList(analysis.analysis.diagnoses, 'No diagnoses found')}
+                            </ul>
+                        </div>
+                    )}
 
-                    <div>
-                        <h4 className={styles.h4}>Extracted Text:</h4>
-                        <pre className={styles.extracted_text}>
-                            {analysis.extracted_text}
-                        </pre>
-                    </div>
+                    {analysis.extracted_text && (
+                        <div>
+                            <h4 className={styles.h4}>Extracted Text:</h4>
+                            <pre className={styles.extracted_text}>
+                                {analysis.extracted_text}
+                            </pre>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

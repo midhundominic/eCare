@@ -15,8 +15,13 @@ export const analyzePrescription = async (prescriptionImage) => {
         if (!response.data.success) {
             throw new Error(response.data.error || 'Failed to analyze prescription');
         }
-        console.log("Resonse from Python",response);
-        
+
+        // Ensure the response has the expected structure
+        if (!response.data.result || !response.data.result.analysis) {
+            throw new Error('Invalid response format from server');
+        }
+
+        console.log("Response from Python:", response.data);
         return response.data;
     } catch (error) {
         console.error('Error in analyzePrescription:', error);
