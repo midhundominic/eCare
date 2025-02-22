@@ -1,1 +1,1 @@
-export { default } from './prescriptionRecognition'
+// export { default } from './prescriptionRecognition'
