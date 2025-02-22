@@ -207,7 +207,7 @@ router.put('/laboratory/tests/:id',labTestControllers.updateTest);
 router.delete('/laboratory/tests/:id',labTestControllers.deleteTest);
 
 //Prescription Recognitio
-router.post('/prescriptions/analyze',authMiddleware,prescriptionUpload,prescriptionRecognition.analyzePrescription)
+router.post('/prescription/analyze',authMiddleware,prescriptionUpload,prescriptionRecognition.analyzePrescription)
 
 //Biometric
 // router.post('/biometric/register', authMiddleware,biometricController.generateRegistrationOptions);
