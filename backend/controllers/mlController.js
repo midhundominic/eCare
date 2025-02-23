@@ -49,6 +49,24 @@ const mlController = {
                 error: error.response?.data?.error || error.message
             });
         }
+    },
+    predictDisease: async (req, res) => {
+        try {
+            const response = await axios.post(
+                `${ML_SERVER_URL}/predict-disease`,
+                req.body,
+                { timeout: 30000 }
+            );
+            
+            res.json(response.data);
+        } catch (error) {
+            console.error('Error predicting disease:', error.response?.data || error.message);
+            res.status(500).json({
+                success: false,
+                message: 'Error predicting disease',
+                error: error.response?.data?.error || error.message
+            });
+        }
     }
 };
 

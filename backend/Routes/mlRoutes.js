@@ -19,4 +19,6 @@ router.post(
     mlController.analyzePrescription
 );
 
+router.post('/predict-disease', mlController.predictDisease);
+
 module.exports = router;

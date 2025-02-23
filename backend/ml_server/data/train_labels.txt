@@ -1,4 +1,0 @@
-image1.jpg,Paracetamol 500mg 1-0-1
-image2.jpg,Paracetamol 500mg 1-0-1
-image3.jpg,Paracetamol 500mg 1-0-1
-image4.jpg,Paracetamol 500mg 1-0-1

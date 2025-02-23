@@ -5,6 +5,7 @@ import os
 from models.prescription_analyzer import PrescriptionAnalyzer
 from werkzeug.utils import secure_filename
 import logging
+from models.disease_predictor import DiseasePredictor
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -18,6 +19,9 @@ CORS(app)
 
 # Initialize prescription analyzer
 prescription_analyzer = PrescriptionAnalyzer()
+
+# Initialize disease predictor
+disease_predictor = DiseasePredictor()
 
 # Configure upload folder
 UPLOAD_FOLDER = 'uploads'
@@ -94,6 +98,25 @@ def train_model():
         return jsonify({'success': True, 'message': 'Model training completed'})
     except Exception as e:
         logger.error(f"Error training model: {str(e)}", exc_info=True)
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/ml/predict-disease', methods=['POST'])
+def predict_disease():
+    try:
+        data = request.get_json()
+        if not data or 'symptoms' not in data:
+            return jsonify({'success': False, 'error': 'No symptoms provided'}), 400
+
+        symptoms = data['symptoms']
+        prediction = disease_predictor.predict_disease(symptoms)
+        
+        return jsonify({
+            'success': True,
+            'prediction': prediction
+        })
+
+    except Exception as e:
+        logger.error(f"Error predicting disease: {str(e)}", exc_info=True)
         return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
