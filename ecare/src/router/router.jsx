@@ -56,6 +56,7 @@ import LabTestList from "../component/Admin/LaboratoryTest";
 
 import GeminiChatbot from "../component/Patient/GeminiChatbot";
 import PrescriptionAnalyzer from "../component/Patient/PrescriptionAnlayzer";
+import DiseasePrediction from '../component/Patient/DiseaseDetection';
 
 
 const Router = () => {
@@ -176,6 +177,8 @@ const Router = () => {
             <Route path ={ROUTES.ADMIN_LABTEST_LIST} element={<LabTestList/>}/>
             <Route path ={ROUTES.GEMINI_CHATBOT} element={<GeminiChatbot/>}/>
             <Route path = {ROUTES.PRESCRIPTION_ANALYZER} element={<PrescriptionAnalyzer/>}/>
+            <Route path = {ROUTES.DISEASE_PREDICTION} element={<DiseasePrediction/>}/>
+
           </Routes>
         </Main>
       )}

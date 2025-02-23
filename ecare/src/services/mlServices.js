@@ -28,3 +28,20 @@ export const analyzePrescription = async (prescriptionImage) => {
         throw new Error(error.response?.data?.error || error.message || 'Failed to analyze prescription');
     }
 };
+
+export const predictDisease = async (symptoms) => {
+    try {
+        const response = await apiClient.post("/ml/predict-disease", {
+            symptoms: symptoms
+        });
+
+        if (!response.data.success) {
+            throw new Error(response.data.error || 'Prediction failed');
+        }
+
+        return response.data.prediction;
+    } catch (error) {
+        console.error('Error in predictDisease:', error);
+        throw new Error(error.response?.data?.error || error.message || 'Failed to predict disease');
+    }
+};

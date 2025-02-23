@@ -10,6 +10,8 @@ import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import ReviewsIcon from '@mui/icons-material/Reviews';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import MedicationIcon from '@mui/icons-material/Medication';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
+import ImageSearchIcon from '@mui/icons-material/ImageSearch';
 
 import { ROUTES } from "../../router/routes";
 
@@ -70,16 +72,22 @@ export const NAV_CONTENT_PATIENT = [
   },
   {
   id: 10,
-  title: "Chatbot Gemini",
+  title: "Chatbot",
   link: ROUTES.GEMINI_CHATBOT,
-  icon: MedicationIcon,
+  icon: ChatBubbleIcon,
  },
  {
   id: 11,
   title: "Prescripion Analyzer",
   link: ROUTES.PRESCRIPTION_ANALYZER,
-  icon: LibraryBooksIcon,
+  icon: ImageSearchIcon,
 
+ },
+ {
+  id: 12,
+  title: "Disease Prediction",
+  link: ROUTES.DISEASE_PREDICTION,
+  icon: AnalyticsIcon,
  }
 
 ];

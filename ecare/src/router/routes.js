@@ -48,7 +48,8 @@ export const ROUTES = {
   CHATBOT: "/medicloud/chatbot",
   VIRTUALHEALTHASSISTANT: "/health/assistant",
   GEMINI_CHATBOT: "/patient/chatbot",
-  PRESCRIPTION_ANALYZER: "/patient/prescription/analyzer"
+  PRESCRIPTION_ANALYZER: "/patient/prescription/analyzer",
+  DISEASE_PREDICTION: "/patient/disease/prediction"
 };
 
 export const NON_AUTH_ROUTES = [
@@ -93,4 +94,5 @@ export const NON_AUTH_ROUTES = [
   ROUTES.ADMIN_LABTEST_LIST,
   ROUTES.GEMINI_CHATBOT,
   ROUTES.PRESCRIPTION_ANALYZER,
+  ROUTES.DISEASE_PREDICTION,
 ];
