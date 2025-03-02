@@ -1,0 +1,31 @@
+health_condition,blood_sugar_range,bp_range,oxygen_level_range,exercise_type,intensity,duration,frequency,precautions
+diabetes_high,>200,140/90,>95,Walking,Low,30-45 min,5-7 days/week,Monitor blood sugar before and after exercise
+diabetes_high,180-200,145/95,>95,Swimming,Low,20-30 min,4-5 days/week,Monitor blood sugar levels frequently
+diabetes_high,>180,150/95,>95,Light cardio,Low,15-25 min,3-4 days/week,Check blood sugar frequently
+diabetes_controlled,140-180,130/85,>95,Cycling,Moderate,30-45 min,4-5 days/week,Stay hydrated and carry snacks
+diabetes_controlled,110-140,125/80,>95,Mixed cardio,Moderate,30-40 min,3-4 days/week,Keep glucose tablets handy
+diabetes_controlled,120-160,128/82,>95,Swimming,Moderate,25-35 min,3-4 days/week,Regular blood sugar monitoring
+hypertension,70-140,>160/100,>95,Swimming,Low,20-30 min,3-4 days/week,Avoid holding breath during exercise
+hypertension,70-140,>150/95,>95,Walking,Low,25-35 min,4-5 days/week,Monitor heart rate closely
+hypertension,70-140,>155/98,>95,Stationary bike,Low,20-30 min,3-4 days/week,Regular BP monitoring
+low_oxygen,70-140,120/80,<90,Breathing exercises,Very Low,15-20 min,Daily,Stop if feeling dizzy
+low_oxygen,70-140,120/80,90-92,Light stretching,Very Low,10-15 min,Daily,Practice pursed lip breathing
+low_oxygen,70-140,120/80,92-94,Gentle walking,Very Low,10-15 min,Daily,Monitor oxygen levels constantly
+obesity,70-140,125/85,>95,HIIT,Moderate to High,20-30 min,3-4 days/week,Start gradually and maintain proper form
+obesity,70-140,130/85,>95,Strength Training,Moderate,40-50 min,3-4 days/week,Focus on compound exercises
+obesity,70-140,128/84,>95,Swimming,Moderate,30-40 min,4-5 days/week,Progressive intensity increase
+normal,70-110,120/80,>95,Mixed cardio,Moderate,45-60 min,4-5 days/week,Regular warm-up and cool-down
+normal,70-110,115/75,>95,Running,Moderate to High,30-45 min,3-4 days/week,Stay hydrated
+normal,70-110,118/78,>95,Cycling,Moderate,40-50 min,4-5 days/week,Balanced workout routine
+elderly,70-140,135/85,>95,Yoga,Low,30-45 min,3-4 days/week,Focus on balance and flexibility
+elderly,70-140,130/80,>95,Walking,Low,20-30 min,4-5 days/week,Use proper support if needed
+elderly,70-140,132/82,>95,Chair exercises,Low,25-35 min,3-4 days/week,Avoid rapid movements
+cardiovascular,70-140,145/95,>95,Stationary bike,Low to Moderate,20-30 min,3-4 days/week,Monitor heart rate
+cardiovascular,70-140,140/90,>95,Light cardio,Low,15-25 min,3-4 days/week,Take frequent breaks if needed
+cardiovascular,70-140,142/92,>95,Walking,Low,20-30 min,Daily,Regular heart rate checks
+respiratory,70-140,120/80,92-95,Breathing exercises,Low,15-20 min,Daily,Use pursed lip breathing
+respiratory,70-140,120/80,93-96,Light aerobics,Low,20-30 min,3-4 days/week,Monitor oxygen levels
+respiratory,70-140,120/80,94-97,Walking,Low,15-25 min,3-4 days/week,Stop if breathing difficulty
+joint_pain,70-140,120/80,>95,Water aerobics,Low,30-45 min,3-4 days/week,Avoid high-impact movements
+joint_pain,70-140,125/85,>95,Gentle stretching,Low,20-30 min,Daily,Focus on range of motion
+joint_pain,70-140,122/82,>95,Swimming,Low,25-35 min,3-4 days/week,Listen to body signals

@@ -6,6 +6,7 @@ from models.prescription_analyzer import PrescriptionAnalyzer
 from werkzeug.utils import secure_filename
 import logging
 from models.disease_predictor import DiseasePredictor
+from models.exercise_recommender import ExerciseRecommender
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -22,6 +23,9 @@ prescription_analyzer = PrescriptionAnalyzer()
 
 # Initialize disease predictor
 disease_predictor = DiseasePredictor()
+
+# Initialize exercise recommender
+exercise_recommender = ExerciseRecommender()
 
 # Configure upload folder
 UPLOAD_FOLDER = 'uploads'
@@ -117,6 +121,32 @@ def predict_disease():
 
     except Exception as e:
         logger.error(f"Error predicting disease: {str(e)}", exc_info=True)
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/ml/recommend-exercise', methods=['POST'])
+def recommend_exercise():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+
+        blood_sugar = float(data.get('bloodSugar', 0))
+        systolic_bp = float(data.get('systolicBP', 0))
+        oxygen_level = float(data.get('oxygenLevel', 0))
+
+        recommendations = exercise_recommender.get_recommendations(
+            blood_sugar, 
+            systolic_bp, 
+            oxygen_level
+        )
+
+        return jsonify({
+            'success': True,
+            'recommendations': recommendations
+        })
+
+    except Exception as e:
+        logger.error(f"Error generating exercise recommendations: {str(e)}", exc_info=True)
         return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
