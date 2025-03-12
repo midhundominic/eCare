@@ -1,37 +1,19 @@
 import apiClient from "../api";
 
-const getAuthHeader = () => {
-  const token = localStorage.getItem('token');
-  if (!token) return {};
-  return {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
-  };
-};
-
-export const chatWithBot = async (message) => {
+export const chatWithBot = async (message,patientId) => {
   try {
-    const response = await apiClient.post(
-      '/gemini/chat',
-      { message },
-      { headers: getAuthHeader() }
-    );
+    const response = await apiClient.post(`/gemini/chat/${patientId}`, { message });
     return response.data;
   } catch (error) {
-    console.error('Chat error:', error.response || error);
-    throw error.response?.data || error;
+    throw new Error(error.response?.data?.message || 'Failed to get chatbot response');
   }
 };
 
-export const getChatHistory = async () => {
+export const getChatHistory = async (patientId) => {
   try {
-    const response = await apiClient.get(
-      '/gemini/chat/history',
-      { headers: getAuthHeader() }
-    );
+    const response = await apiClient.get(`/gemini/chat/history/${patientId}`);
     return response.data;
   } catch (error) {
-    console.error('History error:', error.response || error);
-    throw error.response?.data || error;
+    throw new Error(error.response?.data?.message || 'Failed to fetch chat history');
   }
 };
