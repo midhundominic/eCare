@@ -1,0 +1,142 @@
+.prescriptionContainer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.pageTitle {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.prescriptionCard {
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.prescriptionHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.divider {
+  margin: 16px 0;
+}
+
+.sectionContainer {
+  margin: 24px 0;
+}
+
+.sectionTitle {
+  margin-bottom: 16px;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.medicinesList, .testsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.medicineItem, .testItem {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-left: 4px solid #3f51b5;
+}
+
+.medicineName, .testName {
+  flex: 1;
+}
+
+.medicineInstructions {
+  margin-top: 8px;
+  color: #555;
+}
+
+.testStatus {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.notesContainer {
+  padding: 16px;
+  background-color: #f9f9f9;
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+
+.backButton {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.payButton {
+  background-color: #4caf50;
+  color: white;
+}
+
+.viewResultButton {
+  background-color: #2196f3;
+  color: white;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
+.errorContainer {
+  text-align: center;
+  padding: 40px;
+}
+
+.noItemsText {
+  color: #777;
+  font-style: italic;
+  padding: 16px;
+  text-align: center;
+}
+
+.paymentAlert {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.paymentComplete {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
+  color: #155724;
+}
+
+.lockedSection {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border: 1px dashed #dee2e6;
+  border-radius: 4px;
+  text-align: center;
+  color: #6c757d;
+}

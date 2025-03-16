@@ -59,6 +59,7 @@ import PrescriptionAnalyzer from "../component/Patient/PrescriptionAnlayzer";
 import DiseasePrediction from '../component/Patient/DiseaseDetection';
 
 import HealthTools from '../component/Patient/HealthTools';
+import PrescriptionPayment from '../component/Patient/PrescriptionPayment';
 
 
 const Router = () => {
@@ -181,6 +182,8 @@ const Router = () => {
             <Route path = {ROUTES.PRESCRIPTION_ANALYZER} element={<PrescriptionAnalyzer/>}/>
             <Route path = {ROUTES.DISEASE_PREDICTION} element={<DiseasePrediction/>}/>
             <Route path = {ROUTES.HEALTH_TOOLS} element= {<HealthTools/>}/>
+            <Route path = {ROUTES.PRESCRIPTION_PAYMENT} element= {<PrescriptionPayment/>}/>
+            
 
           </Routes>
         </Main>

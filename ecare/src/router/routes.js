@@ -1,5 +1,3 @@
-
-
 export const ROUTES = {
   DEFAULT: "/",
   LOGIN: "/login",
@@ -50,7 +48,9 @@ export const ROUTES = {
   GEMINI_CHATBOT: "/patient/chatbot",
   PRESCRIPTION_ANALYZER: "/patient/prescription/analyzer",
   DISEASE_PREDICTION: "/patient/disease/prediction",
-  HEALTH_TOOLS: "/patient/health/tools"
+  HEALTH_TOOLS: "/patient/health/tools",
+  PRESCRIPTION_DETAILS: '/patient/prescription-details',
+  PRESCRIPTION_PAYMENT: '/patient/prescriptions/:prescriptionId/payment',
 };
 
 export const NON_AUTH_ROUTES = [
@@ -97,4 +97,6 @@ export const NON_AUTH_ROUTES = [
   ROUTES.PRESCRIPTION_ANALYZER,
   ROUTES.DISEASE_PREDICTION,
   ROUTES.HEALTH_TOOLS,
+  ROUTES.PRESCRIPTION_PAYMENT,
+  ROUTES.PRESCRIPTION_DETAILS,
 ];
