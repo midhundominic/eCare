@@ -164,6 +164,7 @@ const Signup = () => {
           />
           <div className={styles.buttonWrapper}>
             <LoginButton
+              id="submitbutton"
               primaryText="Signup"
               secondaryText="Signup with Google"
             />

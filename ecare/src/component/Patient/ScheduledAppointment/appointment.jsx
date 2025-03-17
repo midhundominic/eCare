@@ -113,6 +113,7 @@ const PatientAppointments = () => {
                   <Button
                     variant="contained"
                     color="primary"
+                    id="start"
                     onClick={() => handleStartConsultation(appointment._id)}
                   >
                     Join Consultation

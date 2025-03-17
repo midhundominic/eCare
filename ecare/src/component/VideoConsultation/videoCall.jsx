@@ -261,6 +261,7 @@ const VideoCall = forwardRef(({ token, channelName, uid, onEndCall, role }, ref)
         <Button 
           onClick={onEndCall}
           variant="contained"
+          id="endcall"
           className={`${styles.controlButton} ${styles.endCallButton}`}
         >
           <CallEndIcon />

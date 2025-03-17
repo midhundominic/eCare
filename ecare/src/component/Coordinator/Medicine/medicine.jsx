@@ -65,9 +65,9 @@ const MedicineList = () => {
     description: "",
     rxnormId: "",
     batchNumber: "",
-    quantity: 0,
-    expiryDate: null,
-    unitPrice: 0
+    quantity: "",
+    expiryDate: "",
+    unitPrice: ""
   });
   const [medicineSuggestions, setMedicineSuggestions] = useState([]);
   const [selectedSuggestion, setSelectedSuggestion] = useState(null);
@@ -279,6 +279,7 @@ const MedicineList = () => {
             size="medium"
             onClick={() => setOpenDialog(true)}
             className={styles.addButton}
+            id="Add"
           >
             <AddIcon />
           </Fab>
@@ -456,6 +457,7 @@ const MedicineList = () => {
                 label="Expiry Date"
                 value={newMedicine.expiryDate}
                 onChange={handleDateChange}
+                
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -463,6 +465,7 @@ const MedicineList = () => {
                     fullWidth
                     margin="normal"
                     variant="outlined"
+                    id="date"
                   />
                 )}
               />
@@ -487,8 +490,9 @@ const MedicineList = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button onClick={handleAddMedicine} styles={{ btnPrimary: true }}>
+          <Button id="AddMedicine" onClick={handleAddMedicine}  styles={{ btnPrimary: true }}>
             Add Medicine
+            
           </Button>
         </DialogActions>
       </Dialog>

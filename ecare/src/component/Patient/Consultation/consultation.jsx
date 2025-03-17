@@ -71,6 +71,7 @@ const Consultation = ({ appointmentId, onClose }) => {
             variant="contained" 
             color="primary"
             onClick={handleJoinCall}
+            id="join"
           >
             Join Consultation
           </Button>
