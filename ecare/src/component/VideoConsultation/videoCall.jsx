@@ -6,7 +6,7 @@ import MicOffIcon from '@mui/icons-material/MicOff';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import VideocamOffIcon from '@mui/icons-material/VideocamOff';
 import CallEndIcon from '@mui/icons-material/CallEnd';
-import styles from './videoCall.module.css';
+import styles from './VideoCall.module.css';
 import { toast } from 'react-toastify';
 
 const VideoCall = forwardRef(({ token, channelName, uid, onEndCall, role }, ref) => {
