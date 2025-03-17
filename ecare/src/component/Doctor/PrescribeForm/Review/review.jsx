@@ -12,7 +12,7 @@ import { FREQUENCY, INITIAL_MEDICINE_ARR } from "../constants";
 import Checkbox from "../../../Common/Checkbox";
 import Button from "../../../Common/Button";
 import { ROUTES } from "../../../../router/routes";
-import { getMedicinesList } from "../../../../services/medicineservices";
+import { getMedicinesList } from "../../../../services/medicineServices";
 import { submitPrescription, updatePrescription, getPrescriptionByAppointment } from "../../../../services/prescriptionServices";
 
 const DoctorReview = ({ labTests = [], onPrescriptionSubmit }) => {
