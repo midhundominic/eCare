@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 
-import "./loginButton.css";
+import "./LoginButton.css";
 import googleIcon from "../../assets/icons/ic_google.png";
 import rightArrow from "../../assets/icons/ic_arrow_right.png";
 
